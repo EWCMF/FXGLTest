@@ -1,8 +1,10 @@
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
+import com.almasb.fxgl.app.Viewport;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.Spawns;
 import com.almasb.fxgl.entity.components.CollidableComponent;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
@@ -11,16 +13,20 @@ import com.almasb.fxgl.physics.CollisionHandler;
 import com.almasb.fxgl.physics.HitBox;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
+import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
+import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import java.util.Map;
 
+
 public class BasicGameApp extends GameApplication {
     public enum EntityType {
-        PLAYER, COIN, WALL
+        PLAYER, TARGET, WALL, BULLET
     }
 
     @Override
@@ -37,7 +43,7 @@ public class BasicGameApp extends GameApplication {
 
         input.addAction(new UserAction("Move Right") {
             @Override
-            protected void onActionBegin() {
+            protected void onAction() {
                 player.getComponent(PlayerControl.class).right();
                 FXGL.getGameState().increment("pixelsMoved", +5);
             }
@@ -46,7 +52,7 @@ public class BasicGameApp extends GameApplication {
             protected void onActionEnd() {
                 player.getComponent(PlayerControl.class).stop();
             }
-        }, KeyCode.RIGHT);
+        }, KeyCode.D);
 
         input.addAction(new UserAction("Move Left") {
             @Override
@@ -59,7 +65,7 @@ public class BasicGameApp extends GameApplication {
             protected void onActionEnd() {
                 player.getComponent(PlayerControl.class).stop();
             }
-        }, KeyCode.LEFT);
+        }, KeyCode.A);
 
         input.addAction(new UserAction("Jump") {
             @Override
@@ -72,9 +78,21 @@ public class BasicGameApp extends GameApplication {
         input.addAction(new UserAction("Play Sound") {
             @Override
             protected void onActionBegin() {
-                FXGL.play("drop.wav");
+                System.out.println(player.getPosition());
+                System.out.println(FXGL.getInput().getMousePositionWorld());
+                System.out.println(FXGL.getInput().getVectorToMouse(player.getPosition()));
+                System.out.println(FXGL.getInput().getVectorToMouse(player.getPosition()).normalize());
             }
         }, KeyCode.F);
+
+        input.addAction(new UserAction("Shoot") {
+            @Override
+            protected void onActionBegin() {
+                Point2D vector = FXGL.getInput().getVectorToMouse(player.getPosition());
+
+                player.getComponent(PlayerControl.class).fire(vector, player.getPosition());
+            }
+        }, MouseButton.PRIMARY);
     }
 
     @Override
@@ -86,9 +104,13 @@ public class BasicGameApp extends GameApplication {
 
     @Override
     protected void initGame() {
+        FXGL.getGameWorld().addEntityFactory(new BasicGameFactory());
+
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
         physicsComponent.addGroundSensor(new HitBox(BoundingShape.box(64, 64)));
+
+        physicsComponent.setFixtureDef(new FixtureDef().friction(0.0f));
 
         player = FXGL.entityBuilder()
                 .type(EntityType.PLAYER)
@@ -101,39 +123,50 @@ public class BasicGameApp extends GameApplication {
                 .buildAndAttach();
 
         FXGL.entityBuilder()
-                .type(EntityType.COIN)
+                .type(EntityType.TARGET)
                 .at(500, 200)
-                .viewWithBBox(new Circle(15, Color.YELLOW))
+                .viewWithBBox(new Circle(15, Color.BLACK))
                 .with(new CollidableComponent(true))
                 .buildAndAttach();
 
         FXGL.entityBuilder()
-                .type(EntityType.COIN)
+                .type(EntityType.TARGET)
                 .at(100, 200)
-                .viewWithBBox(new Circle(15, Color.YELLOW))
+                .viewWithBBox(new Circle(15, Color.BLACK))
                 .with(new CollidableComponent(true))
                 .buildAndAttach();
 
         FXGL.entityBuilder()
                 .type(EntityType.WALL)
                 .at(0, 550)
-                .viewWithBBox(new Rectangle(600, 50, Color.DARKGREY))
+                .view(new Rectangle(600 * 5, 50, Color.DARKGREY))
+                .bbox(new HitBox(BoundingShape.box(600 * 5, 50)))
                 .with(new PhysicsComponent())
+                .with(new CollidableComponent(true))
                 .buildAndAttach();
 
         FXGL.entityBuilder()
                 .type(EntityType.WALL)
                 .at(-50, 0)
-                .viewWithBBox(new Rectangle(50, 600, Color.DARKGREY))
+                .view(new Rectangle(50, 600, Color.DARKGREY))
+                .bbox(new HitBox(BoundingShape.box(50, 600)))
                 .with(new PhysicsComponent())
+                .with(new CollidableComponent(true))
                 .buildAndAttach();
 
         FXGL.entityBuilder()
                 .type(EntityType.WALL)
-                .at(600, 0)
-                .viewWithBBox(new Rectangle(50, 600, Color.DARKGREY))
+                .at(600, 400)
+                .view(new Rectangle(50, 200, Color.DARKGREY))
+                .bbox(new HitBox(BoundingShape.box(50, 200)))
                 .with(new PhysicsComponent())
+                .with(new CollidableComponent(true))
                 .buildAndAttach();
+
+        Viewport viewport = FXGL.getGameScene().getViewport();
+
+        viewport.setBounds(0, 0, 600 * 5, 600);
+        viewport.bindToEntity(player, FXGL.getAppWidth() / 2, FXGL.getAppHeight() / 2);
     }
 
     @Override
@@ -149,15 +182,22 @@ public class BasicGameApp extends GameApplication {
 
     @Override
     protected void initPhysics() {
-        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(EntityType.PLAYER, EntityType.COIN) {
+        FXGL.getPhysicsWorld().setGravity(0, 760);
+        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(EntityType.BULLET, EntityType.TARGET) {
 
             // order of types is the same as passed into the constructor
             @Override
-            protected void onCollisionBegin(Entity player, Entity coin) {
-                coin.removeFromWorld();
+            protected void onCollisionBegin(Entity bullet, Entity target) {
+                bullet.removeFromWorld();
+                target.removeFromWorld();
             }
+        });
 
-
+        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(EntityType.BULLET, EntityType.WALL) {
+            @Override
+            protected void onCollisionBegin(Entity bullet, Entity wall) {
+                bullet.removeFromWorld();
+            }
         });
     }
 
