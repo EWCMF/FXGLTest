@@ -89,8 +89,17 @@ public class BasicGameApp extends GameApplication {
             @Override
             protected void onActionBegin() {
                 Point2D vector = FXGL.getInput().getVectorToMouse(player.getPosition());
+                if (FXGL.getInput().getVectorToMouse(player.getPosition()).getX() < 0 && player.getTransformComponent().getScaleX() != -1.0)
+                    return;
+                if (FXGL.getInput().getVectorToMouse(player.getPosition()).getX() > 0 && player.getTransformComponent().getScaleX() != 1.0)
+                    return;
 
-                player.getComponent(PlayerComponent.class).fire(vector, player.getPosition());
+                if (player.getTransformComponent().getScaleX() == -1.0) {
+                    player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(0, 27));
+                }
+                else {
+                    player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(64, 27));
+                }
             }
         }, MouseButton.PRIMARY);
     }

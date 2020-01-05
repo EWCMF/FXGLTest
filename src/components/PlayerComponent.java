@@ -20,7 +20,7 @@ public class PlayerComponent extends Component {
 
     public PlayerComponent() {
         animIdle = new AnimationChannel(FXGL.image("playerIdle.png"), 1, 64, 80, Duration.seconds(1), 0, 0);
-        animWalk = new AnimationChannel(FXGL.image("playerWalk.png"), 4, 70, 80, Duration.seconds(1), 0,3);
+        animWalk = new AnimationChannel(FXGL.image("playerWalk2.png"), 6, 78, 80, Duration.seconds(1), 0,5);
 
         texture = new AnimatedTexture(animIdle);
         texture.loop();
@@ -28,7 +28,7 @@ public class PlayerComponent extends Component {
 
     @Override
     public void onAdded() {
-        entity.getTransformComponent().setScaleOrigin(new Point2D(35, 40));
+        entity.getTransformComponent().setScaleOrigin(new Point2D(32, 40));
         entity.getViewComponent().addChild(texture);
 
         physics.onGroundProperty().addListener((observableValue, old, isOnGround) -> {
