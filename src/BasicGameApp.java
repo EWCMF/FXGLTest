@@ -4,7 +4,6 @@ import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.app.Viewport;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
-import com.almasb.fxgl.entity.Spawns;
 import com.almasb.fxgl.entity.components.CollidableComponent;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
@@ -14,6 +13,7 @@ import com.almasb.fxgl.physics.HitBox;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
 import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
+import components.PlayerComponent;
 import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
@@ -26,13 +26,13 @@ import java.util.Map;
 
 public class BasicGameApp extends GameApplication {
     public enum EntityType {
-        PLAYER, TARGET, WALL, BULLET
+        PLAYER, TARGET, WALL, BULLET, EXIT
     }
 
     @Override
     protected void initSettings(GameSettings settings) {
-        settings.setWidth(600);
-        settings.setHeight(600);
+        settings.setWidth(1280);
+        settings.setHeight(720);
         settings.setTitle("Basic Game App");
         settings.setVersion("0.1");
     }
@@ -44,33 +44,33 @@ public class BasicGameApp extends GameApplication {
         input.addAction(new UserAction("Move Right") {
             @Override
             protected void onAction() {
-                player.getComponent(PlayerControl.class).right();
+                player.getComponent(PlayerComponent.class).right();
                 FXGL.getGameState().increment("pixelsMoved", +5);
             }
 
             @Override
             protected void onActionEnd() {
-                player.getComponent(PlayerControl.class).stop();
+                player.getComponent(PlayerComponent.class).stop();
             }
         }, KeyCode.D);
 
         input.addAction(new UserAction("Move Left") {
             @Override
             protected void onAction() {
-                player.getComponent(PlayerControl.class).left();
+                player.getComponent(PlayerComponent.class).left();
                 FXGL.getGameState().increment("pixelsMoved", +5);
             }
 
             @Override
             protected void onActionEnd() {
-                player.getComponent(PlayerControl.class).stop();
+                player.getComponent(PlayerComponent.class).stop();
             }
         }, KeyCode.A);
 
         input.addAction(new UserAction("Jump") {
             @Override
             protected void onActionBegin() {
-                player.getComponent(PlayerControl.class).jump();
+                player.getComponent(PlayerComponent.class).jump();
                 FXGL.getGameState().increment("pixelsMoved", +5);
             }
         }, KeyCode.SPACE);
@@ -90,7 +90,7 @@ public class BasicGameApp extends GameApplication {
             protected void onActionBegin() {
                 Point2D vector = FXGL.getInput().getVectorToMouse(player.getPosition());
 
-                player.getComponent(PlayerControl.class).fire(vector, player.getPosition());
+                player.getComponent(PlayerComponent.class).fire(vector, player.getPosition());
             }
         }, MouseButton.PRIMARY);
     }
@@ -108,7 +108,7 @@ public class BasicGameApp extends GameApplication {
 
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
-        physicsComponent.addGroundSensor(new HitBox(BoundingShape.box(64, 64)));
+        physicsComponent.addGroundSensor(new HitBox(BoundingShape.box(64, 80)));
 
         physicsComponent.setFixtureDef(new FixtureDef().friction(0.0f));
 
@@ -116,10 +116,10 @@ public class BasicGameApp extends GameApplication {
                 .type(EntityType.PLAYER)
                 .at(300, 300)
                 //.view(new Rectangle(25, 25, Color.RED))
-                .viewWithBBox("brick.png")
+                .bbox(new HitBox(BoundingShape.box(64, 80)))
                 .with(physicsComponent)
                 .with(new CollidableComponent(true))
-                .with(new PlayerControl())
+                .with(new PlayerComponent())
                 .buildAndAttach();
 
         FXGL.entityBuilder()
@@ -138,7 +138,7 @@ public class BasicGameApp extends GameApplication {
 
         FXGL.entityBuilder()
                 .type(EntityType.WALL)
-                .at(0, 550)
+                .at(0, 670)
                 .view(new Rectangle(600 * 5, 50, Color.DARKGREY))
                 .bbox(new HitBox(BoundingShape.box(600 * 5, 50)))
                 .with(new PhysicsComponent())
@@ -148,7 +148,7 @@ public class BasicGameApp extends GameApplication {
         FXGL.entityBuilder()
                 .type(EntityType.WALL)
                 .at(-50, 0)
-                .view(new Rectangle(50, 600, Color.DARKGREY))
+                .view(new Rectangle(50, 720, Color.DARKGREY))
                 .bbox(new HitBox(BoundingShape.box(50, 600)))
                 .with(new PhysicsComponent())
                 .with(new CollidableComponent(true))
@@ -156,17 +156,24 @@ public class BasicGameApp extends GameApplication {
 
         FXGL.entityBuilder()
                 .type(EntityType.WALL)
-                .at(600, 400)
+                .at(600, 520)
                 .view(new Rectangle(50, 200, Color.DARKGREY))
                 .bbox(new HitBox(BoundingShape.box(50, 200)))
                 .with(new PhysicsComponent())
                 .with(new CollidableComponent(true))
                 .buildAndAttach();
 
+        FXGL.entityBuilder()
+                .type(EntityType.EXIT)
+                .at(600 * 5 - 200, 520)
+                .view(new Rectangle(100, 150, Color.GREEN))
+                .with(new CollidableComponent(true))
+                .buildAndAttach();
+
         Viewport viewport = FXGL.getGameScene().getViewport();
 
-        viewport.setBounds(0, 0, 600 * 5, 600);
-        viewport.bindToEntity(player, FXGL.getAppWidth() / 2, FXGL.getAppHeight() / 2);
+        viewport.setBounds(0, 0, 600 * 5, 720);
+        viewport.bindToEntity(player, FXGL.getAppWidth() / 3, FXGL.getAppHeight() / 2);
     }
 
     @Override
