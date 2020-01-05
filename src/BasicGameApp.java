@@ -98,7 +98,7 @@ public class BasicGameApp extends GameApplication {
                     player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(0, 27));
                 }
                 else {
-                    player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(64, 27));
+                    player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(56, 27));
                 }
             }
         }, MouseButton.PRIMARY);
@@ -109,7 +109,7 @@ public class BasicGameApp extends GameApplication {
         vars.put("pixelsMoved", 0);
     }
 
-    private Entity player;
+    public Entity player;
 
     @Override
     protected void initGame() {
@@ -117,7 +117,7 @@ public class BasicGameApp extends GameApplication {
 
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
-        physicsComponent.addGroundSensor(new HitBox(BoundingShape.box(64, 80)));
+        physicsComponent.addGroundSensor(new HitBox(BoundingShape.box(64, 94)));
 
         physicsComponent.setFixtureDef(new FixtureDef().friction(0.0f));
 
@@ -125,7 +125,7 @@ public class BasicGameApp extends GameApplication {
                 .type(EntityType.PLAYER)
                 .at(300, 300)
                 //.view(new Rectangle(25, 25, Color.RED))
-                .bbox(new HitBox(BoundingShape.box(64, 80)))
+                .bbox(new HitBox(BoundingShape.box(64, 94)))
                 .with(physicsComponent)
                 .with(new CollidableComponent(true))
                 .with(new PlayerComponent())
