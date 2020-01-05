@@ -24,7 +24,7 @@ public class BasicGameFactory implements EntityFactory {
                 .at((Point2D) data.get("position"))
                 .viewWithBBox(new Rectangle(12,3, Color.BLACK))
                 .with(new CollidableComponent(true))
-                .with(new ProjectileComponent(data.get("direction"), 550))
+                .with(new ProjectileComponent(data.get("direction"), 650))
                 .with(new OffscreenCleanComponent())
                 .build();
     }

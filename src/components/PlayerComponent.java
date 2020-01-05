@@ -13,7 +13,10 @@ import javafx.util.Duration;
 public class PlayerComponent extends Component {
 
     private AnimatedTexture texture;
-    private AnimationChannel animIdle, animIdleUp, animWalk, animWalkUp;
+    private AnimationChannel animIdle, animIdleUp, animIdleDown, animWalk, animWalkUp, animWalkDown;
+
+    private double aimUpVectorY = -150;
+    private double aimDownVectorY = 150;
 
     private PhysicsComponent physics;
     private int jumps = 2;
@@ -22,11 +25,13 @@ public class PlayerComponent extends Component {
 
         Image image = FXGL.image("player.png");
 
-        animIdle = new AnimationChannel(image, 14, 78, 94, Duration.seconds(1), 0, 0);
-        animIdleUp = new AnimationChannel(image, 14, 78, 94, Duration.seconds(1), 1, 1);
+        animIdle = new AnimationChannel(image, 21, 78, 94, Duration.seconds(1), 0, 0);
+        animIdleUp = new AnimationChannel(image, 21, 78, 94, Duration.seconds(1), 1, 1);
+        animIdleDown = new AnimationChannel(image, 21, 78, 94, Duration.seconds(1), 14, 14);
 
-        animWalk = new AnimationChannel(image, 14, 78, 94, Duration.seconds(1), 2,7);
-        animWalkUp = new AnimationChannel(image, 14, 78, 94, Duration.seconds(1), 8, 13);
+        animWalk = new AnimationChannel(image, 21, 78, 94, Duration.seconds(1), 2,7);
+        animWalkUp = new AnimationChannel(image, 21, 78, 94, Duration.seconds(1), 8, 13);
+        animWalkDown = new AnimationChannel(image, 21, 78, 94, Duration.seconds(1), 15, 20);
 
 
         texture = new AnimatedTexture(animIdle);
@@ -47,19 +52,24 @@ public class PlayerComponent extends Component {
     @Override
     public void onUpdate(double tpf) {
         if (isMoving()) {
-            if (texture.getAnimationChannel() != animWalk && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() > -50) {
+            if (texture.getAnimationChannel() != animWalk && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() > aimUpVectorY && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() < aimDownVectorY) {
                 texture.loopAnimationChannel(animWalk);
             }
-            else if (texture.getAnimationChannel() != animWalkUp && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() < -50) {
-                System.out.println("Test");
+            else if (texture.getAnimationChannel() != animWalkUp && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() < aimUpVectorY) {
                 texture.loopAnimationChannel(animWalkUp);
             }
+            else if (texture.getAnimationChannel() != animWalkDown && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() > aimDownVectorY) {
+                texture.loopAnimationChannel(animWalkDown);
+            }
         } else {
-            if (texture.getAnimationChannel() != animIdle && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() > -50) {
+            if (texture.getAnimationChannel() != animIdle && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() > aimUpVectorY && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() < aimDownVectorY) {
                 texture.loopAnimationChannel(animIdle);
             }
-            else if (FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() < -50) {
+            else if (FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() < aimUpVectorY) {
                 texture.loopAnimationChannel(animIdleUp);
+            }
+            else if (texture.getAnimationChannel() != animIdleDown && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() > aimDownVectorY) {
+                texture.loopAnimationChannel(animIdleDown);
             }
         }
     }

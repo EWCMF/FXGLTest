@@ -25,6 +25,9 @@ import java.util.Map;
 
 
 public class BasicGameApp extends GameApplication {
+    private double aimUpVectorY = -150;
+    private double aimDownVectorY = 150;
+
     public enum EntityType {
         PLAYER, TARGET, WALL, BULLET, EXIT
     }
@@ -94,11 +97,25 @@ public class BasicGameApp extends GameApplication {
                 if (FXGL.getInput().getVectorToMouse(player.getPosition()).getX() > 0 && player.getTransformComponent().getScaleX() != 1.0)
                     return;
 
+                double gunPosition = FXGL.getInput().getVectorToMouse(player.getPosition()).getY();
+
                 if (player.getTransformComponent().getScaleX() == -1.0) {
-                    player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(0, 27));
+                    // Middle position, Up position, down position.
+                    if (gunPosition > aimUpVectorY && gunPosition < aimDownVectorY)
+                        player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(0, 35));
+                    else if (gunPosition < aimUpVectorY)
+                        player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(6, 13));
+                    else if (gunPosition > aimDownVectorY)
+                        player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(7, 70));
                 }
                 else {
-                    player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(56, 27));
+                    // Middle position, Up position, down position.
+                    if (gunPosition > aimUpVectorY && gunPosition < aimDownVectorY)
+                        player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(52, 35));
+                    else if (gunPosition < aimUpVectorY)
+                        player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(46, 13));
+                    else if (gunPosition > aimDownVectorY)
+                        player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(45, 70));
                 }
             }
         }, MouseButton.PRIMARY);
