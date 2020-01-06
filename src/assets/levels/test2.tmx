@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="-1" width="100" height="35" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="7">
+<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="-1" width="100" height="35" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="12">
  <editorsettings>
   <export target="test2.tmx" format="tmx"/>
  </editorsettings>
@@ -85,10 +85,15 @@
 </data>
  </layer>
  <objectgroup id="2" name="Object Layer 1">
-  <object id="1" name="start" type="start" x="96" y="960" width="64" height="96"/>
+  <object id="1" type="start" x="96" y="960" width="64" height="96"/>
   <object id="3" type="platform" x="32" y="1088" width="448" height="32"/>
   <object id="4" type="platform" x="928" y="1088" width="544" height="32"/>
   <object id="5" type="platform" x="1472" y="640" width="32" height="480"/>
   <object id="6" type="platform" x="0" y="640" width="32" height="480"/>
+  <object id="7" type="target" x="1440" y="1024" width="32" height="32"/>
+  <object id="8" type="target" x="1440" y="960" width="32" height="32"/>
+  <object id="9" type="target" x="1440" y="896" width="32" height="32"/>
+  <object id="10" type="target" x="1440" y="832" width="32" height="32"/>
+  <object id="11" type="target" x="1440" y="768" width="32" height="32"/>
  </objectgroup>
 </map>

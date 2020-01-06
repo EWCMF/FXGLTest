@@ -75,7 +75,7 @@ public class BasicGameFactory implements EntityFactory {
         return entityBuilder()
                 .type(BasicGameApp.EntityType.TARGET)
                 .from(data)
-                .viewWithBBox(new Circle(15, Color.BLACK))
+                .viewWithBBox(new Circle(16, 16, 15, Color.BLACK))
                 .with(new CollidableComponent(true))
                 .build();
     }
