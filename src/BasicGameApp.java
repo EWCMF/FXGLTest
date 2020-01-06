@@ -118,7 +118,7 @@ public class BasicGameApp extends GameApplication {
     @Override
     protected void initGame() {
         FXGL.getGameWorld().addEntityFactory(new BasicGameFactory());
-        FXGL.setLevelFromMap("test.tmx");
+        FXGL.setLevelFromMap("test2.tmx");
 
         start = FXGL.getGameWorld().getSingleton(EntityType.START).getPosition();
 
@@ -126,8 +126,8 @@ public class BasicGameApp extends GameApplication {
 
         Viewport viewport = FXGL.getGameScene().getViewport();
 
-        viewport.setBounds(21, 0, 21 * 100, 21 * 35);
-        viewport.bindToEntity(player, FXGL.getAppWidth() / 3, FXGL.getAppHeight() / 2);
+        viewport.setBounds(32, 0, 32 * 100, 32 * 35);
+        viewport.bindToEntity(player, FXGL.getAppWidth() / 4, FXGL.getAppHeight() / 2);
     }
 
     @Override
