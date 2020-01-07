@@ -1,4 +1,4 @@
-package components;
+package game;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.SpawnData;

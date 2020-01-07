@@ -1,3 +1,4 @@
+package game;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
@@ -7,20 +8,18 @@ import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
-import components.PlayerComponent;
 import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import java.util.Map;
+
+import static game.BasicGameTypes.*;
 
 
 public class BasicGameApp extends GameApplication {
     private double aimUpVectorY = -150;
     private double aimDownVectorY = 150;
 
-    public enum EntityType {
-        PLAYER, TARGET, WALL, BULLET, START, EXIT
-    }
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -120,7 +119,7 @@ public class BasicGameApp extends GameApplication {
         FXGL.getGameWorld().addEntityFactory(new BasicGameFactory());
         FXGL.setLevelFromMap("test2.tmx");
 
-        start = FXGL.getGameWorld().getSingleton(EntityType.START).getPosition();
+        start = FXGL.getGameWorld().getSingleton(START).getPosition();
 
         player = FXGL.getGameWorld().spawn("player", start);
 
@@ -137,7 +136,7 @@ public class BasicGameApp extends GameApplication {
     @Override
     protected void initPhysics() {
         FXGL.getPhysicsWorld().setGravity(0, 760);
-        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(EntityType.BULLET, EntityType.TARGET) {
+        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, TARGET) {
 
             // order of types is the same as passed into the constructor
             @Override
@@ -147,7 +146,7 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
-        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(EntityType.BULLET, EntityType.WALL) {
+        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, WALL) {
             @Override
             protected void onCollisionBegin(Entity bullet, Entity wall) {
                 bullet.removeFromWorld();
