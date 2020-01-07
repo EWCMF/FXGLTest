@@ -34,6 +34,18 @@ public class BasicGameFactory implements EntityFactory {
                 .build();
     }
 
+    @Spawns("enemyBullet")
+    public Entity newEnemyBullet(SpawnData data) {
+        return entityBuilder()
+                .type(ENEMYBULLET)
+                .from(data)
+                .viewWithBBox(new Rectangle(12, 3, Color.BLACK))
+                .with(new CollidableComponent(true))
+                .with(new ProjectileComponent(data.get("direction"), 300))
+                .with(new OffscreenCleanComponent())
+                .build();
+    }
+
     @Spawns("start")
     public Entity newStart(SpawnData data) {
         return entityBuilder()
@@ -78,6 +90,7 @@ public class BasicGameFactory implements EntityFactory {
                 .from(data)
                 .viewWithBBox(new Circle(16, 16, 15, Color.BLACK))
                 .with(new CollidableComponent(true))
+                .with(new EnemySensorComponent())
                 .build();
     }
 }

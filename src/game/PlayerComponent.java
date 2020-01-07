@@ -15,8 +15,8 @@ public class PlayerComponent extends Component {
     private AnimatedTexture texture;
     private AnimationChannel animIdle, animIdleUp, animIdleDown, animWalk, animWalkUp, animWalkDown;
 
-    private double aimUpVectorY = -150;
-    private double aimDownVectorY = 150;
+    private double aimUpVectorY = BasicGameApp.aimUpVectorY;
+    private double aimDownVectorY = BasicGameApp.aimDownVectorY;
 
     private PhysicsComponent physics;
     private int jumps = 2;

@@ -17,8 +17,8 @@ import static game.BasicGameTypes.*;
 
 
 public class BasicGameApp extends GameApplication {
-    private double aimUpVectorY = -150;
-    private double aimDownVectorY = 150;
+    public static double aimUpVectorY = -150;
+    public static double aimDownVectorY = 150;
 
 
     @Override
