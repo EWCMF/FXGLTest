@@ -134,6 +134,9 @@ public class BasicGameApp extends GameApplication {
 
     @Override
     protected void initUI() {
+        var hp = new HPIndicator(player.getComponent(HPComponent.class));
+
+        addUINode(hp, 15, 45);
     }
 
     @Override
