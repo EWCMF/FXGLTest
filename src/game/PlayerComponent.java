@@ -3,6 +3,7 @@ package game;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
+import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
@@ -10,6 +11,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
 
+@Required(HPComponent.class)
 public class PlayerComponent extends Component {
 
     private AnimatedTexture texture;
@@ -19,7 +21,10 @@ public class PlayerComponent extends Component {
     private double aimDownVectorY = BasicGameApp.aimDownVectorY;
 
     private PhysicsComponent physics;
+    private HPComponent hp;
     private int jumps = 2;
+
+    private boolean isBeingDamaged = false;
 
     public PlayerComponent() {
 
@@ -105,6 +110,23 @@ public class PlayerComponent extends Component {
         SpawnData spawnData = new SpawnData(point2D).put("direction", point2D.normalize());
         spawnData.put("position", position);
         FXGL.spawn("playerBullet", spawnData);
+    }
+
+    public void onHit(int damage) {
+        if (isBeingDamaged)
+            return;
+
+        hp.setValue(hp.getValue() - damage);
+
+        isBeingDamaged = true;
+
+        FXGL.runOnce(() -> {
+            isBeingDamaged = false;
+        }, Duration.seconds(2));
+    }
+
+    public void restoreHP() {
+        hp.setValue(hp.getMaxHP());
     }
 
 

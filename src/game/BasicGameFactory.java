@@ -31,6 +31,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new CollidableComponent(true))
                 .with(new ProjectileComponent(data.get("direction"), 650))
                 .with(new OffscreenCleanComponent())
+                .with("damage", 1)
                 .build();
     }
 
@@ -43,6 +44,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new CollidableComponent(true))
                 .with(new ProjectileComponent(data.get("direction"), 300))
                 .with(new OffscreenCleanComponent())
+                .with("damage", 1)
                 .build();
     }
 
@@ -68,6 +70,7 @@ public class BasicGameFactory implements EntityFactory {
                 .bbox(new HitBox(BoundingShape.box(48, 94)))
                 .with(physicsComponent)
                 .with(new CollidableComponent(true))
+                .with(new HPComponent(12))
                 .with(new PlayerComponent())
                 .build();
     }
@@ -90,7 +93,9 @@ public class BasicGameFactory implements EntityFactory {
                 .from(data)
                 .viewWithBBox(new Circle(16, 16, 15, Color.BLACK))
                 .with(new CollidableComponent(true))
-                .with(new EnemySensorComponent())
+                .with(new HPComponent(2))
+                .with(new EnemyComponent())
+                .with("alertRange", 600)
                 .build();
     }
 }

@@ -4,11 +4,14 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
+import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.time.LocalTimer;
 import javafx.util.Duration;
 
-public class EnemySensorComponent extends Component {
+@Required(HPComponent.class)
+public class EnemyComponent extends Component {
     private LocalTimer enemyAttackInterval;
+    private HPComponent hp;
     boolean alerted = false;
 
     public void onAdded() {
@@ -20,19 +23,14 @@ public class EnemySensorComponent extends Component {
     public void onUpdate(double tpf) {
         Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
 
-        if (enemyAttackInterval.elapsed(Duration.seconds(5))) {
+        if (enemyAttackInterval.elapsed(Duration.seconds((Math.random() * 2) + 2))) {
             if (alerted) {
                 basicEnemyAttack(player);
                 enemyAttackInterval.capture();
-                System.out.println("test");
             }
         }
 
-        if (distanceToPlayer(player) < 600) {
-            alerted = true;
-        } else {
-            alerted = false;
-        }
+        alerted = distanceToPlayer(player) < entity.getInt("alertRange");
     }
 
     public double distanceToPlayer(Entity player) {
@@ -41,5 +39,17 @@ public class EnemySensorComponent extends Component {
 
     public void basicEnemyAttack(Entity player) {
         FXGL.getGameWorld().spawn("enemyBullet", new SpawnData(entity.getPosition()).put("direction", player.getPosition().subtract(entity.getPosition())));
+    }
+
+    public void onHit(int damage) {
+        hp.setValue(hp.getValue() - damage);
+
+        if (hp.getValue() <= 0) {
+            entity.removeFromWorld();
+        }
+    }
+
+    public void initHP() {
+        hp.setValue(hp.getMaxHP());
     }
 }

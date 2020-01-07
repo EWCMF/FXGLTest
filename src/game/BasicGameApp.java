@@ -14,6 +14,7 @@ import javafx.scene.input.MouseButton;
 import java.util.Map;
 
 import static game.BasicGameTypes.*;
+import static com.almasb.fxgl.dsl.FXGL.*;
 
 
 public class BasicGameApp extends GameApplication {
@@ -123,6 +124,8 @@ public class BasicGameApp extends GameApplication {
 
         player = FXGL.getGameWorld().spawn("player", start);
 
+        initHP();
+
         Viewport viewport = FXGL.getGameScene().getViewport();
 
         viewport.setBounds(32, 0, 32 * 100, 32 * 35);
@@ -142,7 +145,7 @@ public class BasicGameApp extends GameApplication {
             @Override
             protected void onCollisionBegin(Entity bullet, Entity target) {
                 bullet.removeFromWorld();
-                target.removeFromWorld();
+                target.getComponent(EnemyComponent.class).onHit(bullet.getInt("damage"));
             }
         });
 
@@ -152,6 +155,23 @@ public class BasicGameApp extends GameApplication {
                 bullet.removeFromWorld();
             }
         });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(ENEMYBULLET, PLAYER) {
+            @Override
+            protected void onCollisionBegin(Entity enemyBullet, Entity player) {
+                enemyBullet.removeFromWorld();
+                player.getComponent(PlayerComponent.class).onHit(enemyBullet.getInt("damage"));
+            }
+        });
+    }
+
+    protected void initHP() {
+        if (player != null) {
+            player.getComponent(PlayerComponent.class).restoreHP();
+        }
+        for (int i = 0; i < getGameWorld().getEntitiesByType(TARGET).size(); i++) {
+            getGameWorld().getEntitiesByType(TARGET).get(i).getComponent(EnemyComponent.class).initHP();
+        }
     }
 
     public static void main(String[] args) {
