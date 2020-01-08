@@ -161,7 +161,8 @@ public class BasicGameApp extends GameApplication {
     protected void initGame() {
         getGameWorld().addEntityFactory(new BasicGameFactory());
         setLevelFromMap("test2.tmx");
-        getGameScene().setBackgroundColor(Color.DARKGRAY);
+        getGameScene().setBackgroundColor(Color.color(0.2, 0.2, 0.2));
+
         start = FXGL.getGameWorld().getSingleton(START).getPosition();
 
         player = FXGL.getGameWorld().spawn("player", start);
