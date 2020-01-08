@@ -5,7 +5,6 @@ import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.app.Viewport;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
-import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
@@ -14,6 +13,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 import java.util.Map;
 
@@ -38,6 +38,8 @@ public class BasicGameApp extends GameApplication {
 
     public static int ammoShotgun = 20;
     public static int ammoMachineGun = 200;
+
+    public static int enemyDamageModifier = 2;
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -168,8 +170,8 @@ public class BasicGameApp extends GameApplication {
 
         Viewport viewport = FXGL.getGameScene().getViewport();
 
-        viewport.setBounds(32, 0, 32 * 100, 32 * 35);
-        viewport.bindToEntity(player, FXGL.getAppWidth() / 4, FXGL.getAppHeight() / 2);
+        viewport.setBounds(32, 0, 32 * 100, 32 * 70);
+        viewport.bindToEntity(player, FXGL.getAppWidth() / 4, FXGL.getAppHeight() / 1.5);
     }
 
     @Override
@@ -183,9 +185,9 @@ public class BasicGameApp extends GameApplication {
         var m = getUIFactory().newText("M", Color.WHITE, 20);
         m.setStroke(Color.BLACK);
 
-        var ammoShotgun = getUIFactory().newText("", Color.GRAY, 15);
+        var ammoShotgun = getUIFactory().newText("", Color.WHITE, 15);
         ammoShotgun.textProperty().bind(getip("ammoShotgun").asString());
-        var ammoMachineGun = getUIFactory().newText("", Color.GRAY, 15);
+        var ammoMachineGun = getUIFactory().newText("", Color.WHITE, 15);
         ammoMachineGun.textProperty().bind(getip("ammoMachineGun").asString());
 
         var weaponIndicator = new Rectangle(13, 32, 20, 22);
@@ -207,14 +209,25 @@ public class BasicGameApp extends GameApplication {
     @Override
     protected void initPhysics() {
         FXGL.getPhysicsWorld().setGravity(0, 760);
-        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, TARGET) {
+        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, ENEMY) {
 
             // order of types is the same as passed into the constructor
             @Override
-            protected void onCollisionBegin(Entity bullet, Entity target) {
+            protected void onCollisionBegin(Entity bullet, Entity enemy) {
                 bullet.removeFromWorld();
-                target.getComponent(EnemyComponent.class).onHit(bullet.getInt("damage"));
-                target.getComponent(FlickerComponent.class).flicker();
+                enemy.getComponent(EnemyComponent.class).onHit(bullet.getInt("damage"));
+                enemy.getComponent(FlickerComponent.class).flicker();
+            }
+        });
+
+        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, ELITEENEMY) {
+
+            // order of types is the same as passed into the constructor
+            @Override
+            protected void onCollisionBegin(Entity bullet, Entity eliteEnemy) {
+                bullet.removeFromWorld();
+                eliteEnemy.getComponent(EliteEnemyComponent.class).onHit(bullet.getInt("damage"));
+                eliteEnemy.getComponent(FlickerComponent.class).flicker();
             }
         });
 
@@ -233,14 +246,37 @@ public class BasicGameApp extends GameApplication {
                 player.getComponent(FlickerComponent.class).flicker();
             }
         });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, EXIT) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity exit) {
+                getDisplay().showMessageBox("You Won.", getGameController()::exit);
+            }
+        });
+    }
+
+    protected void onUpdate(double tpf) {
+        if (player.getPosition().getY() > 32 * 70) {
+            player.getComponent(PlayerComponent.class).setHP(0);
+            playerDeath();
+        }
+    }
+
+    protected void playerDeath() {
+        FXGL.runOnce(() -> {
+            getDisplay().showMessageBox("You Died.", getGameController()::exit);
+        }, Duration.seconds(0.45));
     }
 
     protected void initHP() {
         if (player != null) {
             player.getComponent(PlayerComponent.class).restoreHP();
         }
-        for (int i = 0; i < getGameWorld().getEntitiesByType(TARGET).size(); i++) {
-            getGameWorld().getEntitiesByType(TARGET).get(i).getComponent(EnemyComponent.class).initHP();
+        for (int i = 0; i < getGameWorld().getEntitiesByType(ENEMY).size(); i++) {
+            getGameWorld().getEntitiesByType(ENEMY).get(i).getComponent(EnemyComponent.class).initHP();
+        }
+        for (int i = 0; i < getGameWorld().getEntitiesByType(ELITEENEMY).size(); i++) {
+            getGameWorld().getEntitiesByType(ELITEENEMY).get(i).getComponent(EliteEnemyComponent.class).initHP();
         }
     }
 

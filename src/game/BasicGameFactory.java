@@ -66,11 +66,11 @@ public class BasicGameFactory implements EntityFactory {
         return entityBuilder()
                 .type(ENEMYBULLET)
                 .from(data)
-                .viewWithBBox(new Rectangle(12, 3, Color.DARKRED))
+                .viewWithBBox(new Rectangle(12, 3, Color.RED))
                 .with(new CollidableComponent(true))
                 .with(new ProjectileComponent(data.get("direction"), 300))
                 .with(new OffscreenCleanComponent())
-                .with("damage", 1)
+                .with("damage", 1 * BasicGameApp.enemyDamageModifier)
                 .build();
     }
 
@@ -78,6 +78,16 @@ public class BasicGameFactory implements EntityFactory {
     public Entity newStart(SpawnData data) {
         return entityBuilder()
                 .type(START)
+                .from(data)
+                .build();
+    }
+
+    @Spawns("exit")
+    public Entity newExit(SpawnData data) {
+        return entityBuilder()
+                .type(EXIT)
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .with(new CollidableComponent(true))
                 .from(data)
                 .build();
     }
@@ -115,17 +125,55 @@ public class BasicGameFactory implements EntityFactory {
                 .build();
     }
 
-    @Spawns("target")
-    public Entity newTarget(SpawnData data) {
+    @Spawns("passablePlatform")
+    public Entity newPassablePlatform(SpawnData data) {
         return entityBuilder()
-                .type(TARGET)
+                .type(PASSABLE)
+                .from(data)
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .with(new PhysicsComponent())
+                .with(new CollidableComponent(true))
+                .build();
+    }
+
+    @Spawns("turret")
+    public Entity newTurret(SpawnData data) {
+        return entityBuilder()
+                .type(ENEMY)
                 .from(data)
                 .viewWithBBox(new Circle(16, 16, 15, Color.BLACK))
                 .with(new CollidableComponent(true))
                 .with(new HPComponent(6))
                 .with(new EnemyComponent())
                 .with(new FlickerComponent())
-                .with("alertRange", 600)
+                .with("alertRange", 1000)
+                .build();
+    }
+
+    @Spawns("eliteTurret")
+    public Entity eliteTurret(SpawnData data) {
+        return entityBuilder()
+                .type(ELITEENEMY)
+                .from(data)
+                .viewWithBBox(new Circle(16, 16, 15, Color.DARKRED))
+                .with(new CollidableComponent(true))
+                .with(new HPComponent(30))
+                .with(new EliteEnemyComponent())
+                .with(new FlickerComponent())
+                .with("alertRange", 1000)
+                .build();
+    }
+
+    @Spawns("eliteEnemyBullet")
+    public Entity newEliteEnemyBullet(SpawnData data) {
+        return entityBuilder()
+                .type(ENEMYBULLET)
+                .from(data)
+                .viewWithBBox(new Rectangle(20, 3, Color.DARKVIOLET))
+                .with(new CollidableComponent(true))
+                .with(new ProjectileComponent(data.get("direction"), 700))
+                .with(new OffscreenCleanComponent())
+                .with("damage", 3 * BasicGameApp.enemyDamageModifier)
                 .build();
     }
 }

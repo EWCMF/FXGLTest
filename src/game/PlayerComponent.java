@@ -124,7 +124,7 @@ public class PlayerComponent extends Component {
         }
         else {
             currentWeapon = 0;
-            FXGL.set("weaponIndicatorPosition", 40);
+            FXGL.set("weaponIndicatorPosition", 13);
         }
     }
 
@@ -135,7 +135,7 @@ public class PlayerComponent extends Component {
         }
         else {
             currentWeapon = weaponList.length - 1;
-            FXGL.set("weaponIndicatorPosition", 40 * weaponList.length);
+            FXGL.set("weaponIndicatorPosition", 13 + 40 * (weaponList.length - 1));
         }
     }
 
@@ -193,21 +193,17 @@ public class PlayerComponent extends Component {
         FXGL.runOnce(() -> {
             isBeingDamaged = false;
         }, Duration.seconds(1));
+
+        if (hp.getValue() <= 0) {
+            FXGL.<BasicGameApp>getAppCast().playerDeath();
+        }
+    }
+
+    public void setHP(int hp) {
+        this.hp.setValue(hp);
     }
 
     public void restoreHP() {
         hp.setValue(hp.getMaxHP());
     }
-
-    public int getShotgunAmmo() {
-        return shotgunAmmo;
-    }
-
-    public int getMachineGunAmmo() {
-        return machineGunAmmo;
-    }
-
-
-
-
 }
