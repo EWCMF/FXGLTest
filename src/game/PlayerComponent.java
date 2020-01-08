@@ -1,14 +1,19 @@
 package game;
 
 import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 @Required(HPComponent.class)
@@ -122,7 +127,7 @@ public class PlayerComponent extends Component {
 
         FXGL.runOnce(() -> {
             isBeingDamaged = false;
-        }, Duration.seconds(2));
+        }, Duration.seconds(1));
     }
 
     public void restoreHP() {

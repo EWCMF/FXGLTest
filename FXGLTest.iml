@@ -7,6 +7,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="fxgl-11.6-uber" level="project" />
+    <orderEntry type="library" name="fxgl-11.7-uber" level="project" />
   </component>
 </module>

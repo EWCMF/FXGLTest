@@ -60,18 +60,21 @@ public class BasicGameFactory implements EntityFactory {
     public Entity newPlayer(SpawnData data) {
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
-        physicsComponent.addGroundSensor(new HitBox(BoundingShape.box(48, 94)));
-
+        physicsComponent.addGroundSensor(new HitBox(BoundingShape.box(42, 94)));
         physicsComponent.setFixtureDef(new FixtureDef().friction(0.0f));
+
+        Point2D hitboxOffset = new Point2D(7, 14);
+
         return entityBuilder()
                 .type(PLAYER)
                 .from(data)
                 //.view(new Rectangle(25, 25, Color.RED))
-                .bbox(new HitBox(BoundingShape.box(48, 94)))
+                .bbox(new HitBox(hitboxOffset, BoundingShape.box(42, 80)))
                 .with(physicsComponent)
                 .with(new CollidableComponent(true))
                 .with(new HPComponent(12))
                 .with(new PlayerComponent())
+                .with(new FlickerComponent())
                 .build();
     }
 
@@ -95,6 +98,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new CollidableComponent(true))
                 .with(new HPComponent(2))
                 .with(new EnemyComponent())
+                .with(new FlickerComponent())
                 .with("alertRange", 600)
                 .build();
     }

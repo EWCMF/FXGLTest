@@ -5,9 +5,11 @@ import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.app.Viewport;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
+import com.almasb.fxgl.physics.PhysicsComponent;
 import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
@@ -20,6 +22,9 @@ import static com.almasb.fxgl.dsl.FXGL.*;
 public class BasicGameApp extends GameApplication {
     public static double aimUpVectorY = -150;
     public static double aimDownVectorY = 150;
+
+    public static int hpInX = 15;
+    public static int hpInY = 35;
 
 
     @Override
@@ -65,13 +70,20 @@ public class BasicGameApp extends GameApplication {
             }
         }, KeyCode.SPACE);
 
-        input.addAction(new UserAction("Test vectors") {
+        input.addAction(new UserAction("Test something") {
             @Override
             protected void onActionBegin() {
-                System.out.println(player.getPosition());
-                System.out.println(FXGL.getInput().getMousePositionWorld());
-                System.out.println(FXGL.getInput().getVectorToMouse(player.getPosition()));
-                System.out.println(FXGL.getInput().getVectorToMouse(player.getPosition()).normalize());
+                double width = player.getBoundingBoxComponent().getWidth();
+                double height = player.getBoundingBoxComponent().getHeight();
+
+                SpawnData data = new SpawnData(player.getBoundingBoxComponent().getMinXWorld(), player.getBoundingBoxComponent().getMinYWorld());
+                data.put("width", width);
+                data.put("height", height);
+
+                Entity flicker = FXGL.getGameWorld().spawn("hitboxFlicker", data);
+                System.out.println(flicker.getViewComponent().getChildren());
+                System.out.println(player.getViewComponent().getChildren());
+
             }
         }, KeyCode.F);
 
@@ -136,7 +148,7 @@ public class BasicGameApp extends GameApplication {
     protected void initUI() {
         var hp = new HPIndicator(player.getComponent(HPComponent.class));
 
-        addUINode(hp, 15, 45);
+        addUINode(hp, hpInX, hpInY);
     }
 
     @Override
@@ -149,6 +161,7 @@ public class BasicGameApp extends GameApplication {
             protected void onCollisionBegin(Entity bullet, Entity target) {
                 bullet.removeFromWorld();
                 target.getComponent(EnemyComponent.class).onHit(bullet.getInt("damage"));
+                target.getComponent(FlickerComponent.class).flicker();
             }
         });
 
@@ -164,6 +177,7 @@ public class BasicGameApp extends GameApplication {
             protected void onCollisionBegin(Entity enemyBullet, Entity player) {
                 enemyBullet.removeFromWorld();
                 player.getComponent(PlayerComponent.class).onHit(enemyBullet.getInt("damage"));
+                player.getComponent(FlickerComponent.class).flicker();
             }
         });
     }
