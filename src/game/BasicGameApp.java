@@ -12,6 +12,9 @@ import com.almasb.fxgl.physics.CollisionHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+
 import java.util.Map;
 
 import static game.BasicGameTypes.*;
@@ -32,6 +35,9 @@ public class BasicGameApp extends GameApplication {
     private Point2D gunLeftUp = new Point2D(6, 13);
     private Point2D gunLeftMiddle = new Point2D(0, 35);
     private Point2D gunLeftDown = new Point2D(7, 70);
+
+    public static int ammoShotgun = 20;
+    public static int ammoMachineGun = 200;
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -89,6 +95,13 @@ public class BasicGameApp extends GameApplication {
             }
         }, KeyCode.E);
 
+        input.addAction(new UserAction("Change weapon back") {
+            @Override
+            protected void onActionBegin() {
+                player.getComponent(PlayerComponent.class).changeWeaponReverse();
+            }
+        }, KeyCode.Q);
+
         input.addAction(new UserAction("Shoot") {
             @Override
             protected void onAction() {
@@ -134,6 +147,9 @@ public class BasicGameApp extends GameApplication {
 
     @Override
     protected void initGameVars(Map<String, Object> vars) {
+        vars.put("ammoShotgun", ammoShotgun);
+        vars.put("ammoMachineGun", ammoMachineGun);
+        vars.put("weaponIndicatorPosition", 13);
     }
 
     public Entity player;
@@ -141,9 +157,9 @@ public class BasicGameApp extends GameApplication {
 
     @Override
     protected void initGame() {
-        FXGL.getGameWorld().addEntityFactory(new BasicGameFactory());
-        FXGL.setLevelFromMap("test2.tmx");
-
+        getGameWorld().addEntityFactory(new BasicGameFactory());
+        setLevelFromMap("test2.tmx");
+        getGameScene().setBackgroundColor(Color.DARKGRAY);
         start = FXGL.getGameWorld().getSingleton(START).getPosition();
 
         player = FXGL.getGameWorld().spawn("player", start);
@@ -160,7 +176,32 @@ public class BasicGameApp extends GameApplication {
     protected void initUI() {
         var hp = new HPIndicator(player.getComponent(HPComponent.class));
 
+        var d = getUIFactory().newText("D", Color.WHITE, 20);
+        d.setStroke(Color.BLACK);
+        var s = getUIFactory().newText("S", Color.WHITE, 20);
+        s.setStroke(Color.BLACK);
+        var m = getUIFactory().newText("M", Color.WHITE, 20);
+        m.setStroke(Color.BLACK);
+
+        var ammoShotgun = getUIFactory().newText("", Color.GRAY, 15);
+        ammoShotgun.textProperty().bind(getip("ammoShotgun").asString());
+        var ammoMachineGun = getUIFactory().newText("", Color.GRAY, 15);
+        ammoMachineGun.textProperty().bind(getip("ammoMachineGun").asString());
+
+        var weaponIndicator = new Rectangle(13, 32, 20, 22);
+        weaponIndicator.xProperty().bind(getip("weaponIndicatorPosition"));
+        weaponIndicator.setStroke(Color.BLUE);
+        weaponIndicator.setFill(null);
+
         addUINode(hp, hpInX, hpInY);
+
+        addUINode(d, 15, 50);
+        addUINode(s, 55, 50);
+        addUINode(ammoShotgun, 55, 65);
+        addUINode(m, 95, 50);
+        addUINode(ammoMachineGun, 95, 65);
+        addUINode(weaponIndicator);
+
     }
 
     @Override

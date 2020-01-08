@@ -1,19 +1,14 @@
 package game;
 
 import com.almasb.fxgl.dsl.FXGL;
-import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 @Required(HPComponent.class)
@@ -29,12 +24,16 @@ public class PlayerComponent extends Component {
     private HPComponent hp;
     private int jumps = 2;
 
-    private String[] weaponList = {"default", "shotgun"};
+    private String[] weaponList = {"default", "shotgun", "machineGun"};
     private int currentWeapon = 0;
 
     private boolean canFire = true;
-    private double defaultCooldown = 0.3;
+    private double defaultCooldown = 0.6;
     private double shotgunCooldown = 1;
+    private double machineGunCooldown = 0.10;
+
+    private int shotgunAmmo = BasicGameApp.ammoShotgun;
+    private int machineGunAmmo = BasicGameApp.ammoMachineGun;
 
     private boolean isBeingDamaged = false;
 
@@ -119,26 +118,44 @@ public class PlayerComponent extends Component {
     }
 
     public void changeWeapon() {
-        if (currentWeapon < weaponList.length - 1)
+        if (currentWeapon < weaponList.length - 1) {
             currentWeapon++;
-        else
+            FXGL.inc("weaponIndicatorPosition", 40);
+        }
+        else {
             currentWeapon = 0;
+            FXGL.set("weaponIndicatorPosition", 40);
+        }
+    }
+
+    public void changeWeaponReverse() {
+        if (currentWeapon != 0) {
+            currentWeapon--;
+            FXGL.inc("weaponIndicatorPosition", -40);
+        }
+        else {
+            currentWeapon = weaponList.length - 1;
+            FXGL.set("weaponIndicatorPosition", 40 * weaponList.length);
+        }
     }
 
     public void fire(Point2D aim, Point2D position) {
         if (canFire) {
             switch (weaponList[currentWeapon]) {
                 case "default":
-                        canFire = false;
-                        SpawnData spawnData = new SpawnData(aim).put("direction", aim);
-                        spawnData.put("position", position);
-                        FXGL.spawn("defaultBullet", spawnData);
-                        FXGL.runOnce(() -> {
+                    canFire = false;
+                    SpawnData spawnData = new SpawnData(aim).put("direction", aim);
+                    spawnData.put("position", position);
+                    FXGL.spawn("defaultBullet", spawnData);
+                    FXGL.runOnce(() -> {
                         canFire = true;
                         }, Duration.seconds(defaultCooldown));
-                        return;
+                    return;
                 case "shotgun":
+                    if (shotgunAmmo != 0) {
                         canFire = false;
+                        shotgunAmmo--;
+                        FXGL.set("ammoShotgun", shotgunAmmo);
                         for (int i = 0; i <= 6; i++) {
                             SpawnData spawnDataShotgun = new SpawnData(aim).put("direction", aim.add(Math.random() * 0.1, Math.random() * 0.1));
                             spawnDataShotgun.put("position", position);
@@ -147,6 +164,20 @@ public class PlayerComponent extends Component {
                         FXGL.runOnce(() -> {
                             canFire = true;
                         }, Duration.seconds(shotgunCooldown));
+                    }
+                    return;
+                case "machineGun":
+                    if (machineGunAmmo != 0) {
+                        machineGunAmmo--;
+                        FXGL.set("ammoMachineGun", machineGunAmmo);
+                        canFire = false;
+                        SpawnData spawnDataMachineGun = new SpawnData(aim).put("direction", aim);
+                        spawnDataMachineGun.put("position", position);
+                        FXGL.spawn("machineGunBullet", spawnDataMachineGun);
+                        FXGL.runOnce(() -> {
+                            canFire = true;
+                        }, Duration.seconds(machineGunCooldown));
+                    }
             }
         }
     }
@@ -167,6 +198,16 @@ public class PlayerComponent extends Component {
     public void restoreHP() {
         hp.setValue(hp.getMaxHP());
     }
+
+    public int getShotgunAmmo() {
+        return shotgunAmmo;
+    }
+
+    public int getMachineGunAmmo() {
+        return machineGunAmmo;
+    }
+
+
 
 
 }

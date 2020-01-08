@@ -27,11 +27,11 @@ public class BasicGameFactory implements EntityFactory {
         return entityBuilder()
                 .type(BULLET)
                 .at((Point2D) data.get("position"))
-                .viewWithBBox(new Rectangle(12,3, Color.BLACK))
+                .viewWithBBox(new Rectangle(12,3, Color.GOLD))
                 .with(new CollidableComponent(true))
-                .with(new ProjectileComponent(data.get("direction"), 650))
+                .with(new ProjectileComponent(data.get("direction"), 500))
                 .with(new OffscreenCleanComponent())
-                .with("damage", 1)
+                .with("damage", 3)
                 .build();
     }
 
@@ -44,7 +44,20 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new CollidableComponent(true))
                 .with(new ProjectileComponent(data.get("direction"), 850))
                 .with(new OffscreenCleanComponent())
-                .with("damage", 1)
+                .with("damage", 2)
+                .build();
+    }
+
+    @Spawns("machineGunBullet")
+    public Entity newMachineGun(SpawnData data) {
+        return entityBuilder()
+                .type(BULLET)
+                .at((Point2D) data.get("position"))
+                .viewWithBBox(new Rectangle(14,3, Color.ORANGERED))
+                .with(new CollidableComponent(true))
+                .with(new ProjectileComponent(data.get("direction"), 650))
+                .with(new OffscreenCleanComponent())
+                .with("damage", 2)
                 .build();
     }
 
@@ -53,7 +66,7 @@ public class BasicGameFactory implements EntityFactory {
         return entityBuilder()
                 .type(ENEMYBULLET)
                 .from(data)
-                .viewWithBBox(new Rectangle(12, 3, Color.BLACK))
+                .viewWithBBox(new Rectangle(12, 3, Color.DARKRED))
                 .with(new CollidableComponent(true))
                 .with(new ProjectileComponent(data.get("direction"), 300))
                 .with(new OffscreenCleanComponent())
@@ -109,7 +122,7 @@ public class BasicGameFactory implements EntityFactory {
                 .from(data)
                 .viewWithBBox(new Circle(16, 16, 15, Color.BLACK))
                 .with(new CollidableComponent(true))
-                .with(new HPComponent(2))
+                .with(new HPComponent(6))
                 .with(new EnemyComponent())
                 .with(new FlickerComponent())
                 .with("alertRange", 600)
