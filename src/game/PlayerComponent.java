@@ -29,6 +29,13 @@ public class PlayerComponent extends Component {
     private HPComponent hp;
     private int jumps = 2;
 
+    private String[] weaponList = {"default", "shotgun"};
+    private int currentWeapon = 0;
+
+    private boolean canFire = true;
+    private double defaultCooldown = 0.3;
+    private double shotgunCooldown = 1;
+
     private boolean isBeingDamaged = false;
 
     public PlayerComponent() {
@@ -111,10 +118,37 @@ public class PlayerComponent extends Component {
         physics.setVelocityX(0);
     }
 
+    public void changeWeapon() {
+        if (currentWeapon < weaponList.length - 1)
+            currentWeapon++;
+        else
+            currentWeapon = 0;
+    }
+
     public void fire(Point2D aim, Point2D position) {
-        SpawnData spawnData = new SpawnData(aim).put("direction", aim);
-        spawnData.put("position", position);
-        FXGL.spawn("playerBullet", spawnData);
+        if (canFire) {
+            switch (weaponList[currentWeapon]) {
+                case "default":
+                        canFire = false;
+                        SpawnData spawnData = new SpawnData(aim).put("direction", aim);
+                        spawnData.put("position", position);
+                        FXGL.spawn("defaultBullet", spawnData);
+                        FXGL.runOnce(() -> {
+                        canFire = true;
+                        }, Duration.seconds(defaultCooldown));
+                        return;
+                case "shotgun":
+                        canFire = false;
+                        for (int i = 0; i <= 6; i++) {
+                            SpawnData spawnDataShotgun = new SpawnData(aim).put("direction", aim.add(Math.random() * 0.1, Math.random() * 0.1));
+                            spawnDataShotgun.put("position", position);
+                            FXGL.spawn("shotgunPellet", spawnDataShotgun);
+                        }
+                        FXGL.runOnce(() -> {
+                            canFire = true;
+                        }, Duration.seconds(shotgunCooldown));
+            }
+        }
     }
 
     public void onHit(int damage) {

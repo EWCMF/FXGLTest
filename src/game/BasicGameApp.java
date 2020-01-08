@@ -33,7 +33,6 @@ public class BasicGameApp extends GameApplication {
     private Point2D gunLeftMiddle = new Point2D(0, 35);
     private Point2D gunLeftDown = new Point2D(7, 70);
 
-
     @Override
     protected void initSettings(GameSettings settings) {
         settings.setWidth(1280);
@@ -83,9 +82,16 @@ public class BasicGameApp extends GameApplication {
             }
         }, KeyCode.F);
 
-        input.addAction(new UserAction("Shoot") {
+        input.addAction(new UserAction("Change weapon") {
             @Override
             protected void onActionBegin() {
+                player.getComponent(PlayerComponent.class).changeWeapon();
+            }
+        }, KeyCode.E);
+
+        input.addAction(new UserAction("Shoot") {
+            @Override
+            protected void onAction() {
                 Point2D vector = FXGL.getInput().getVectorToMouse(player.getPosition());
                 if (vector.getX() < 0 && player.getTransformComponent().getScaleX() != -1.0)
                     return;

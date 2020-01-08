@@ -22,14 +22,27 @@ import static game.BasicGameTypes.*;
 
 public class BasicGameFactory implements EntityFactory {
 
-    @Spawns("playerBullet")
-    public Entity newBullet(SpawnData data) {
+    @Spawns("defaultBullet")
+    public Entity newDefault(SpawnData data) {
         return entityBuilder()
                 .type(BULLET)
                 .at((Point2D) data.get("position"))
                 .viewWithBBox(new Rectangle(12,3, Color.BLACK))
                 .with(new CollidableComponent(true))
                 .with(new ProjectileComponent(data.get("direction"), 650))
+                .with(new OffscreenCleanComponent())
+                .with("damage", 1)
+                .build();
+    }
+
+    @Spawns("shotgunPellet")
+    public Entity newPellet(SpawnData data) {
+        return entityBuilder()
+                .type(BULLET)
+                .at((Point2D) data.get("position"))
+                .viewWithBBox(new Rectangle(10,3, Color.BLACK))
+                .with(new CollidableComponent(true))
+                .with(new ProjectileComponent(data.get("direction"), 850))
                 .with(new OffscreenCleanComponent())
                 .with("damage", 1)
                 .build();
