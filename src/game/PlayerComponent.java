@@ -111,8 +111,8 @@ public class PlayerComponent extends Component {
         physics.setVelocityX(0);
     }
 
-    public void fire(Point2D point2D, Point2D position) {
-        SpawnData spawnData = new SpawnData(point2D).put("direction", point2D.normalize());
+    public void fire(Point2D aim, Point2D position) {
+        SpawnData spawnData = new SpawnData(aim).put("direction", aim);
         spawnData.put("position", position);
         FXGL.spawn("playerBullet", spawnData);
     }

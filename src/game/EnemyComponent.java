@@ -6,7 +6,9 @@ import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.time.LocalTimer;
+import javafx.geometry.Point2D;
 import javafx.util.Duration;
+
 
 @Required(HPComponent.class)
 public class EnemyComponent extends Component {
@@ -38,7 +40,9 @@ public class EnemyComponent extends Component {
     }
 
     public void basicEnemyAttack(Entity player) {
-        FXGL.getGameWorld().spawn("enemyBullet", new SpawnData(entity.getPosition()).put("direction", player.getPosition().subtract(entity.getPosition())));
+        Point2D enemyPosition = entity.getBoundingBoxComponent().getCenterWorld();
+        Point2D enemyTarget =  player.getBoundingBoxComponent().getCenterWorld().add(0, -12).subtract(entity.getBoundingBoxComponent().getCenterWorld());
+        FXGL.getGameWorld().spawn("enemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));
     }
 
     public void onHit(int damage) {

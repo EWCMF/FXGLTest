@@ -9,7 +9,6 @@ import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
-import com.almasb.fxgl.physics.PhysicsComponent;
 import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
@@ -25,6 +24,14 @@ public class BasicGameApp extends GameApplication {
 
     public static int hpInX = 15;
     public static int hpInY = 35;
+
+    private Point2D gunRightUp = new Point2D(46, 13);
+    private Point2D gunRightMiddle = new Point2D(52, 35);
+    private Point2D gunRightDown = new Point2D(45, 70);
+
+    private Point2D gunLeftUp = new Point2D(6, 13);
+    private Point2D gunLeftMiddle = new Point2D(0, 35);
+    private Point2D gunLeftDown = new Point2D(7, 70);
 
 
     @Override
@@ -73,17 +80,6 @@ public class BasicGameApp extends GameApplication {
         input.addAction(new UserAction("Test something") {
             @Override
             protected void onActionBegin() {
-                double width = player.getBoundingBoxComponent().getWidth();
-                double height = player.getBoundingBoxComponent().getHeight();
-
-                SpawnData data = new SpawnData(player.getBoundingBoxComponent().getMinXWorld(), player.getBoundingBoxComponent().getMinYWorld());
-                data.put("width", width);
-                data.put("height", height);
-
-                Entity flicker = FXGL.getGameWorld().spawn("hitboxFlicker", data);
-                System.out.println(flicker.getViewComponent().getChildren());
-                System.out.println(player.getViewComponent().getChildren());
-
             }
         }, KeyCode.F);
 
@@ -91,33 +87,43 @@ public class BasicGameApp extends GameApplication {
             @Override
             protected void onActionBegin() {
                 Point2D vector = FXGL.getInput().getVectorToMouse(player.getPosition());
-                if (FXGL.getInput().getVectorToMouse(player.getPosition()).getX() < 0 && player.getTransformComponent().getScaleX() != -1.0)
+                if (vector.getX() < 0 && player.getTransformComponent().getScaleX() != -1.0)
                     return;
-                if (FXGL.getInput().getVectorToMouse(player.getPosition()).getX() > 0 && player.getTransformComponent().getScaleX() != 1.0)
+                if (vector.getX() > 0 && player.getTransformComponent().getScaleX() != 1.0)
                     return;
 
-                double gunPosition = FXGL.getInput().getVectorToMouse(player.getPosition()).getY();
+                double mouseY = FXGL.getInput().getVectorToMouse(player.getPosition()).getY();
 
+                // Facing left.
                 if (player.getTransformComponent().getScaleX() == -1.0) {
                     // Middle position, Up position, down position.
-                    if (gunPosition > aimUpVectorY && gunPosition < aimDownVectorY)
-                        player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(0, 35));
-                    else if (gunPosition < aimUpVectorY)
-                        player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(6, 13));
-                    else if (gunPosition > aimDownVectorY)
-                        player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(7, 70));
+                    FiringPosition(mouseY, gunLeftMiddle, gunLeftUp, gunLeftDown);
                 }
+                // Facing right.
                 else {
                     // Middle position, Up position, down position.
-                    if (gunPosition > aimUpVectorY && gunPosition < aimDownVectorY)
-                        player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(52, 35));
-                    else if (gunPosition < aimUpVectorY)
-                        player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(46, 13));
-                    else if (gunPosition > aimDownVectorY)
-                        player.getComponent(PlayerComponent.class).fire(vector, player.getPosition().add(45, 70));
+                    FiringPosition(mouseY, gunRightMiddle, gunRightUp, gunRightDown);
                 }
             }
         }, MouseButton.PRIMARY);
+    }
+
+    private void FiringPosition(double mouseY, Point2D gunMiddle, Point2D gunUp, Point2D gunDown) {
+        if (mouseY > aimUpVectorY && mouseY < aimDownVectorY) {
+            Point2D gunOffset = player.getPosition().add(gunMiddle);
+            Point2D mouseVector = FXGL.getInput().getVectorToMouse(gunOffset).normalize();
+            player.getComponent(PlayerComponent.class).fire(mouseVector, gunOffset);
+        }
+        else if (mouseY < aimUpVectorY) {
+            Point2D gunOffset = player.getPosition().add(gunUp);
+            Point2D mouseVector = FXGL.getInput().getVectorToMouse(gunOffset).normalize();
+            player.getComponent(PlayerComponent.class).fire(mouseVector, gunOffset);
+        }
+        else if (mouseY > aimDownVectorY) {
+            Point2D gunOffset = player.getPosition().add(gunDown);
+            Point2D mouseVector = FXGL.getInput().getVectorToMouse(gunOffset).normalize();
+            player.getComponent(PlayerComponent.class).fire(mouseVector, gunOffset);
+        }
     }
 
     @Override
