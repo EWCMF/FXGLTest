@@ -45,8 +45,8 @@ public class BasicGameApp extends GameApplication {
     protected void initSettings(GameSettings settings) {
         settings.setWidth(1280);
         settings.setHeight(720);
-        settings.setTitle("Basic Game App");
-        settings.setVersion("0.1");
+        settings.setTitle("Contra Knockoff");
+        settings.setVersion("0.2");
     }
 
     @Override

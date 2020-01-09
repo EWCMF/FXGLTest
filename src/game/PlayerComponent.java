@@ -99,7 +99,7 @@ public class PlayerComponent extends Component {
 
         if (jumps == 2 && dead) {
             texture.loopAnimationChannel(animDead);
-            stop();
+            physics.setVelocityX(0);
             FXGL.runOnce(() -> {
                 FXGL.<BasicGameApp>getAppCast().playerDeath();
             }, Duration.seconds(2));
@@ -127,7 +127,7 @@ public class PlayerComponent extends Component {
     }
 
     public void jump() {
-        if (dead || jumps == 0)
+        if (jumps == 0 || dead)
             return;
 
         physics.setVelocityY(-400);
@@ -135,6 +135,9 @@ public class PlayerComponent extends Component {
     }
 
     public void stop() {
+        if (dead)
+            return;
+
         physics.setVelocityX(0);
     }
 

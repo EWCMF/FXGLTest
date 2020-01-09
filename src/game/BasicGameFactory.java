@@ -96,7 +96,7 @@ public class BasicGameFactory implements EntityFactory {
     public Entity newPlayer(SpawnData data) {
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
-        physicsComponent.addGroundSensor(new HitBox(BoundingShape.box(42, 94)));
+        physicsComponent.addGroundSensor(new HitBox(new Point2D(39, 84), BoundingShape.box(5, 10)));
         physicsComponent.setFixtureDef(new FixtureDef().friction(0.0f));
 
         Point2D hitboxOffset = new Point2D(7, 14);
