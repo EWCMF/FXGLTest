@@ -15,7 +15,7 @@ import javafx.util.Duration;
 public class PlayerComponent extends Component {
 
     private AnimatedTexture texture;
-    private AnimationChannel animIdle, animIdleUp, animIdleDown, animWalk, animWalkUp, animWalkDown;
+    private AnimationChannel animIdle, animIdleUp, animIdleDown, animWalk, animWalkUp, animWalkDown, animDeath, animDead;
 
     private double aimUpVectorY = BasicGameApp.aimUpVectorY;
     private double aimDownVectorY = BasicGameApp.aimDownVectorY;
@@ -36,10 +36,12 @@ public class PlayerComponent extends Component {
     private int machineGunAmmo = BasicGameApp.ammoMachineGun;
 
     private boolean isBeingDamaged = false;
+    private boolean dead = false;
 
     public PlayerComponent() {
 
         Image image = FXGL.image("player.png");
+        Image death = FXGL.image("playerDeath.png");
 
         animIdle = new AnimationChannel(image, 21, 78, 94, Duration.seconds(1), 0, 0);
         animIdleUp = new AnimationChannel(image, 21, 78, 94, Duration.seconds(1), 1, 1);
@@ -49,6 +51,8 @@ public class PlayerComponent extends Component {
         animWalkUp = new AnimationChannel(image, 21, 78, 94, Duration.seconds(1), 8, 13);
         animWalkDown = new AnimationChannel(image, 21, 78, 94, Duration.seconds(1), 15, 20);
 
+        animDeath = new AnimationChannel(death, 2, 96, 94, Duration.seconds(1), 0, 0);
+        animDead = new AnimationChannel(death, 2, 96, 94, Duration.seconds(1), 1, 1);
 
         texture = new AnimatedTexture(animIdle);
         texture.loop();
@@ -88,6 +92,18 @@ public class PlayerComponent extends Component {
                 texture.loopAnimationChannel(animIdleDown);
             }
         }
+
+        if (jumps == -1) {
+            texture.loopAnimationChannel(animDeath);
+        }
+
+        if (jumps == 2 && dead) {
+            texture.loopAnimationChannel(animDead);
+            stop();
+            FXGL.runOnce(() -> {
+                FXGL.<BasicGameApp>getAppCast().playerDeath();
+            }, Duration.seconds(2));
+        }
     }
 
     private boolean isMoving() {
@@ -95,20 +111,25 @@ public class PlayerComponent extends Component {
     }
 
     public void left() {
+        if (dead)
+            return;
 
         getEntity().setScaleX(-1);
         physics.setVelocityX(-300);
     }
 
     public void right() {
+        if (dead)
+            return;
 
         getEntity().setScaleX(1);
         physics.setVelocityX(300);
     }
 
     public void jump() {
-        if (jumps == 0)
+        if (dead || jumps == 0)
             return;
+
         physics.setVelocityY(-400);
         jumps--;
     }
@@ -156,8 +177,17 @@ public class PlayerComponent extends Component {
                         canFire = false;
                         shotgunAmmo--;
                         FXGL.set("ammoShotgun", shotgunAmmo);
-                        for (int i = 0; i <= 6; i++) {
-                            SpawnData spawnDataShotgun = new SpawnData(aim).put("direction", aim.add(Math.random() * 0.1, Math.random() * 0.1));
+                        SpawnData spawnDataShotgunInitial = new SpawnData(aim).put("direction", aim);
+                        spawnDataShotgunInitial.put("position", position);
+                        FXGL.spawn("shotgunPellet", spawnDataShotgunInitial);
+                        for (int i = 0; i <= 5; i++) {
+                            double randomX = Math.random() * 0.05;
+                            if (randomX < 0.025)
+                                randomX = randomX * -1;
+                            double randomY = Math.random() * 0.05;
+                            if (randomY < 0.025)
+                                randomY = randomY * -1;
+                            SpawnData spawnDataShotgun = new SpawnData(aim).put("direction", aim.add(randomX, randomY));
                             spawnDataShotgun.put("position", position);
                             FXGL.spawn("shotgunPellet", spawnDataShotgun);
                         }
@@ -182,7 +212,7 @@ public class PlayerComponent extends Component {
         }
     }
 
-    public void onHit(int damage) {
+    public void onHit(int damage, Point2D direction) {
         if (isBeingDamaged)
             return;
 
@@ -194,8 +224,17 @@ public class PlayerComponent extends Component {
             isBeingDamaged = false;
         }, Duration.seconds(1));
 
-        if (hp.getValue() <= 0) {
-            FXGL.<BasicGameApp>getAppCast().playerDeath();
+        if (hp.getValue() <= 0 && !dead) {
+            dead = true;
+            jumps = -1;
+            if (direction.getX() <= 0) {
+                getEntity().setScaleX(1);
+                physics.setLinearVelocity(-500, -300);
+            }
+            else {
+                getEntity().setScaleX(-1);
+                physics.setLinearVelocity(500, -300);
+            }
         }
     }
 

@@ -239,11 +239,19 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(ENEMYBULLET, WALL) {
+            @Override
+            protected void onCollisionBegin(Entity enemyBullet, Entity wall) {
+                enemyBullet.removeFromWorld();
+            }
+        });
+
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(ENEMYBULLET, PLAYER) {
             @Override
             protected void onCollisionBegin(Entity enemyBullet, Entity player) {
                 enemyBullet.removeFromWorld();
-                player.getComponent(PlayerComponent.class).onHit(enemyBullet.getInt("damage"));
+                Point2D deathVector = (player.getBoundingBoxComponent().getCenterWorld().subtract(enemyBullet.getBoundingBoxComponent().getCenterWorld()));
+                player.getComponent(PlayerComponent.class).onHit(enemyBullet.getInt("damage"), deathVector);
                 player.getComponent(FlickerComponent.class).flicker();
             }
         });
