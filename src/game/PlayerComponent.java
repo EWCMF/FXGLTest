@@ -107,6 +107,9 @@ public class PlayerComponent extends Component {
                 FXGL.<BasicGameApp>getAppCast().playerDeath();
             }, Duration.seconds(2));
         }
+
+        FXGL.set("ammoMachineGun", machineGunAmmo);
+        FXGL.set("ammoShotgun", shotgunAmmo);
     }
 
     private boolean isMoving() {
@@ -182,7 +185,6 @@ public class PlayerComponent extends Component {
                     if (shotgunAmmo != 0) {
                         canFire = false;
                         shotgunAmmo--;
-                        FXGL.set("ammoShotgun", shotgunAmmo);
                         SpawnData spawnDataShotgunInitial = new SpawnData(aim).put("direction", aim);
                         spawnDataShotgunInitial.put("position", position);
                         FXGL.spawn("shotgunPellet", spawnDataShotgunInitial);
@@ -205,7 +207,6 @@ public class PlayerComponent extends Component {
                 case "machineGun":
                     if (machineGunAmmo != 0) {
                         machineGunAmmo--;
-                        FXGL.set("ammoMachineGun", machineGunAmmo);
                         canFire = false;
                         SpawnData spawnDataMachineGun = new SpawnData(aim).put("direction", aim);
                         spawnDataMachineGun.put("position", position);
@@ -250,6 +251,11 @@ public class PlayerComponent extends Component {
 
     public void restoreHP() {
         hp.setValue(hp.getMaxHP());
+    }
+
+    public void restoreAmmo(int amount) {
+        shotgunAmmo += amount * 10;
+        machineGunAmmo += amount * 100;
     }
 
     public void setHoldingMoveDirection(boolean holdingMoveDirection) {

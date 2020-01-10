@@ -298,6 +298,14 @@ public class BasicGameApp extends GameApplication {
                 moving.getComponent(MovingPlatformComponent.class).checkDirection();
             }
         });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, AMMOBOX) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity ammobox) {
+                ammobox.removeFromWorld();
+                player.getComponent(PlayerComponent.class).restoreAmmo(ammobox.getProperties().getInt("amount"));
+            }
+        });
     }
 
     protected void onUpdate(double tpf) {

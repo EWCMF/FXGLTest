@@ -218,4 +218,16 @@ public class BasicGameFactory implements EntityFactory {
                 .with("damage", 3 * BasicGameApp.enemyDamageModifier)
                 .build();
     }
+
+    @Spawns("ammoBox")
+    public Entity newAmmoBox(SpawnData data) {
+        return entityBuilder()
+                .type(AMMOBOX)
+                .from(data)
+                .view("ammoBox.png")
+                .bbox(new HitBox(new Point2D(0, 27), BoundingShape.box(64, 37)))
+                .with(new CollidableComponent(true))
+                .with("amount", data.get("amount"))
+                .build();
+    }
 }
