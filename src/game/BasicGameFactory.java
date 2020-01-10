@@ -98,7 +98,7 @@ public class BasicGameFactory implements EntityFactory {
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
         physicsComponent.addGroundSensor(new HitBox(new Point2D(39, 84), BoundingShape.box(5, 10)));
-        physicsComponent.setFixtureDef(new FixtureDef().friction(0.0f));
+        physicsComponent.setFixtureDef(new FixtureDef().friction(5));
 
         Point2D hitboxOffset = new Point2D(7, 14);
 
@@ -118,33 +118,62 @@ public class BasicGameFactory implements EntityFactory {
 
     @Spawns("platform")
     public Entity newPlatform(SpawnData data) {
+        PhysicsComponent physicsComponent = new PhysicsComponent();
+        physicsComponent.setBodyType(BodyType.STATIC);
+        physicsComponent.setFixtureDef(new FixtureDef().friction(0));
+
         return entityBuilder()
                 .type(WALL)
                 .from(data)
                 .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
-                .with(new PhysicsComponent())
+                .with(physicsComponent)
                 .with(new CollidableComponent(true))
                 .build();
     }
 
     @Spawns("passablePlatform")
     public Entity newPassablePlatform(SpawnData data) {
+        PhysicsComponent physicsComponent = new PhysicsComponent();
+        physicsComponent.setBodyType(BodyType.STATIC);
+        physicsComponent.setFixtureDef(new FixtureDef().friction(0));
+
         return entityBuilder()
                 .type(PASSABLE)
                 .from(data)
                 .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
-                .with(new PhysicsComponent())
+                .with(physicsComponent)
                 .with(new CollidableComponent(true))
                 .build();
     }
 
     @Spawns("movingPlatform")
     public Entity newMovingPlatform(SpawnData data) {
+        PhysicsComponent physicsComponent = new PhysicsComponent();
+        physicsComponent.setBodyType(BodyType.KINEMATIC);
+        physicsComponent.setOnPhysicsInitialized(() -> {
+            Integer typeCast = data.get("startDir");
+            physicsComponent.setVelocityX(typeCast.doubleValue());
+        });
+
+        physicsComponent.setFixtureDef(new FixtureDef().friction(5));
+
         return entityBuilder()
                 .type(MOVING)
                 .from(data)
+                .view("testPlatform.png")
                 .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
-                .with(new PhysicsComponent())
+                .with(physicsComponent)
+                .with(new CollidableComponent(true))
+                .with(new MovingPlatformComponent())
+                .build();
+    }
+
+    @Spawns("movingPlatformStop")
+    public Entity newMovingPlatformStop(SpawnData data) {
+        return entityBuilder()
+                .type(MOVINGSTOP)
+                .from(data)
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
                 .with(new CollidableComponent(true))
                 .build();
     }

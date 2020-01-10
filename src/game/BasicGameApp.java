@@ -4,7 +4,6 @@ import com.almasb.fxgl.app.*;
 import com.almasb.fxgl.core.collection.PropertyMap;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
-import com.almasb.fxgl.entity.level.Level;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
@@ -15,8 +14,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-
-import java.io.File;
 import java.util.Map;
 
 import static game.BasicGameTypes.*;
@@ -68,11 +65,13 @@ public class BasicGameApp extends GameApplication {
             @Override
             protected void onAction() {
                 player.getComponent(PlayerComponent.class).right();
+                player.getComponent(PlayerComponent.class).setHoldingMoveDirection(true);
             }
 
             @Override
             protected void onActionEnd() {
                 player.getComponent(PlayerComponent.class).stop();
+                player.getComponent(PlayerComponent.class).setHoldingMoveDirection(false);
             }
         }, KeyCode.D);
 
@@ -80,11 +79,13 @@ public class BasicGameApp extends GameApplication {
             @Override
             protected void onAction() {
                 player.getComponent(PlayerComponent.class).left();
+                player.getComponent(PlayerComponent.class).setHoldingMoveDirection(true);
             }
 
             @Override
             protected void onActionEnd() {
                 player.getComponent(PlayerComponent.class).stop();
+                player.getComponent(PlayerComponent.class).setHoldingMoveDirection(false);
             }
         }, KeyCode.A);
 
@@ -273,7 +274,7 @@ public class BasicGameApp extends GameApplication {
             @Override
             protected void onCollisionBegin(Entity player, Entity exit) {
                 PropertyMap exitP = exit.getProperties();
-                getDisplay().showMessageBox("Level Complete", () -> {
+                getDisplay().showMessageBox("Level Complete.", () -> {
                     if (exitP.exists("next")) {
                         if (exitP.exists("newBoundX"))
                             setLevel(exitP.getString("next"), exitP.getInt("newBoundX"), exitP.getInt("newBoundY"));
@@ -283,6 +284,13 @@ public class BasicGameApp extends GameApplication {
                     else
                         setLevel(gets("level"));
                 });
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(MOVING, MOVINGSTOP) {
+            @Override
+            protected void onCollisionBegin(Entity moving, Entity movingStop) {
+                moving.getComponent(MovingPlatformComponent.class).checkDirection();
             }
         });
     }

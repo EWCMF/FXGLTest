@@ -5,6 +5,7 @@ import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.physics.PhysicsComponent;
+import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
 import javafx.geometry.Point2D;
@@ -37,6 +38,8 @@ public class PlayerComponent extends Component {
 
     private boolean isBeingDamaged = false;
     private boolean dead = false;
+
+    private boolean holdingMoveDirection = false;
 
     public PlayerComponent() {
 
@@ -71,7 +74,7 @@ public class PlayerComponent extends Component {
 
     @Override
     public void onUpdate(double tpf) {
-        if (isMoving()) {
+        if (holdingMoveDirection) {
             if (texture.getAnimationChannel() != animWalk && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() > aimUpVectorY && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() < aimDownVectorY) {
                 texture.loopAnimationChannel(animWalk);
             }
@@ -247,5 +250,9 @@ public class PlayerComponent extends Component {
 
     public void restoreHP() {
         hp.setValue(hp.getMaxHP());
+    }
+
+    public void setHoldingMoveDirection(boolean holdingMoveDirection) {
+        this.holdingMoveDirection = holdingMoveDirection;
     }
 }
