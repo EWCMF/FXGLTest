@@ -1,8 +1,6 @@
 package game;
 
-import com.almasb.fxgl.app.GameApplication;
-import com.almasb.fxgl.app.GameSettings;
-import com.almasb.fxgl.app.Viewport;
+import com.almasb.fxgl.app.*;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.input.Input;
@@ -14,6 +12,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -39,7 +38,7 @@ public class BasicGameApp extends GameApplication {
     public static int ammoShotgun = 20;
     public static int ammoMachineGun = 200;
 
-    public static int enemyDamageModifier = 2;
+    public static int enemyDamageModifier = 0;
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -47,6 +46,13 @@ public class BasicGameApp extends GameApplication {
         settings.setHeight(720);
         settings.setTitle("Contra Knockoff");
         settings.setVersion("0.2");
+        settings.setMenuEnabled(true);
+        settings.setSceneFactory(new SceneFactory() {
+            @Override
+            public FXGLMenu newMainMenu() {
+                return new BasicGameMenu();
+            }
+        });
     }
 
     @Override
@@ -273,7 +279,7 @@ public class BasicGameApp extends GameApplication {
 
     protected void playerDeath() {
         FXGL.runOnce(() -> {
-            getDisplay().showMessageBox("You Died.", getGameController()::exit);
+            getDisplay().showMessageBox("You Died.", getGameController()::gotoMainMenu);
         }, Duration.seconds(0.45));
     }
 
