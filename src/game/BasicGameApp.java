@@ -1,19 +1,22 @@
 package game;
 
 import com.almasb.fxgl.app.*;
+import com.almasb.fxgl.core.collection.PropertyMap;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.level.Level;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
+import com.almasb.fxgl.physics.PhysicsComponent;
 import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.Map;
 
 import static game.BasicGameTypes.*;
@@ -39,6 +42,8 @@ public class BasicGameApp extends GameApplication {
     public static int ammoMachineGun = 200;
 
     public static int enemyDamageModifier = 0;
+
+    private String startLevel = "test2.tmx";
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -155,22 +160,24 @@ public class BasicGameApp extends GameApplication {
 
     @Override
     protected void initGameVars(Map<String, Object> vars) {
+        vars.put("level", startLevel);
+
         vars.put("ammoShotgun", ammoShotgun);
         vars.put("ammoMachineGun", ammoMachineGun);
         vars.put("weaponIndicatorPosition", 13);
     }
 
     public Entity player;
-    public Point2D start;
 
     @Override
     protected void initGame() {
         getGameWorld().addEntityFactory(new BasicGameFactory());
-        setLevelFromMap("test2.tmx");
+
+        player = null;
+        setLevel(gets("level"));
         getGameScene().setBackgroundColor(Color.color(0.2, 0.2, 0.2));
 
-        start = FXGL.getGameWorld().getSingleton(START).getPosition();
-
+        Point2D start = FXGL.getGameWorld().getSingleton(START).getPosition();
         player = FXGL.getGameWorld().spawn("player", start);
 
         initHP();
@@ -265,7 +272,17 @@ public class BasicGameApp extends GameApplication {
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, EXIT) {
             @Override
             protected void onCollisionBegin(Entity player, Entity exit) {
-                getDisplay().showMessageBox("You Won.", getGameController()::exit);
+                PropertyMap exitP = exit.getProperties();
+                getDisplay().showMessageBox("Level Complete", () -> {
+                    if (exitP.exists("next")) {
+                        if (exitP.exists("newBoundX"))
+                            setLevel(exitP.getString("next"), exitP.getInt("newBoundX"), exitP.getInt("newBoundY"));
+                        else
+                            setLevel(exitP.getString("next"));
+                    }
+                    else
+                        setLevel(gets("level"));
+                });
             }
         });
     }
@@ -274,6 +291,30 @@ public class BasicGameApp extends GameApplication {
         if (player.getPosition().getY() > 32 * 70) {
             player.getComponent(PlayerComponent.class).setHP(0);
             playerDeath();
+        }
+    }
+
+    protected void setLevel(String level) {
+        setLevelFromMap(level);
+        set("level", level);
+
+        if (player != null) {
+            player.getComponent(PhysicsComponent.class).overwritePosition(getGameWorld().getSingleton(START).getPosition());
+            player.setZ(Integer.MAX_VALUE);
+            player.getComponent(PlayerComponent.class).restoreHP();
+        }
+    }
+
+    protected void setLevel(String level, int newMaxX, int newMaxY) {
+        setLevelFromMap(level);
+        set("level", level);
+
+        getGameScene().getViewport().setBounds(-32, 0, newMaxX, newMaxY);
+
+        if (player != null) {
+            player.getComponent(PhysicsComponent.class).overwritePosition(getGameWorld().getSingleton(START).getPosition());
+            player.setZ(Integer.MAX_VALUE);
+            player.getComponent(PlayerComponent.class).restoreHP();
         }
     }
 

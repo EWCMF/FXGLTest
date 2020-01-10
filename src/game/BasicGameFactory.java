@@ -7,6 +7,7 @@ import com.almasb.fxgl.entity.EntityFactory;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.Spawns;
 import com.almasb.fxgl.entity.components.CollidableComponent;
+import com.almasb.fxgl.entity.components.IrremovableComponent;
 import com.almasb.fxgl.physics.BoundingShape;
 import com.almasb.fxgl.physics.HitBox;
 import com.almasb.fxgl.physics.PhysicsComponent;
@@ -111,6 +112,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new HPComponent(12))
                 .with(new PlayerComponent())
                 .with(new FlickerComponent())
+                .with(new IrremovableComponent())
                 .build();
     }
 
@@ -129,6 +131,17 @@ public class BasicGameFactory implements EntityFactory {
     public Entity newPassablePlatform(SpawnData data) {
         return entityBuilder()
                 .type(PASSABLE)
+                .from(data)
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .with(new PhysicsComponent())
+                .with(new CollidableComponent(true))
+                .build();
+    }
+
+    @Spawns("movingPlatform")
+    public Entity newMovingPlatform(SpawnData data) {
+        return entityBuilder()
+                .type(MOVING)
                 .from(data)
                 .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
                 .with(new PhysicsComponent())

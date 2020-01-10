@@ -155,7 +155,7 @@
 </data>
  </layer>
  <objectgroup id="2" name="Object Layer 1">
-  <object id="1" type="start" x="96" y="2080" width="64" height="96"/>
+  <object id="1" type="start" x="96" y="2112" width="64" height="96"/>
   <object id="3" type="platform" x="32" y="2208" width="448" height="32"/>
   <object id="4" type="platform" x="928" y="2208" width="1792" height="32"/>
   <object id="5" type="platform" x="1472" y="352" width="32" height="1760"/>
@@ -184,7 +184,13 @@
   <object id="31" type="platform" x="2688" y="576" width="512" height="32"/>
   <object id="32" type="platform" x="1472" y="320" width="1216" height="32"/>
   <object id="33" type="platform" x="2688" y="224" width="32" height="224"/>
-  <object id="34" type="exit" x="2912" y="416" width="128" height="160"/>
+  <object id="34" type="exit" x="2912" y="416" width="128" height="160">
+   <properties>
+    <property name="newBoundX" type="int" value="3200"/>
+    <property name="newBoundY" type="int" value="1120"/>
+    <property name="next" value="test3.tmx"/>
+   </properties>
+  </object>
   <object id="35" type="platform" x="2720" y="224" width="448" height="32"/>
   <object id="36" type="platform" x="3168" y="224" width="32" height="352"/>
   <object id="37" type="eliteTurret" x="2016" y="352" width="32" height="32"/>
