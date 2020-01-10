@@ -1,6 +1,7 @@
 package game;
 
 import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import javafx.util.Duration;
@@ -14,6 +15,7 @@ public class MovingPlatformComponent extends Component {
     private double playerPlatformDiffLeftSideX;
     private double playerPlatformDiffRightSideX;
     private double playerPlatformDiffY;
+    private Entity player;
 
 
     @Override
@@ -23,16 +25,18 @@ public class MovingPlatformComponent extends Component {
     @Override
     public void onUpdate(double tpf) {
         // Needed for rebound
-        playerPlatformDiffLeftSideX = entity.getBoundingBoxComponent().getMinXWorld() - FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER).getBoundingBoxComponent().getMaxXWorld();
-        playerPlatformDiffRightSideX = entity.getBoundingBoxComponent().getMaxXWorld() - FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER).getBoundingBoxComponent().getMinXWorld();
-        playerPlatformDiffY = entity.getBoundingBoxComponent().getMinYWorld() - FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER).getBoundingBoxComponent().getMaxYWorld();
-
+        player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        playerPlatformDiffLeftSideX = entity.getBoundingBoxComponent().getMinXWorld() - player.getBoundingBoxComponent().getMaxXWorld();
+        playerPlatformDiffRightSideX = player.getBoundingBoxComponent().getMinXWorld() - entity.getBoundingBoxComponent().getMaxXWorld();
+        playerPlatformDiffY = entity.getBoundingBoxComponent().getMinYWorld() - player.getBoundingBoxComponent().getMaxYWorld();
         movingLeft = physics.getVelocityX() < 0;
 
-        if (playerPlatformDiffLeftSideX <= playerReboundRange && playerPlatformDiffY < 1 && playerPlatformDiffY > -100)
-            FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER).getComponent(PhysicsComponent.class).setVelocityX(-100);
-        if (playerPlatformDiffRightSideX <= playerReboundRange && playerPlatformDiffY < 1 && playerPlatformDiffY > -100)
-            FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER).getComponent(PhysicsComponent.class).setVelocityX(100);
+        if (playerPlatformDiffLeftSideX <= playerReboundRange && playerPlatformDiffRightSideX <= -playerReboundRange && playerPlatformDiffY < 1 && playerPlatformDiffY > -110) {
+            player.getComponent(PhysicsComponent.class).setVelocityX(-100);
+        }
+        if (playerPlatformDiffRightSideX <= playerReboundRange && playerPlatformDiffLeftSideX <= -playerReboundRange && playerPlatformDiffY < 1 && playerPlatformDiffY > -110) {
+            player.getComponent(PhysicsComponent.class).setVelocityX(100);
+        }
     }
 
     public void checkDirection() {

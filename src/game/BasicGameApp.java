@@ -40,7 +40,10 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "test2.tmx";
+    private String startLevel = "test3.tmx";
+    private int startBoundX = 32 * 100;
+    private int startBoundY = 32 * 70;
+
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -162,6 +165,8 @@ public class BasicGameApp extends GameApplication {
     @Override
     protected void initGameVars(Map<String, Object> vars) {
         vars.put("level", startLevel);
+        vars.put("currentBoundX", startBoundX);
+        vars.put("currentBoundY", startBoundY);
 
         vars.put("ammoShotgun", ammoShotgun);
         vars.put("ammoMachineGun", ammoMachineGun);
@@ -185,7 +190,7 @@ public class BasicGameApp extends GameApplication {
 
         Viewport viewport = FXGL.getGameScene().getViewport();
 
-        viewport.setBounds(32, 0, 32 * 100, 32 * 70);
+        viewport.setBounds(32, 0, startBoundX, startBoundY);
         viewport.bindToEntity(player, FXGL.getAppWidth() / 4, FXGL.getAppHeight() / 1.5);
     }
 
@@ -296,7 +301,7 @@ public class BasicGameApp extends GameApplication {
     }
 
     protected void onUpdate(double tpf) {
-        if (player.getPosition().getY() > 32 * 70) {
+        if (player.getPosition().getY() > geti("currentBoundY")) {
             player.getComponent(PlayerComponent.class).setHP(0);
             playerDeath();
         }
@@ -316,6 +321,8 @@ public class BasicGameApp extends GameApplication {
     protected void setLevel(String level, int newMaxX, int newMaxY) {
         setLevelFromMap(level);
         set("level", level);
+        set("currentBoundX", newMaxX);
+        set("currentBoundY", newMaxY);
 
         getGameScene().getViewport().setBounds(-32, 0, newMaxX, newMaxY);
 
