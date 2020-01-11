@@ -1,4 +1,4 @@
-package game;
+package game.enemy;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
@@ -6,12 +6,14 @@ import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.time.LocalTimer;
+import game.BasicGameTypes;
+import game.characters.HPComponent;
 import javafx.geometry.Point2D;
 import javafx.util.Duration;
 
 
 @Required(HPComponent.class)
-public class EliteEnemyComponent extends Component {
+public class EnemyComponent extends Component {
     private LocalTimer enemyAttackInterval;
     private HPComponent hp;
     boolean alerted = false;
@@ -42,7 +44,7 @@ public class EliteEnemyComponent extends Component {
     public void basicEnemyAttack(Entity player) {
         Point2D enemyPosition = entity.getBoundingBoxComponent().getCenterWorld();
         Point2D enemyTarget =  player.getBoundingBoxComponent().getCenterWorld().add(0, -12).subtract(entity.getBoundingBoxComponent().getCenterWorld());
-        FXGL.getGameWorld().spawn("eliteEnemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));
+        FXGL.getGameWorld().spawn("enemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));
     }
 
     public void onHit(int damage) {

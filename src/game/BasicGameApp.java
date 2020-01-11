@@ -9,6 +9,15 @@ import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
 import com.almasb.fxgl.physics.PhysicsComponent;
+import game.characters.FlickerComponent;
+import game.enemy.EliteEnemyComponent;
+import game.enemy.EnemyComponent;
+import game.level.ExitDoorComponent;
+import game.level.MovingPlatformComponent;
+import game.characters.HPComponent;
+import game.player.PlayerComponent;
+import game.ui.BasicGameMenu;
+import game.ui.HPIndicator;
 import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
@@ -41,7 +50,7 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "test1.tmx";
+    private String startLevel = "test2.tmx";
     private int startBoundX = 32 * 100;
     private int startBoundY = 32 * 70;
 
@@ -354,6 +363,21 @@ public class BasicGameApp extends GameApplication {
         setLevelFromMap(level);
         set("level", level);
 
+        initialLevelActions();
+    }
+
+    protected void setLevel(String level, int newMaxX, int newMaxY) {
+        setLevelFromMap(level);
+        set("level", level);
+        set("currentBoundX", newMaxX);
+        set("currentBoundY", newMaxY);
+
+        getGameScene().getViewport().setBounds(-32, 0, newMaxX, newMaxY);
+
+        initialLevelActions();
+    }
+
+    private void initialLevelActions() {
         if (player != null) {
             player.getComponent(PhysicsComponent.class).overwritePosition(getGameWorld().getSingleton(START).getPosition());
             player.setZ(Integer.MAX_VALUE);
@@ -371,25 +395,9 @@ public class BasicGameApp extends GameApplication {
                 getGameWorld().spawn("passablePlatformTrigger", data);
             }
         }
-
     }
 
-    protected void setLevel(String level, int newMaxX, int newMaxY) {
-        setLevelFromMap(level);
-        set("level", level);
-        set("currentBoundX", newMaxX);
-        set("currentBoundY", newMaxY);
-
-        getGameScene().getViewport().setBounds(-32, 0, newMaxX, newMaxY);
-
-        if (player != null) {
-            player.getComponent(PhysicsComponent.class).overwritePosition(getGameWorld().getSingleton(START).getPosition());
-            player.setZ(Integer.MAX_VALUE);
-            player.getComponent(PlayerComponent.class).restoreHP();
-        }
-    }
-
-    protected void playerDeath() {
+    public void playerDeath() {
         FXGL.runOnce(() -> {
             getDisplay().showMessageBox("You Died.", getGameController()::gotoMainMenu);
         }, Duration.seconds(0.45));

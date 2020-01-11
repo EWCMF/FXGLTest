@@ -1,8 +1,9 @@
-package game;
+package game.ui;
 
 import com.almasb.fxgl.app.FXGLMenu;
 import com.almasb.fxgl.app.MenuType;
 import com.almasb.fxgl.dsl.FXGL;
+import game.BasicGameApp;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.scene.Node;

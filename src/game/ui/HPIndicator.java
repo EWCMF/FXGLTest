@@ -1,6 +1,8 @@
-package game;
+package game.ui;
 
 import com.almasb.fxgl.animation.Interpolators;
+import game.BasicGameApp;
+import game.characters.HPComponent;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;

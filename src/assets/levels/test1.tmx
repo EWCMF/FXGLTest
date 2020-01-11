@@ -99,6 +99,7 @@
   <object id="9" type="platform" x="2272" y="512" width="32" height="576"/>
   <object id="10" type="exit" x="2176" y="672" width="64" height="96">
    <properties>
+    <property name="next" value="test2.tmx"/>
     <property name="startOpened" type="bool" value="true"/>
    </properties>
   </object>

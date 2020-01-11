@@ -1,6 +1,5 @@
 package game;
 
-import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.dsl.components.OffscreenCleanComponent;
 import com.almasb.fxgl.dsl.components.ProjectileComponent;
 import com.almasb.fxgl.entity.Entity;
@@ -13,8 +12,14 @@ import com.almasb.fxgl.physics.BoundingShape;
 import com.almasb.fxgl.physics.HitBox;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
-import com.almasb.fxgl.physics.box2d.dynamics.Filter;
 import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
+import game.characters.FlickerComponent;
+import game.enemy.EliteEnemyComponent;
+import game.enemy.EnemyComponent;
+import game.level.ExitDoorComponent;
+import game.level.MovingPlatformComponent;
+import game.characters.HPComponent;
+import game.player.PlayerComponent;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;

@@ -1,9 +1,10 @@
-package game;
+package game.level;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.physics.PhysicsComponent;
+import game.BasicGameTypes;
 import javafx.util.Duration;
 
 
