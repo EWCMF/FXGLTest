@@ -80,6 +80,7 @@ public class BasicGameFactory implements EntityFactory {
     @Spawns("start")
     public Entity newStart(SpawnData data) {
         return entityBuilder()
+                .view("startDoor.png")
                 .type(START)
                 .from(data)
                 .build();
@@ -92,6 +93,8 @@ public class BasicGameFactory implements EntityFactory {
                 .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
                 .with(new CollidableComponent(true))
                 .from(data)
+                .with(new ExitDoorComponent())
+                .with("startOpened", data.get("startOpened"))
                 .build();
     }
 

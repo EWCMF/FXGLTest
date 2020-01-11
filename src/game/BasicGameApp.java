@@ -293,17 +293,18 @@ public class BasicGameApp extends GameApplication {
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, EXIT) {
             @Override
             protected void onCollisionBegin(Entity player, Entity exit) {
-                PropertyMap exitP = exit.getProperties();
-                getDisplay().showMessageBox("Level Complete.", () -> {
-                    if (exitP.exists("next")) {
-                        if (exitP.exists("newBoundX"))
-                            setLevel(exitP.getString("next"), exitP.getInt("newBoundX"), exitP.getInt("newBoundY"));
-                        else
-                            setLevel(exitP.getString("next"));
-                    }
-                    else
-                        setLevel(gets("level"));
-                });
+                if (exit.getComponent(ExitDoorComponent.class).isOpened()) {
+                    PropertyMap exitP = exit.getProperties();
+                    getDisplay().showMessageBox("Level Complete.", () -> {
+                        if (exitP.exists("next")) {
+                            if (exitP.exists("newBoundX"))
+                                setLevel(exitP.getString("next"), exitP.getInt("newBoundX"), exitP.getInt("newBoundY"));
+                            else
+                                setLevel(exitP.getString("next"));
+                        } else
+                            setLevel(gets("level"));
+                    });
+                }
             }
         });
 
