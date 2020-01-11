@@ -107,12 +107,16 @@
   <object id="27" type="passablePlatform" x="2912" y="928" width="192" height="32"/>
   <object id="28" type="movingPlatform" x="2368" y="288" width="96" height="32">
    <properties>
-    <property name="startDir" type="int" value="100"/>
+    <property name="startDirX" type="int" value="100"/>
+    <property name="startDirY" type="int" value="0"/>
+    <property name="stopTime" type="int" value="3"/>
    </properties>
   </object>
   <object id="30" type="movingPlatform" x="1664" y="288" width="96" height="32">
    <properties>
-    <property name="startDir" type="int" value="-100"/>
+    <property name="startDirX" type="int" value="-100"/>
+    <property name="startDirY" type="int" value="0"/>
+    <property name="stopTime" type="int" value="3"/>
    </properties>
   </object>
   <object id="31" type="passablePlatform" x="2912" y="288" width="192" height="32"/>

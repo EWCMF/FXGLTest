@@ -166,8 +166,9 @@ public class BasicGameFactory implements EntityFactory {
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.KINEMATIC);
         physicsComponent.setOnPhysicsInitialized(() -> {
-            Integer typeCast = data.get("startDir");
-            physicsComponent.setVelocityX(typeCast.doubleValue());
+            Integer typeCast = data.get("startDirX");
+            Integer typeCast2 = data.get("startDirY");
+            physicsComponent.setLinearVelocity(typeCast.doubleValue(), typeCast2.doubleValue());
         });
 
         physicsComponent.setFixtureDef(new FixtureDef().friction(5));
@@ -180,6 +181,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(physicsComponent)
                 .with(new CollidableComponent(true))
                 .with(new MovingPlatformComponent())
+                .with("stopTime", data.get("stopTime"))
                 .build();
     }
 
