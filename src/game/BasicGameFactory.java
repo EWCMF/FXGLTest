@@ -1,5 +1,6 @@
 package game;
 
+import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.dsl.components.OffscreenCleanComponent;
 import com.almasb.fxgl.dsl.components.ProjectileComponent;
 import com.almasb.fxgl.entity.Entity;
@@ -12,6 +13,7 @@ import com.almasb.fxgl.physics.BoundingShape;
 import com.almasb.fxgl.physics.HitBox;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
+import com.almasb.fxgl.physics.box2d.dynamics.Filter;
 import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -136,12 +138,25 @@ public class BasicGameFactory implements EntityFactory {
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.STATIC);
         physicsComponent.setFixtureDef(new FixtureDef().friction(0));
-
+        physicsComponent.setOnPhysicsInitialized(() -> {
+            physicsComponent.getBody().setActive(false);
+        });
+        
         return entityBuilder()
                 .type(PASSABLE)
                 .from(data)
-                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), 1)))
                 .with(physicsComponent)
+                .with(new CollidableComponent(true))
+                .build();
+    }
+
+    @Spawns("passablePlatformTrigger")
+    public Entity newPassablePlatformTrigger(SpawnData data) {
+        return entityBuilder()
+                .type(PASSABLETRIGGER)
+                .from(data)
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
                 .with(new CollidableComponent(true))
                 .build();
     }

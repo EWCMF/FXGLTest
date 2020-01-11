@@ -4,6 +4,7 @@ import com.almasb.fxgl.app.*;
 import com.almasb.fxgl.core.collection.PropertyMap;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
@@ -40,10 +41,11 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "test3.tmx";
+    private String startLevel = "test2.tmx";
     private int startBoundX = 32 * 100;
     private int startBoundY = 32 * 70;
 
+    private boolean allowPass = false;
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -92,6 +94,18 @@ public class BasicGameApp extends GameApplication {
             }
         }, KeyCode.A);
 
+        input.addAction(new UserAction("Prone/Through platform") {
+            @Override
+            protected void onActionBegin() {
+                allowPass = true;
+            }
+
+            @Override
+            protected void onActionEnd() {
+                allowPass = false;
+            }
+        }, KeyCode.S);
+
         input.addAction(new UserAction("Jump") {
             @Override
             protected void onActionBegin() {
@@ -102,6 +116,7 @@ public class BasicGameApp extends GameApplication {
         input.addAction(new UserAction("Test something") {
             @Override
             protected void onActionBegin() {
+                System.out.println(player.getPosition());
             }
         }, KeyCode.F);
 
@@ -306,6 +321,25 @@ public class BasicGameApp extends GameApplication {
                 player.getComponent(PlayerComponent.class).restoreAmmo(ammobox.getProperties().getInt("amount"));
             }
         });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, PASSABLETRIGGER) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity passableTrigger) {
+                getGameWorld().getEntitiesAt(passableTrigger.getPosition().add(0, 81)).get(0).getComponent(PhysicsComponent.class).getBody().setActive(true);
+            }
+
+            @Override
+            protected void onCollision(Entity player, Entity passableTrigger) {
+                if (allowPass)
+                    getGameWorld().getEntitiesAt(passableTrigger.getPosition().add(0, 81)).get(0).getComponent(PhysicsComponent.class).getBody().setActive(false);
+
+            }
+
+            @Override
+            protected void onCollisionEnd(Entity player, Entity passableTrigger) {
+                getGameWorld().getEntitiesAt(passableTrigger.getPosition().add(0, 81)).get(0).getComponent(PhysicsComponent.class).getBody().setActive(false);
+            }
+        });
     }
 
     protected void onUpdate(double tpf) {
@@ -324,6 +358,19 @@ public class BasicGameApp extends GameApplication {
             player.setZ(Integer.MAX_VALUE);
             player.getComponent(PlayerComponent.class).restoreHP();
         }
+
+        if (!getGameWorld().getEntitiesByType(PASSABLE).isEmpty()) {
+            for (int i = 0; i < getGameWorld().getEntitiesByType(PASSABLE).size(); i++) {
+                Entity passable = getGameWorld().getEntitiesByType(PASSABLE).get(i);
+                SpawnData data = new SpawnData(passable.getPosition().add(0, -81));
+                Double typeCast = passable.getWidth();
+                data.put("width", typeCast.intValue());
+                Double typeCast2 = passable.getHeight();
+                data.put("height", typeCast2.intValue());
+                getGameWorld().spawn("passablePlatformTrigger", data);
+            }
+        }
+
     }
 
     protected void setLevel(String level, int newMaxX, int newMaxY) {

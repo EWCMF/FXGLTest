@@ -82,7 +82,7 @@
 </data>
  </layer>
  <objectgroup id="3" name="Object Layer 1">
-  <object id="1" type="start" x="128" y="192" width="64" height="96"/>
+  <object id="1" type="start" x="96" y="192" width="64" height="96"/>
   <object id="2" type="platform" x="0" y="0" width="32" height="1120"/>
   <object id="3" type="platform" x="896" y="1088" width="96" height="32"/>
   <object id="4" type="platform" x="32" y="1088" width="640" height="32"/>
