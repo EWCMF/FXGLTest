@@ -50,7 +50,7 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "test2.tmx";
+    private String startLevel = "test1.tmx";
     private int startBoundX = 32 * 100;
     private int startBoundY = 32 * 70;
 
@@ -285,6 +285,20 @@ public class BasicGameApp extends GameApplication {
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(ENEMYBULLET, WALL) {
             @Override
             protected void onCollisionBegin(Entity enemyBullet, Entity wall) {
+                enemyBullet.removeFromWorld();
+            }
+        });
+
+        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, SIDEDOOR) {
+            @Override
+            protected void onCollisionBegin(Entity bullet, Entity door) {
+                bullet.removeFromWorld();
+            }
+        });
+
+        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(ENEMYBULLET, SIDEDOOR) {
+            @Override
+            protected void onCollisionBegin(Entity enemyBullet, Entity door) {
                 enemyBullet.removeFromWorld();
             }
         });

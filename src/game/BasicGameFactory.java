@@ -19,6 +19,7 @@ import game.enemy.EnemyComponent;
 import game.level.ExitDoorComponent;
 import game.level.MovingPlatformComponent;
 import game.characters.HPComponent;
+import game.level.SideDoorComponent;
 import game.player.PlayerComponent;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -99,6 +100,19 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new CollidableComponent(true))
                 .from(data)
                 .with(new ExitDoorComponent())
+                .with("startOpened", data.get("startOpened"))
+                .build();
+    }
+
+    @Spawns("sideDoor")
+    public Entity newSideDoor(SpawnData data) {
+        return entityBuilder()
+                .type(SIDEDOOR)
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .with(new CollidableComponent(true))
+                .from(data)
+                .with(new SideDoorComponent())
+                .with(new PhysicsComponent())
                 .with("startOpened", data.get("startOpened"))
                 .build();
     }
