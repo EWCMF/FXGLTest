@@ -12,6 +12,7 @@ import com.almasb.fxgl.physics.PhysicsComponent;
 import game.characters.FlickerComponent;
 import game.enemy.EliteEnemyComponent;
 import game.enemy.EnemyComponent;
+import game.enemy.MovingEnemyComponent;
 import game.level.ExitDoorComponent;
 import game.level.MovingPlatformComponent;
 import game.characters.HPComponent;
@@ -71,6 +72,7 @@ public class BasicGameApp extends GameApplication {
                 return new BasicGameMenu();
             }
         });
+        settings.setDeveloperMenuEnabled(true);
     }
 
     @Override
@@ -127,8 +129,8 @@ public class BasicGameApp extends GameApplication {
         input.addAction(new UserAction("Test something") {
             @Override
             protected void onActionBegin() {
-                System.out.println(getGameWorld().getEntitiesByType(SIDEDOOR).get(0).getPosition());
-                System.out.println(getGameWorld().getEntitiesByType(SIDEDOORTRIGGER).get(0).getPosition());
+                String test = FXGL.getGameWorld().getEntitiesByType(MOVINGENEMY).get(0).getComponent(PhysicsComponent.class).getSensorHandlers().values().toString();
+                System.out.println(test);
             }
         }, KeyCode.F);
 
@@ -280,6 +282,17 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
+        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, MOVINGENEMY) {
+
+            // order of types is the same as passed into the constructor
+            @Override
+            protected void onCollisionBegin(Entity bullet, Entity movingEnemy) {
+                bullet.removeFromWorld();
+                movingEnemy.getComponent(MovingEnemyComponent.class).onHit(bullet.getInt("damage"));
+                movingEnemy.getComponent(FlickerComponent.class).flicker();
+            }
+        });
+
         FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, WALL) {
             @Override
             protected void onCollisionBegin(Entity bullet, Entity wall) {
@@ -297,14 +310,16 @@ public class BasicGameApp extends GameApplication {
         FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, SIDEDOOR) {
             @Override
             protected void onCollisionBegin(Entity bullet, Entity door) {
-                bullet.removeFromWorld();
+                if (!door.getComponent(SideDoorComponent.class).isOpened())
+                    bullet.removeFromWorld();
             }
         });
 
         FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(ENEMYBULLET, SIDEDOOR) {
             @Override
             protected void onCollisionBegin(Entity enemyBullet, Entity door) {
-                enemyBullet.removeFromWorld();
+                if (!door.getComponent(SideDoorComponent.class).isOpened())
+                    enemyBullet.removeFromWorld();
             }
         });
 

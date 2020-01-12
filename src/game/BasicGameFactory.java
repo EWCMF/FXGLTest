@@ -14,6 +14,7 @@ import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
 import game.characters.FlickerComponent;
 import game.enemy.EliteEnemyComponent;
 import game.enemy.EnemyComponent;
+import game.enemy.MovingEnemyComponent;
 import game.level.ExitDoorComponent;
 import game.level.MovingPlatformComponent;
 import game.characters.HPComponent;
@@ -253,6 +254,24 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new EliteEnemyComponent())
                 .with(new FlickerComponent())
                 .with("alertRange", 1000)
+                .build();
+    }
+
+    @Spawns("movingEnemy")
+    public Entity newMovingEnemy(SpawnData data) {
+        PhysicsComponent physicsComponent = new PhysicsComponent();
+        physicsComponent.setBodyType(BodyType.DYNAMIC);
+
+        return entityBuilder()
+                .type(MOVINGENEMY)
+                .from(data)
+                .viewWithBBox(new Rectangle(data.<Integer>get("width"), data.<Integer>get("height"), Color.BLUE))
+                .with(physicsComponent)
+                .with(new CollidableComponent(true))
+                .with(new HPComponent(12))
+                .with(new MovingEnemyComponent())
+                .with(new FlickerComponent())
+                .with("alertRange", 500)
                 .build();
     }
 
