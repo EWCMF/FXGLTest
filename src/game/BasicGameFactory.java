@@ -18,11 +18,13 @@ import game.level.ExitDoorComponent;
 import game.level.MovingPlatformComponent;
 import game.characters.HPComponent;
 import game.level.SideDoorComponent;
+import game.level.TeleportComponent;
 import game.player.PlayerComponent;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
 import static game.BasicGameTypes.*;
@@ -286,6 +288,18 @@ public class BasicGameFactory implements EntityFactory {
                 .from(data)
                 .viewWithBBox("keycard.png")
                 .with(new CollidableComponent(true))
+                .build();
+    }
+
+    @Spawns("teleporter")
+    public Entity newTeleporter(SpawnData data) {
+        return entityBuilder()
+                .type(TELEPORTER)
+                .from(data)
+                .view(texture("teleporter.png").toAnimatedTexture(3, Duration.seconds(0.8)).loop())
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .with(new CollidableComponent(true))
+                .with(new TeleportComponent())
                 .build();
     }
 }

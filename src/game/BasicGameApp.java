@@ -16,6 +16,7 @@ import game.level.ExitDoorComponent;
 import game.level.MovingPlatformComponent;
 import game.characters.HPComponent;
 import game.level.SideDoorComponent;
+import game.level.TeleportComponent;
 import game.player.PlayerComponent;
 import game.ui.BasicGameMenu;
 import game.ui.HPIndicator;
@@ -388,6 +389,42 @@ public class BasicGameApp extends GameApplication {
             protected void onCollisionEnd(Entity player, Entity sideDoorTrigger) {
                 Entity sideDoor = getGameWorld().getEntitiesAt(sideDoorTrigger.getPosition().add(90, 0)).get(0);
                 sideDoor.getComponent(SideDoorComponent.class).checkCondition();
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, TELEPORTER) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity teleport) {
+                var teleport1 = teleport.getComponent(TeleportComponent.class);
+
+                if (!teleport1.isActive()) {
+                    return;
+                }
+
+                var teleport2 = getGameWorld().getEntitiesByType(TELEPORTER)
+                        .stream()
+                        .filter(e -> e != teleport)
+                        .findAny()
+                        .get()
+                        .getComponent(TeleportComponent.class);
+
+                teleport2.activate();
+
+                animationBuilder()
+                        .duration(Duration.seconds(0.5))
+                        .onFinished(() -> {
+                            player.getComponent(PhysicsComponent.class).overwritePosition(teleport2.getEntity().getPosition());
+
+                            animationBuilder()
+                                    .scale(player)
+                                    .from(new Point2D(0, 0))
+                                    .to(new Point2D(1, 1))
+                                    .buildAndPlay();
+                        })
+                        .scale(player)
+                        .from(new Point2D(1, 1))
+                        .to(new Point2D(0, 0))
+                        .buildAndPlay();
             }
         });
     }
