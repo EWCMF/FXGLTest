@@ -15,6 +15,7 @@ import game.enemy.EnemyComponent;
 import game.level.ExitDoorComponent;
 import game.level.MovingPlatformComponent;
 import game.characters.HPComponent;
+import game.level.SideDoorComponent;
 import game.player.PlayerComponent;
 import game.ui.BasicGameMenu;
 import game.ui.HPIndicator;
@@ -125,7 +126,8 @@ public class BasicGameApp extends GameApplication {
         input.addAction(new UserAction("Test something") {
             @Override
             protected void onActionBegin() {
-                System.out.println(player.getPosition());
+                System.out.println(getGameWorld().getEntitiesByType(SIDEDOOR).get(0).getPosition());
+                System.out.println(getGameWorld().getEntitiesByType(SIDEDOORTRIGGER).get(0).getPosition());
             }
         }, KeyCode.F);
 
@@ -195,6 +197,8 @@ public class BasicGameApp extends GameApplication {
         vars.put("ammoShotgun", ammoShotgun);
         vars.put("ammoMachineGun", ammoMachineGun);
         vars.put("weaponIndicatorPosition", 13);
+
+        vars.put("hasKeycard", false);
     }
 
     public Entity player;
@@ -331,6 +335,14 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, KEYCARD) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity keycard) {
+                keycard.removeFromWorld();
+                set("hasKeycard", true);
+            }
+        });
+
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(MOVING, MOVINGSTOP) {
             @Override
             protected void onCollisionBegin(Entity moving, Entity movingStop) {
@@ -364,6 +376,20 @@ public class BasicGameApp extends GameApplication {
                 getGameWorld().getEntitiesAt(passableTrigger.getPosition().add(0, 81)).get(0).getComponent(PhysicsComponent.class).getBody().setActive(false);
             }
         });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, SIDEDOORTRIGGER) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity sideDoorTrigger) {
+                Entity sideDoor = getGameWorld().getEntitiesAt(sideDoorTrigger.getPosition().add(90, 0)).get(0);
+                sideDoor.getComponent(SideDoorComponent.class).checkCondition();
+            }
+
+            @Override
+            protected void onCollisionEnd(Entity player, Entity sideDoorTrigger) {
+                Entity sideDoor = getGameWorld().getEntitiesAt(sideDoorTrigger.getPosition().add(90, 0)).get(0);
+                sideDoor.getComponent(SideDoorComponent.class).checkCondition();
+            }
+        });
     }
 
     protected void onUpdate(double tpf) {
@@ -392,6 +418,8 @@ public class BasicGameApp extends GameApplication {
     }
 
     private void initialLevelActions() {
+        set("hasKeycard", false);
+
         if (player != null) {
             player.getComponent(PhysicsComponent.class).overwritePosition(getGameWorld().getSingleton(START).getPosition());
             player.setZ(Integer.MAX_VALUE);
@@ -402,11 +430,22 @@ public class BasicGameApp extends GameApplication {
             for (int i = 0; i < getGameWorld().getEntitiesByType(PASSABLE).size(); i++) {
                 Entity passable = getGameWorld().getEntitiesByType(PASSABLE).get(i);
                 SpawnData data = new SpawnData(passable.getPosition().add(0, -81));
-                Double typeCast = passable.getWidth();
-                data.put("width", typeCast.intValue());
-                Double typeCast2 = passable.getHeight();
-                data.put("height", typeCast2.intValue());
+                double typeCast = passable.getWidth();
+                data.put("width", (int) typeCast);
+                double typeCast2 = passable.getHeight();
+                data.put("height", (int) typeCast2);
                 getGameWorld().spawn("passablePlatformTrigger", data);
+            }
+        }
+
+        if (!getGameWorld().getEntitiesByType(SIDEDOOR).isEmpty()) {
+            for (int i = 0; i < getGameWorld().getEntitiesByType(SIDEDOOR).size(); i++) {
+                Entity sideDoor = getGameWorld().getEntitiesByType(SIDEDOOR).get(i);
+                SpawnData data = new SpawnData(sideDoor.getPosition().add(-90, 0));
+                data.put("width", 212);
+                Double typeCast = sideDoor.getHeight();
+                data.put("height", typeCast.intValue());
+                getGameWorld().spawn("sideDoorTrigger", data);
             }
         }
     }

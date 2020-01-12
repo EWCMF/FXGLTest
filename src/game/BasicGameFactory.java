@@ -8,9 +8,7 @@ import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.Spawns;
 import com.almasb.fxgl.entity.components.CollidableComponent;
 import com.almasb.fxgl.entity.components.IrremovableComponent;
-import com.almasb.fxgl.physics.BoundingShape;
-import com.almasb.fxgl.physics.HitBox;
-import com.almasb.fxgl.physics.PhysicsComponent;
+import com.almasb.fxgl.physics.*;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
 import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
 import game.characters.FlickerComponent;
@@ -111,9 +109,20 @@ public class BasicGameFactory implements EntityFactory {
                 .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
                 .with(new CollidableComponent(true))
                 .from(data)
-                .with(new SideDoorComponent())
                 .with(new PhysicsComponent())
+                .with(new SideDoorComponent())
                 .with("startOpened", data.get("startOpened"))
+                .with("openType", data.get("openType"))
+                .build();
+    }
+
+    @Spawns("sideDoorTrigger")
+    public Entity newSideDoorTrigger(SpawnData data) {
+        return entityBuilder()
+                .type(SIDEDOORTRIGGER)
+                .from(data)
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .with(new CollidableComponent(true))
                 .build();
     }
 
@@ -267,6 +276,16 @@ public class BasicGameFactory implements EntityFactory {
                 .bbox(new HitBox(new Point2D(0, 27), BoundingShape.box(64, 37)))
                 .with(new CollidableComponent(true))
                 .with("amount", data.get("amount"))
+                .build();
+    }
+
+    @Spawns("keycard")
+    public Entity newKeycard(SpawnData data) {
+        return entityBuilder()
+                .type(KEYCARD)
+                .from(data)
+                .viewWithBBox("keycard.png")
+                .with(new CollidableComponent(true))
                 .build();
     }
 }
