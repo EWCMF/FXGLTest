@@ -1,5 +1,7 @@
 package game;
 
+import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.dsl.components.ExpireCleanComponent;
 import com.almasb.fxgl.dsl.components.OffscreenCleanComponent;
 import com.almasb.fxgl.dsl.components.ProjectileComponent;
 import com.almasb.fxgl.entity.Entity;
@@ -8,6 +10,8 @@ import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.Spawns;
 import com.almasb.fxgl.entity.components.CollidableComponent;
 import com.almasb.fxgl.entity.components.IrremovableComponent;
+import com.almasb.fxgl.particle.ParticleComponent;
+import com.almasb.fxgl.particle.ParticleEmitters;
 import com.almasb.fxgl.physics.*;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
 import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
@@ -172,6 +176,35 @@ public class BasicGameFactory implements EntityFactory {
                 .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
                 .with(physicsComponent)
                 .with(new CollidableComponent(true))
+                .build();
+    }
+
+    @Spawns("breakWall")
+    public Entity newBreakWall(SpawnData data) {
+        PhysicsComponent physicsComponent = new PhysicsComponent();
+        physicsComponent.setBodyType(BodyType.STATIC);
+        physicsComponent.setFixtureDef(new FixtureDef().friction(0));
+
+        return entityBuilder()
+                .type(BREAKABLEWALL)
+                .from(data)
+                .view("breakableWall.png")
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .with(physicsComponent)
+                .collidable()
+                .with(new HPComponent(20))
+                .with(new FlickerComponent())
+                .with(new BreakableWallComponent())
+                .build();
+    }
+
+    @Spawns("hidden")
+    public Entity newHidden(SpawnData data) {
+        return entityBuilder()
+                .type(HIDDEN)
+                .from(data)
+                .viewWithBBox(new Rectangle(data.<Integer>get("width"), data.<Integer>get("height"), Color.color(0.2, 0.2, 0.2)))
+                .collidable()
                 .build();
     }
 
@@ -348,6 +381,22 @@ public class BasicGameFactory implements EntityFactory {
                 .type(OWTDROPOFF)
                 .from(data)
                 .with("connected", data.get("connected"))
+                .build();
+    }
+
+    @Spawns("teleportEffect")
+    public Entity newTeleportEffect(SpawnData data) {
+        play("teleport.wav");
+
+        var emitter = ParticleEmitters.newExplosionEmitter(100);
+        emitter.setMaxEmissions(1);
+        emitter.setColor(Color.BLUE);
+
+        return entityBuilder()
+                .from(data)
+                .view(texture("teleportEffect.png").toAnimatedTexture(2, Duration.seconds(0.33)).loop())
+                .with(new ExpireCleanComponent(Duration.seconds(0.66)))
+                .with(new ParticleComponent(emitter))
                 .build();
     }
 }

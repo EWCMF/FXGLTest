@@ -19,6 +19,7 @@ import game.player.PlayerComponent;
 import game.ui.BasicGameMenu;
 import game.ui.HPIndicator;
 import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
@@ -50,7 +51,7 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "test3.tmx";
+    private String startLevel = "test2.tmx";
     private int startBoundX = 32 * 100;
     private int startBoundY = 32 * 70;
 
@@ -62,7 +63,7 @@ public class BasicGameApp extends GameApplication {
         settings.setWidth(1280);
         settings.setHeight(720);
         settings.setTitle("Contra Knockoff");
-        settings.setVersion("0.2");
+        settings.setVersion("0.3");
         settings.setMenuEnabled(true);
         settings.setSceneFactory(new SceneFactory() {
             @Override
@@ -70,6 +71,7 @@ public class BasicGameApp extends GameApplication {
                 return new BasicGameMenu();
             }
         });
+        //settings.setDeveloperMenuEnabled(true);
     }
 
     @Override
@@ -130,6 +132,16 @@ public class BasicGameApp extends GameApplication {
                     FXGL.getGameWorld().getEntitiesByType(EXITSWITCH).get(0).getComponent(ExitSwitchComponent.class).activate();
             }
         }, KeyCode.F);
+
+        input.addAction(new UserAction("Test something") {
+            @Override
+            protected void onActionBegin() {
+                System.out.println(getGameWorld().getEntitiesInRange(new Rectangle2D(player.getX()-1, player.getY(), player.getWidth()+2, player.getHeight())).stream()
+                .filter(entity -> entity.isType(WALL))
+                .findAny()
+                .get().getPosition());
+            }
+        }, KeyCode.C);
 
         input.addAction(new UserAction("Change weapon") {
             @Override
@@ -256,8 +268,8 @@ public class BasicGameApp extends GameApplication {
 
     @Override
     protected void initPhysics() {
-        FXGL.getPhysicsWorld().setGravity(0, 760);
-        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, ENEMY) {
+        getPhysicsWorld().setGravity(0, 760);
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, ENEMY) {
 
             // order of types is the same as passed into the constructor
             @Override
@@ -268,7 +280,7 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
-        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, ELITEENEMY) {
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, ELITEENEMY) {
 
             // order of types is the same as passed into the constructor
             @Override
@@ -279,7 +291,7 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
-        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, MOVINGENEMY) {
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, MOVINGENEMY) {
 
             // order of types is the same as passed into the constructor
             @Override
@@ -290,7 +302,7 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
-        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, WALL) {
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, WALL) {
             @Override
             protected void onCollisionBegin(Entity bullet, Entity wall) {
                 bullet.removeFromWorld();
@@ -304,7 +316,7 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
-        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, SIDEDOOR) {
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, SIDEDOOR) {
             @Override
             protected void onCollisionBegin(Entity bullet, Entity door) {
                 if (!door.getComponent(SideDoorComponent.class).isOpened())
@@ -312,7 +324,16 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
-        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(ENEMYBULLET, SIDEDOOR) {
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, BREAKABLEWALL) {
+            @Override
+            protected void onCollisionBegin(Entity bullet, Entity wall) {
+                bullet.removeFromWorld();
+                wall.getComponent(BreakableWallComponent.class).onHit(bullet.getInt("damage"));
+                wall.getComponent(FlickerComponent.class).flicker();
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(ENEMYBULLET, SIDEDOOR) {
             @Override
             protected void onCollisionBegin(Entity enemyBullet, Entity door) {
                 if (!door.getComponent(SideDoorComponent.class).isOpened())
@@ -426,16 +447,12 @@ public class BasicGameApp extends GameApplication {
                         .duration(Duration.seconds(0.5))
                         .onFinished(() -> {
                             player.getComponent(PhysicsComponent.class).overwritePosition(teleport2.getEntity().getPosition());
-
+                            spawn("teleportEffect", teleport2.getEntity().getPosition());
                             animationBuilder()
-                                    .scale(player)
-                                    .from(new Point2D(0, 0))
-                                    .to(new Point2D(1, 1))
+                                    .fadeIn(player)
                                     .buildAndPlay();
                         })
-                        .scale(player)
-                        .from(new Point2D(1, 1))
-                        .to(new Point2D(0, 0))
+                        .fadeOut(player)
                         .buildAndPlay();
             }
         });
@@ -455,16 +472,12 @@ public class BasicGameApp extends GameApplication {
                                     .duration(Duration.seconds(0.5))
                                     .onFinished(() -> {
                                         player.getComponent(PhysicsComponent.class).overwritePosition(teleport2.getPosition());
-
+                                        spawn("teleportEffect", teleport2.getPosition());
                                         animationBuilder()
-                                                .scale(player)
-                                                .from(new Point2D(0, 0))
-                                                .to(new Point2D(1, 1))
+                                                .fadeIn(player)
                                                 .buildAndPlay();
                                     })
-                                    .scale(player)
-                                    .from(new Point2D(1, 1))
-                                    .to(new Point2D(0, 0))
+                                    .fadeOut(player)
                                     .buildAndPlay();
                         }
                     }

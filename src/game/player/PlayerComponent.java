@@ -1,7 +1,6 @@
 package game.player;
 
 import com.almasb.fxgl.dsl.FXGL;
-import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.entity.component.Required;
@@ -9,7 +8,6 @@ import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
 import game.BasicGameApp;
-import game.BasicGameTypes;
 import game.characters.HPComponent;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
@@ -99,6 +97,15 @@ public class PlayerComponent extends Component {
             }
         }
 
+        double mousePosition = FXGL.getInput().getMousePositionWorld().getX();
+        if (!dead) {
+            if (entity.getX() - mousePosition > 0)
+                getEntity().setScaleX(-1);
+            else
+                getEntity().setScaleX(1);
+        }
+
+
         if (jumps == -1) {
             texture.loopAnimationChannel(animDeath);
         }
@@ -123,7 +130,6 @@ public class PlayerComponent extends Component {
         if (dead)
             return;
 
-        getEntity().setScaleX(-1);
         physics.setVelocityX(-300);
     }
 
@@ -131,7 +137,6 @@ public class PlayerComponent extends Component {
         if (dead)
             return;
 
-        getEntity().setScaleX(1);
         physics.setVelocityX(300);
     }
 
@@ -235,6 +240,7 @@ public class PlayerComponent extends Component {
         }, Duration.seconds(1));
 
         if (hp.getValue() <= 0 && !dead) {
+            FXGL.play("aah.wav");
             dead = true;
             jumps = -1;
             if (direction.getX() <= 0) {
