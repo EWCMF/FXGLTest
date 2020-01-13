@@ -100,7 +100,7 @@
   <object id="10" type="exit" x="2176" y="672" width="64" height="96">
    <properties>
     <property name="next" value="test2.tmx"/>
-    <property name="startOpened" type="bool" value="true"/>
+    <property name="startOpened" type="bool" value="false"/>
    </properties>
   </object>
   <object id="11" type="platform" x="608" y="768" width="1664" height="32"/>

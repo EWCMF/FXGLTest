@@ -4,10 +4,12 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
+import game.BasicGameTypes;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
 
 public class ExitSwitchComponent extends Component {
+    private boolean alreadyPressed = false;
     private AnimatedTexture texture;
     private AnimationChannel animOff, animOn;
 
@@ -24,5 +26,13 @@ public class ExitSwitchComponent extends Component {
     @Override
     public void onAdded() {
         entity.getViewComponent().addChild(texture);
+    }
+
+    public void activate() {
+        if (alreadyPressed)
+            return;
+        texture.playAnimationChannel(animOn);
+        FXGL.getGameWorld().getEntitiesByType(BasicGameTypes.EXIT).get(0).getComponent(ExitDoorComponent.class).openDoor();
+        alreadyPressed = true;
     }
 }

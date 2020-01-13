@@ -13,11 +13,8 @@ import game.characters.FlickerComponent;
 import game.enemy.EliteEnemyComponent;
 import game.enemy.EnemyComponent;
 import game.enemy.MovingEnemyComponent;
-import game.level.ExitDoorComponent;
-import game.level.MovingPlatformComponent;
+import game.level.*;
 import game.characters.HPComponent;
-import game.level.SideDoorComponent;
-import game.level.TeleportComponent;
 import game.player.PlayerComponent;
 import game.ui.BasicGameMenu;
 import game.ui.HPIndicator;
@@ -58,6 +55,7 @@ public class BasicGameApp extends GameApplication {
     private int startBoundY = 32 * 70;
 
     private boolean allowPass = false;
+    private boolean onSwitch = false;
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -125,11 +123,11 @@ public class BasicGameApp extends GameApplication {
             }
         }, KeyCode.SPACE);
 
-        input.addAction(new UserAction("Test something") {
+        input.addAction(new UserAction("Press switch") {
             @Override
             protected void onActionBegin() {
-                String test = FXGL.getGameWorld().getEntitiesByType(MOVINGENEMY).get(0).getComponent(PhysicsComponent.class).getSensorHandlers().values().toString();
-                System.out.println(test);
+                if (onSwitch)
+                    FXGL.getGameWorld().getEntitiesByType(EXITSWITCH).get(0).getComponent(ExitSwitchComponent.class).activate();
             }
         }, KeyCode.F);
 
@@ -439,6 +437,18 @@ public class BasicGameApp extends GameApplication {
                         .from(new Point2D(1, 1))
                         .to(new Point2D(0, 0))
                         .buildAndPlay();
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, EXITSWITCH) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity exitSwitch) {
+                onSwitch = true;
+            }
+
+            @Override
+            protected void onCollisionEnd(Entity player, Entity exitSwitch) {
+                onSwitch = false;
             }
         });
     }
