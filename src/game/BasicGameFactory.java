@@ -15,11 +15,8 @@ import game.characters.FlickerComponent;
 import game.enemy.EliteEnemyComponent;
 import game.enemy.EnemyComponent;
 import game.enemy.MovingEnemyComponent;
-import game.level.ExitDoorComponent;
-import game.level.MovingPlatformComponent;
+import game.level.*;
 import game.characters.HPComponent;
-import game.level.SideDoorComponent;
-import game.level.TeleportComponent;
 import game.player.PlayerComponent;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -102,6 +99,17 @@ public class BasicGameFactory implements EntityFactory {
                 .from(data)
                 .with(new ExitDoorComponent())
                 .with("startOpened", data.get("startOpened"))
+                .build();
+    }
+
+    @Spawns("exitSwitch")
+    public Entity newExitSwitch(SpawnData data) {
+        return entityBuilder()
+                .type(EXITSWITCH)
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .with(new CollidableComponent(true))
+                .from(data)
+                .with(new ExitSwitchComponent())
                 .build();
     }
 

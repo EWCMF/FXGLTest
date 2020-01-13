@@ -72,7 +72,6 @@ public class BasicGameApp extends GameApplication {
                 return new BasicGameMenu();
             }
         });
-        settings.setDeveloperMenuEnabled(true);
     }
 
     @Override

@@ -22,7 +22,6 @@ public class MovingEnemyComponent extends Component {
     private HPComponent hp;
     private PhysicsComponent physics;
     boolean alerted = false;
-    private ArrayList<Entity> OIS = new ArrayList<>();
 
 
     public void onAdded() {
@@ -51,7 +50,7 @@ public class MovingEnemyComponent extends Component {
     }
 
     public boolean checkLineOfSight() {
-        double minX = entity.getPosition().getX() - 500;
+        double minX = entity.getPosition().getX() - entity.getInt("alertRange");
         double minY = entity.getPosition().getY();
         List<Entity> list = FXGL.getGameWorld().getEntitiesInRange(new Rectangle2D(minX, minY, 500, 80));
         for (Entity value : list) {
