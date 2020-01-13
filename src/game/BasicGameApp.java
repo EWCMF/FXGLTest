@@ -50,7 +50,7 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "test1.tmx";
+    private String startLevel = "test3.tmx";
     private int startBoundX = 32 * 100;
     private int startBoundY = 32 * 70;
 
@@ -437,6 +437,38 @@ public class BasicGameApp extends GameApplication {
                         .from(new Point2D(1, 1))
                         .to(new Point2D(0, 0))
                         .buildAndPlay();
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, ONEWAYTELEPORT) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity teleport) {
+                String connected1 = teleport.getProperties().getString("connected");
+                String connected2 = "";
+
+                for (int i = 0; i < FXGL.getGameWorld().getEntitiesByType(OWTDROPOFF).size(); i++) {
+                    if (FXGL.getGameWorld().getEntitiesByType(OWTDROPOFF).get(i).getProperties().exists("connected")) {
+                        connected2 = FXGL.getGameWorld().getEntitiesByType(OWTDROPOFF).get(i).getProperties().getString("connected");
+                        if (connected1.equals(connected2)) {
+                            var teleport2 = FXGL.getGameWorld().getEntitiesByType(OWTDROPOFF).get(i);
+                            animationBuilder()
+                                    .duration(Duration.seconds(0.5))
+                                    .onFinished(() -> {
+                                        player.getComponent(PhysicsComponent.class).overwritePosition(teleport2.getPosition());
+
+                                        animationBuilder()
+                                                .scale(player)
+                                                .from(new Point2D(0, 0))
+                                                .to(new Point2D(1, 1))
+                                                .buildAndPlay();
+                                    })
+                                    .scale(player)
+                                    .from(new Point2D(1, 1))
+                                    .to(new Point2D(0, 0))
+                                    .buildAndPlay();
+                        }
+                    }
+                }
             }
         });
 

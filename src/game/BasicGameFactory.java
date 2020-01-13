@@ -329,4 +329,25 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new TeleportComponent())
                 .build();
     }
+
+    @Spawns("oneWayTeleport")
+    public Entity newOWTeleporter(SpawnData data) {
+        return entityBuilder()
+                .type(ONEWAYTELEPORT)
+                .from(data)
+                .view(texture("teleporter.png").toAnimatedTexture(3, Duration.seconds(0.8)).loop())
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .with(new CollidableComponent(true))
+                .with("connected", data.get("connected"))
+                .build();
+    }
+
+    @Spawns("oneWayTeleportDropOff")
+    public Entity newOWTDropOff(SpawnData data) {
+        return entityBuilder()
+                .type(OWTDROPOFF)
+                .from(data)
+                .with("connected", data.get("connected"))
+                .build();
+    }
 }
