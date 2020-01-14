@@ -1,12 +1,20 @@
 package game.level;
 
 import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
+import com.almasb.fxgl.time.LocalTimer;
+import game.BasicGameTypes;
+import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SideDoorComponent extends Component {
     private boolean opened = false;
@@ -15,6 +23,8 @@ public class SideDoorComponent extends Component {
     private AnimationChannel animOpen, animClosed, animClosing;
     private String openType;
     private PhysicsComponent physics;
+    private Entity trigger;
+    private boolean animPlaying;
 
     public SideDoorComponent() {
         Image image = FXGL.image("sideDoor.png");
@@ -35,13 +45,30 @@ public class SideDoorComponent extends Component {
     }
 
     public void checkCondition() {
+        if (animPlaying)
+            return;
+
         if (opened && !openType.equals("auto") && !locked)
             return;
 
+        trigger = FXGL.getGameWorld().getEntitiesByType(BasicGameTypes.SIDEDOOR)
+                .stream()
+                .filter(e -> e.isColliding(entity))
+                .findAny()
+                .get();
+
+        List<Entity> actorsOnTrigger = FXGL.getGameWorld().getCollidingEntities(trigger)
+                .stream()
+                .filter(e -> e.isType(BasicGameTypes.PLAYER) || e.isType(BasicGameTypes.MOVINGENEMY) || e.isType(BasicGameTypes.ELITEMOVINGENEMY))
+                .collect(Collectors.toList());
+
         if (openType.equals("auto") && !opened)
             openDoor();
-        else if (openType.equals("auto"))
+        else if (openType.equals("auto") && actorsOnTrigger.size() == 0)
             closeDoor();
+
+        if (openType.equals("key") && !FXGL.getb("hasKeycard"))
+            FXGL.spawn("overheadText", new SpawnData(entity.getPosition().add(0, -50)).put("text", "The door needs a keycard to open."));
 
         if (openType.equals("key") && FXGL.getb("hasKeycard"))
             openDoor();
@@ -49,7 +76,11 @@ public class SideDoorComponent extends Component {
 
     public void openDoor() {
         opened = true;
+        animPlaying = true;
         texture.playAnimationChannel(animOpen);
+        FXGL.runOnce(() -> {
+            animPlaying = false;
+        }, Duration.seconds(1));
         FXGL.runOnce(() -> {
             entity.getComponent(PhysicsComponent.class).getBody().setActive(false);
         }, Duration.seconds(0.5));
@@ -57,7 +88,11 @@ public class SideDoorComponent extends Component {
 
     public void closeDoor() {
         opened = false;
+        animPlaying = true;
         texture.playAnimationChannel(animClosing);
+        FXGL.runOnce(() -> {
+            animPlaying = false;
+        }, Duration.seconds(1));
         entity.getComponent(PhysicsComponent.class).getBody().setActive(true);
     }
 

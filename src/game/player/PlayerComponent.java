@@ -97,12 +97,14 @@ public class PlayerComponent extends Component {
             }
         }
 
-        double mousePosition = FXGL.getInput().getMousePositionWorld().getX();
+        double mousePosition = FXGL.getInput().getMouseXWorld();
         if (!dead) {
-            if (entity.getX() - mousePosition > 0)
+            if ((int) mousePosition - (int) entity.getBoundingBoxComponent().getCenterWorld().getX()<= 0) {
                 getEntity().setScaleX(-1);
-            else
+            }
+            else if ((int) mousePosition - (int) entity.getBoundingBoxComponent().getCenterWorld().getX() > 0) {
                 getEntity().setScaleX(1);
+            }
         }
 
 

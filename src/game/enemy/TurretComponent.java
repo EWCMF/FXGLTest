@@ -13,7 +13,7 @@ import javafx.util.Duration;
 
 
 @Required(HPComponent.class)
-public class EnemyComponent extends Component {
+public class TurretComponent extends Component {
     private LocalTimer enemyAttackInterval;
     private HPComponent hp;
     boolean alerted = false;
@@ -44,7 +44,10 @@ public class EnemyComponent extends Component {
     public void basicEnemyAttack(Entity player) {
         Point2D enemyPosition = entity.getBoundingBoxComponent().getCenterWorld();
         Point2D enemyTarget =  player.getBoundingBoxComponent().getCenterWorld().add(0, -12).subtract(entity.getBoundingBoxComponent().getCenterWorld());
-        FXGL.getGameWorld().spawn("enemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));
+        if (entity.isType(BasicGameTypes.TURRET))
+            FXGL.getGameWorld().spawn("enemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));
+        else
+            FXGL.getGameWorld().spawn("eliteEnemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));
     }
 
     public void onHit(int damage) {

@@ -1,6 +1,5 @@
 package game;
 
-import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.dsl.components.ExpireCleanComponent;
 import com.almasb.fxgl.dsl.components.OffscreenCleanComponent;
 import com.almasb.fxgl.dsl.components.ProjectileComponent;
@@ -16,8 +15,7 @@ import com.almasb.fxgl.physics.*;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
 import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
 import game.characters.FlickerComponent;
-import game.enemy.EliteEnemyComponent;
-import game.enemy.EnemyComponent;
+import game.enemy.TurretComponent;
 import game.enemy.MovingEnemyComponent;
 import game.level.*;
 import game.characters.HPComponent;
@@ -273,12 +271,12 @@ public class BasicGameFactory implements EntityFactory {
     @Spawns("turret")
     public Entity newTurret(SpawnData data) {
         return entityBuilder()
-                .type(ENEMY)
+                .type(TURRET)
                 .from(data)
                 .viewWithBBox(new Circle(16, 16, 15, Color.BLACK))
                 .with(new CollidableComponent(true))
                 .with(new HPComponent(6))
-                .with(new EnemyComponent())
+                .with(new TurretComponent())
                 .with(new FlickerComponent())
                 .with("alertRange", 1000)
                 .build();
@@ -287,12 +285,12 @@ public class BasicGameFactory implements EntityFactory {
     @Spawns("eliteTurret")
     public Entity eliteTurret(SpawnData data) {
         return entityBuilder()
-                .type(ELITEENEMY)
+                .type(ELITETURRET)
                 .from(data)
                 .viewWithBBox(new Circle(16, 16, 15, Color.DARKRED))
                 .with(new CollidableComponent(true))
                 .with(new HPComponent(30))
-                .with(new EliteEnemyComponent())
+                .with(new TurretComponent())
                 .with(new FlickerComponent())
                 .with("alertRange", 1000)
                 .build();
@@ -302,6 +300,7 @@ public class BasicGameFactory implements EntityFactory {
     public Entity newMovingEnemy(SpawnData data) {
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
+        physicsComponent.setFixtureDef(new FixtureDef().density(1000));
 
         return entityBuilder()
                 .type(MOVINGENEMY)
@@ -312,7 +311,26 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new HPComponent(12))
                 .with(new MovingEnemyComponent())
                 .with(new FlickerComponent())
-                .with("alertRange", 500)
+                .with("alertRange", 1000)
+                .build();
+    }
+
+    @Spawns("eliteMovingEnemy")
+    public Entity newEliteMovingEnemy(SpawnData data) {
+        PhysicsComponent physicsComponent = new PhysicsComponent();
+        physicsComponent.setBodyType(BodyType.DYNAMIC);
+        physicsComponent.setFixtureDef(new FixtureDef().density(1000));
+
+        return entityBuilder()
+                .type(ELITEMOVINGENEMY)
+                .from(data)
+                .viewWithBBox(new Rectangle(data.<Integer>get("width"), data.<Integer>get("height"), Color.PURPLE))
+                .with(physicsComponent)
+                .with(new CollidableComponent(true))
+                .with(new HPComponent(40))
+                .with(new MovingEnemyComponent())
+                .with(new FlickerComponent())
+                .with("alertRange", 1000)
                 .build();
     }
 
@@ -397,6 +415,17 @@ public class BasicGameFactory implements EntityFactory {
                 .view(texture("teleportEffect.png").toAnimatedTexture(2, Duration.seconds(0.33)).loop())
                 .with(new ExpireCleanComponent(Duration.seconds(0.66)))
                 .with(new ParticleComponent(emitter))
+                .build();
+    }
+
+    @Spawns("overheadText")
+    public Entity newText(SpawnData data) {
+        String text = data.get("text");
+
+        return entityBuilder()
+                .from(data)
+                .view(getUIFactory().newText(text, 20))
+                .with(new ExpireCleanComponent(Duration.seconds(3)))
                 .build();
     }
 }

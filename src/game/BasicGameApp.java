@@ -10,8 +10,7 @@ import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import game.characters.FlickerComponent;
-import game.enemy.EliteEnemyComponent;
-import game.enemy.EnemyComponent;
+import game.enemy.TurretComponent;
 import game.enemy.MovingEnemyComponent;
 import game.level.*;
 import game.characters.HPComponent;
@@ -51,12 +50,15 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "test2.tmx";
+    private String startLevel = "test3.tmx";
     private int startBoundX = 32 * 100;
     private int startBoundY = 32 * 70;
 
     private boolean allowPass = false;
     private boolean onSwitch = false;
+
+    private String cameraPosX = "";
+    private String cameraPosY = "";
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -71,11 +73,12 @@ public class BasicGameApp extends GameApplication {
                 return new BasicGameMenu();
             }
         });
-        //settings.setDeveloperMenuEnabled(true);
+        settings.setDeveloperMenuEnabled(false);
     }
 
     @Override
     protected void initInput() {
+
         Input input = FXGL.getInput();
 
         input.addAction(new UserAction("Move Right") {
@@ -128,8 +131,10 @@ public class BasicGameApp extends GameApplication {
         input.addAction(new UserAction("Press switch") {
             @Override
             protected void onActionBegin() {
-                if (onSwitch)
+                if (onSwitch) {
                     FXGL.getGameWorld().getEntitiesByType(EXITSWITCH).get(0).getComponent(ExitSwitchComponent.class).activate();
+                    spawn("overheadText", new SpawnData(player.getPosition().add(0, -50)).put("text", "The exit is now open."));
+                }
             }
         }, KeyCode.F);
 
@@ -180,6 +185,34 @@ public class BasicGameApp extends GameApplication {
                 }
             }
         }, MouseButton.PRIMARY);
+
+        input.addAction(new UserAction("Camera left") {
+            @Override
+            protected void onActionBegin() {
+                cameraPosX = "left";
+            }
+        }, KeyCode.J);
+
+        input.addAction(new UserAction("Camera down") {
+            @Override
+            protected void onActionBegin() {
+                cameraPosY = "down";
+            }
+        }, KeyCode.K);
+
+        input.addAction(new UserAction("Camera right") {
+            @Override
+            protected void onActionBegin() {
+                cameraPosX = "right";
+            }
+        }, KeyCode.L);
+
+        input.addAction(new UserAction("Camera up") {
+            @Override
+            protected void onActionBegin() {
+                cameraPosY = "up";
+            }
+        }, KeyCode.I);
     }
 
     private void FiringPosition(double mouseY, Point2D gunMiddle, Point2D gunUp, Point2D gunDown) {
@@ -220,11 +253,12 @@ public class BasicGameApp extends GameApplication {
         getGameWorld().addEntityFactory(new BasicGameFactory());
 
         player = null;
+
         setLevel(gets("level"));
         getGameScene().setBackgroundColor(Color.color(0.2, 0.2, 0.2));
 
         Point2D start = FXGL.getGameWorld().getSingleton(START).getPosition();
-        player = FXGL.getGameWorld().spawn("player", start);
+        player = getGameWorld().spawn("player", start);
 
         initHP();
 
@@ -269,31 +303,34 @@ public class BasicGameApp extends GameApplication {
     @Override
     protected void initPhysics() {
         getPhysicsWorld().setGravity(0, 760);
-        getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, ENEMY) {
-
-            // order of types is the same as passed into the constructor
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, TURRET) {
             @Override
             protected void onCollisionBegin(Entity bullet, Entity enemy) {
                 bullet.removeFromWorld();
-                enemy.getComponent(EnemyComponent.class).onHit(bullet.getInt("damage"));
+                enemy.getComponent(TurretComponent.class).onHit(bullet.getInt("damage"));
                 enemy.getComponent(FlickerComponent.class).flicker();
             }
         });
 
-        getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, ELITEENEMY) {
-
-            // order of types is the same as passed into the constructor
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, ELITETURRET) {
             @Override
             protected void onCollisionBegin(Entity bullet, Entity eliteEnemy) {
                 bullet.removeFromWorld();
-                eliteEnemy.getComponent(EliteEnemyComponent.class).onHit(bullet.getInt("damage"));
+                eliteEnemy.getComponent(TurretComponent.class).onHit(bullet.getInt("damage"));
                 eliteEnemy.getComponent(FlickerComponent.class).flicker();
             }
         });
 
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, MOVINGENEMY) {
+            @Override
+            protected void onCollisionBegin(Entity bullet, Entity movingEnemy) {
+                bullet.removeFromWorld();
+                movingEnemy.getComponent(MovingEnemyComponent.class).onHit(bullet.getInt("damage"));
+                movingEnemy.getComponent(FlickerComponent.class).flicker();
+            }
+        });
 
-            // order of types is the same as passed into the constructor
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, ELITEMOVINGENEMY) {
             @Override
             protected void onCollisionBegin(Entity bullet, Entity movingEnemy) {
                 bullet.removeFromWorld();
@@ -324,20 +361,20 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(ENEMYBULLET, SIDEDOOR) {
+            @Override
+            protected void onCollisionBegin(Entity enemyBullet, Entity door) {
+                if (!door.getComponent(SideDoorComponent.class).isOpened())
+                    enemyBullet.removeFromWorld();
+            }
+        });
+
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, BREAKABLEWALL) {
             @Override
             protected void onCollisionBegin(Entity bullet, Entity wall) {
                 bullet.removeFromWorld();
                 wall.getComponent(BreakableWallComponent.class).onHit(bullet.getInt("damage"));
                 wall.getComponent(FlickerComponent.class).flicker();
-            }
-        });
-
-        getPhysicsWorld().addCollisionHandler(new CollisionHandler(ENEMYBULLET, SIDEDOOR) {
-            @Override
-            protected void onCollisionBegin(Entity enemyBullet, Entity door) {
-                if (!door.getComponent(SideDoorComponent.class).isOpened())
-                    enemyBullet.removeFromWorld();
             }
         });
 
@@ -366,6 +403,8 @@ public class BasicGameApp extends GameApplication {
                             setLevel(gets("level"));
                     });
                 }
+                else
+                    spawn("overheadText", new SpawnData(exit.getPosition().add(0, -50)).put("text", "Find a switch to open the door."));
             }
         });
 
@@ -411,19 +450,9 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
-        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, SIDEDOORTRIGGER) {
-            @Override
-            protected void onCollisionBegin(Entity player, Entity sideDoorTrigger) {
-                Entity sideDoor = getGameWorld().getEntitiesAt(sideDoorTrigger.getPosition().add(90, 0)).get(0);
-                sideDoor.getComponent(SideDoorComponent.class).checkCondition();
-            }
-
-            @Override
-            protected void onCollisionEnd(Entity player, Entity sideDoorTrigger) {
-                Entity sideDoor = getGameWorld().getEntitiesAt(sideDoorTrigger.getPosition().add(90, 0)).get(0);
-                sideDoor.getComponent(SideDoorComponent.class).checkCondition();
-            }
-        });
+        sideDoorTrigger(PLAYER);
+        sideDoorTrigger(MOVINGENEMY);
+        sideDoorTrigger(ELITEMOVINGENEMY);
 
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, TELEPORTER) {
             @Override
@@ -498,11 +527,32 @@ public class BasicGameApp extends GameApplication {
         });
     }
 
+    private void sideDoorTrigger(BasicGameTypes enemy) {
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(enemy, SIDEDOORTRIGGER) {
+            @Override
+            protected void onCollisionBegin(Entity actor, Entity sideDoorTrigger) {
+                    Entity sideDoor = getGameWorld().getEntitiesAt(sideDoorTrigger.getPosition().add(90, 0)).get(0);
+                    sideDoor.getComponent(SideDoorComponent.class).checkCondition();
+            }
+
+            @Override
+            protected void onCollisionEnd(Entity actor, Entity sideDoorTrigger) {
+                Entity sideDoor = getGameWorld().getEntitiesAt(sideDoorTrigger.getPosition().add(90, 0)).get(0);
+                sideDoor.getComponent(SideDoorComponent.class).checkCondition();
+            }
+        });
+    }
+
     protected void onUpdate(double tpf) {
         if (player.getPosition().getY() > geti("currentBoundY")) {
             player.getComponent(PlayerComponent.class).setHP(0);
             playerDeath();
         }
+
+        if (cameraPosX.equals("left"))
+            getGameScene().getViewport().setX(player.getPosition().getX() - 900);
+        if (cameraPosY.equals("down"))
+            getGameScene().getViewport().setY(player.getPosition().getY() - 200);
     }
 
     protected void setLevel(String level) {
@@ -566,12 +616,12 @@ public class BasicGameApp extends GameApplication {
         if (player != null) {
             player.getComponent(PlayerComponent.class).restoreHP();
         }
-        for (int i = 0; i < getGameWorld().getEntitiesByType(ENEMY).size(); i++) {
-            getGameWorld().getEntitiesByType(ENEMY).get(i).getComponent(EnemyComponent.class).initHP();
-        }
-        for (int i = 0; i < getGameWorld().getEntitiesByType(ELITEENEMY).size(); i++) {
-            getGameWorld().getEntitiesByType(ELITEENEMY).get(i).getComponent(EliteEnemyComponent.class).initHP();
-        }
+//        for (int i = 0; i < getGameWorld().getEntitiesByType(TURRET).size(); i++) {
+//            getGameWorld().getEntitiesByType(TURRET).get(i).getComponent(TurretComponent.class).initHP();
+//        }
+//        for (int i = 0; i < getGameWorld().getEntitiesByType(ELITETURRET).size(); i++) {
+//            getGameWorld().getEntitiesByType(ELITETURRET).get(i).getComponent(EliteEnemyComponent.class).initHP();
+//        }
     }
 
     public static void main(String[] args) {
