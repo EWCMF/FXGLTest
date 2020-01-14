@@ -21,7 +21,6 @@ public class BreakableWallComponent extends Component {
                     .filter(e -> e.isType(BasicGameTypes.HIDDEN))
                     .findAny()
                     .ifPresent(e -> {
-                        System.out.println("test");
                         FXGL.animationBuilder()
                                 .onFinished(e::removeFromWorld)
                                 .fadeOut(e)

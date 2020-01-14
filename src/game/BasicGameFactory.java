@@ -1,5 +1,6 @@
 package game;
 
+import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.dsl.components.ExpireCleanComponent;
 import com.almasb.fxgl.dsl.components.OffscreenCleanComponent;
 import com.almasb.fxgl.dsl.components.ProjectileComponent;
@@ -22,6 +23,7 @@ import game.level.*;
 import game.characters.HPComponent;
 import game.player.PlayerComponent;
 import javafx.geometry.Point2D;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -118,6 +120,9 @@ public class BasicGameFactory implements EntityFactory {
 
     @Spawns("sideDoor")
     public Entity newSideDoor(SpawnData data) {
+        String neededKey = "";
+        if (data.hasKey("neededKey"))
+            neededKey = data.get("neededKey");
         return entityBuilder()
                 .type(SIDEDOOR)
                 .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
@@ -127,6 +132,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new SideDoorComponent())
                 .with("startOpened", data.get("startOpened"))
                 .with("openType", data.get("openType"))
+                .with("neededKey", neededKey)
                 .build();
     }
 
@@ -384,11 +390,27 @@ public class BasicGameFactory implements EntityFactory {
 
     @Spawns("keycard")
     public Entity newKeycard(SpawnData data) {
+        String keyGraphic;
+        switch (data.get("keyType").toString()) {
+            case "blue":
+                keyGraphic = "keycard(blue).png";
+                break;
+            case "red":
+                keyGraphic = "keycard(red).png";
+                break;
+            case "yellow":
+                keyGraphic = "keycard(yellow).png";
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + data.get("keyType").toString());
+        }
+
         return entityBuilder()
                 .type(KEYCARD)
                 .from(data)
-                .viewWithBBox("keycard.png")
+                .viewWithBBox(keyGraphic)
                 .with(new CollidableComponent(true))
+                .with("keyType", data.get("keyType"))
                 .build();
     }
 

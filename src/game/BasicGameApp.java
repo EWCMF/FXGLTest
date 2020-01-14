@@ -22,6 +22,7 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -53,7 +54,7 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "test3.tmx";
+    private String startLevel = "test1.tmx";
     private int startBoundX = 32 * 100;
     private int startBoundY = 32 * 70;
 
@@ -62,6 +63,8 @@ public class BasicGameApp extends GameApplication {
 
     private String cameraPosX = "";
     private String cameraPosY = "";
+
+    private VBox keysBox = new VBox();
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -252,7 +255,9 @@ public class BasicGameApp extends GameApplication {
         vars.put("ammoMachineGun", ammoMachineGun);
         vars.put("weaponIndicatorPosition", 13);
 
-        vars.put("hasKeycard", false);
+        vars.put("hasKeycardBlue", false);
+        vars.put("hasKeycardRed", false);
+        vars.put("hasKeycardYellow", false);
     }
 
     public Entity player;
@@ -300,6 +305,7 @@ public class BasicGameApp extends GameApplication {
 
         addUINode(hp, hpInX, hpInY);
 
+        addUINode(keysBox, 15, 120);
         addUINode(d, 15, 50);
         addUINode(s, 55, 50);
         addUINode(ammoShotgun, 55, 65);
@@ -421,7 +427,22 @@ public class BasicGameApp extends GameApplication {
             @Override
             protected void onCollisionBegin(Entity player, Entity keycard) {
                 keycard.removeFromWorld();
-                set("hasKeycard", true);
+                switch (keycard.getProperties().getString("keyType")) {
+                    case "blue":
+                        set("hasKeycardBlue", true);
+                        var key1 = getUIFactory().newText(keycard.getString("keyType").replace("b", "B"), Color.BLUE, 18);
+                        keysBox.getChildren().add(key1);
+                        break;
+                    case "red":
+                        set("hasKeycardRed", true);
+                        var key2 = getUIFactory().newText(keycard.getString("keyType").replace("r", "R"), Color.RED, 18);
+                        keysBox.getChildren().add(key2);
+                        break;
+                    case "yellow":
+                        set("hasKeycardYellow", true);
+                        var key3 = getUIFactory().newText(keycard.getString("keyType").replace("y", "Y"), Color.YELLOW, 18);
+                        keysBox.getChildren().add(key3);
+                }
             }
         });
 
@@ -583,7 +604,12 @@ public class BasicGameApp extends GameApplication {
     }
 
     private void initialLevelActions() {
-        set("hasKeycard", false);
+        set("hasKeycardBlue", false);
+        set("hasKeycardRed", false);
+        set("hasKeycardYellow", false);
+        keysBox.getChildren().clear();
+        var keys = getUIFactory().newText("Keys:", Color.WHITE, 20);
+        keysBox.getChildren().add(keys);
 
         if (player != null) {
             player.getComponent(PhysicsComponent.class).overwritePosition(getGameWorld().getSingleton(START).getPosition());
@@ -632,12 +658,6 @@ public class BasicGameApp extends GameApplication {
         if (player != null) {
             player.getComponent(PlayerComponent.class).restoreHP();
         }
-//        for (int i = 0; i < getGameWorld().getEntitiesByType(TURRET).size(); i++) {
-//            getGameWorld().getEntitiesByType(TURRET).get(i).getComponent(TurretComponent.class).initHP();
-//        }
-//        for (int i = 0; i < getGameWorld().getEntitiesByType(ELITETURRET).size(); i++) {
-//            getGameWorld().getEntitiesByType(ELITETURRET).get(i).getComponent(EliteEnemyComponent.class).initHP();
-//        }
     }
 
     public static void main(String[] args) {

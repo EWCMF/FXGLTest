@@ -67,11 +67,28 @@ public class SideDoorComponent extends Component {
         else if (openType.equals("auto") && actorsOnTrigger.size() == 0)
             closeDoor();
 
-        if (openType.equals("key") && !FXGL.getb("hasKeycard"))
-            FXGL.spawn("overheadText", new SpawnData(entity.getPosition().add(0, -50)).put("text", "The door needs a keycard to open."));
-
-        if (openType.equals("key") && FXGL.getb("hasKeycard"))
-            openDoor();
+        if (openType.equals("key")) {
+            switch (entity.getProperties().getString("neededKey")) {
+                case "blue":
+                    if (FXGL.getb("hasKeycardBlue"))
+                        openDoor();
+                    else
+                        FXGL.spawn("overheadText", new SpawnData(entity.getPosition().add(0, -50)).put("text", "The door needs a blue keycard to open."));
+                    break;
+                case "red":
+                    if (FXGL.getb("hasKeycardRed"))
+                        openDoor();
+                    else
+                        FXGL.spawn("overheadText", new SpawnData(entity.getPosition().add(0, -50)).put("text", "The door needs a red keycard to open."));
+                    break;
+                case "yellow":
+                    if (FXGL.getb("hasKeycardYellow"))
+                        openDoor();
+                    else
+                        FXGL.spawn("overheadText", new SpawnData(entity.getPosition().add(0, -50)).put("text", "The door needs a yellow keycard to open."));
+                    break;
+            }
+        }
     }
 
     public void openDoor() {
