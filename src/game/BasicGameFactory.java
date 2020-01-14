@@ -11,6 +11,7 @@ import com.almasb.fxgl.entity.Spawns;
 import com.almasb.fxgl.entity.components.CollidableComponent;
 import com.almasb.fxgl.entity.components.IrremovableComponent;
 import com.almasb.fxgl.particle.ParticleComponent;
+import com.almasb.fxgl.particle.ParticleEmitter;
 import com.almasb.fxgl.particle.ParticleEmitters;
 import com.almasb.fxgl.physics.*;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
@@ -22,8 +23,8 @@ import game.enemy.MovingEnemyComponent;
 import game.level.*;
 import game.characters.HPComponent;
 import game.player.PlayerComponent;
+import game.player.PlayerExplosionComponent;
 import javafx.geometry.Point2D;
-import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -70,6 +71,37 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new ProjectileComponent(data.get("direction"), 650))
                 .with(new OffscreenCleanComponent())
                 .with("damage", 2)
+                .build();
+    }
+
+    @Spawns("playerRocket")
+    public Entity newPlayerRocket(SpawnData data) {
+        return entityBuilder()
+                .type(ROCKET)
+                .at((Point2D) data.get("position"))
+                .viewWithBBox("rocket.png")
+                .collidable()
+                .with(new ProjectileComponent(data.get("direction"), 850))
+                .build();
+    }
+
+    @Spawns("playerExplosion")
+    public Entity newPlayerExplosion(SpawnData data) {
+        FXGL.play("boom.wav");
+        var emitter = ParticleEmitters.newExplosionEmitter(350);
+        emitter.setMaxEmissions(1);
+        emitter.setSpawnPointFunction(i -> new Point2D(75, 75));
+        emitter.setColor(Color.FIREBRICK);
+        emitter.setSize(2, 10);
+
+
+        return entityBuilder()
+                .from(data)
+                .view(texture("explosion.png").toAnimatedTexture(3, Duration.seconds(0.33)).play())
+                .with("damage", 30)
+                .with(new ParticleComponent(emitter))
+                .with(new ExpireCleanComponent(Duration.seconds(0.60)))
+                .with(new PlayerExplosionComponent())
                 .build();
     }
 
@@ -373,6 +405,17 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new ProjectileComponent(data.get("direction"), 700))
                 .with(new OffscreenCleanComponent())
                 .with("damage", 3 * BasicGameApp.enemyDamageModifier)
+                .build();
+    }
+
+    @Spawns("enemyDeathEffect")
+    public Entity newEnemyDeathEffect(SpawnData data) {
+        var emitter = ParticleEmitters.newExplosionEmitter(40);
+        emitter.setColor(Color.GRAY);
+        return entityBuilder()
+                .from(data)
+                .with(new ParticleComponent(emitter))
+                .with(new ExpireCleanComponent(Duration.seconds(1)))
                 .build();
     }
 

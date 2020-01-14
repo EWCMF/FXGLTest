@@ -26,16 +26,18 @@ public class PlayerComponent extends Component {
     private HPComponent hp;
     private int jumps = 2;
 
-    private String[] weaponList = {"default", "shotgun", "machineGun"};
+    private String[] weaponList = {"default", "shotgun", "machineGun", "rocketLauncher"};
     private int currentWeapon = 0;
 
     private boolean canFire = true;
     private double defaultCooldown = 0.6;
     private double shotgunCooldown = 1;
     private double machineGunCooldown = 0.10;
+    private double rocketCooldown = 2;
 
     private int shotgunAmmo = BasicGameApp.ammoShotgun;
     private int machineGunAmmo = BasicGameApp.ammoMachineGun;
+    private int rocketAmmo = BasicGameApp.ammoRocket;
 
     private boolean isBeingDamaged = false;
     private boolean dead = false;
@@ -122,6 +124,7 @@ public class PlayerComponent extends Component {
 
         FXGL.set("ammoMachineGun", machineGunAmmo);
         FXGL.set("ammoShotgun", shotgunAmmo);
+        FXGL.set("ammoRockets", rocketAmmo);
     }
 
     private boolean isMoving() {
@@ -225,6 +228,19 @@ public class PlayerComponent extends Component {
                             canFire = true;
                         }, Duration.seconds(machineGunCooldown));
                     }
+                    return;
+                case "rocketLauncher":
+                    if (rocketAmmo != 0) {
+                        FXGL.play("woosh.wav");
+                        rocketAmmo--;
+                        canFire = false;
+                        SpawnData spawnDataRocket = new SpawnData(aim).put("direction", aim);
+                        spawnDataRocket.put("position", position);
+                        FXGL.spawn("playerRocket", spawnDataRocket);
+                        FXGL.runOnce(() -> {
+                            canFire = true;
+                        }, Duration.seconds(rocketCooldown));
+                    }
             }
         }
     }
@@ -267,6 +283,7 @@ public class PlayerComponent extends Component {
     public void restoreAmmo(int amount) {
         shotgunAmmo += amount * 10;
         machineGunAmmo += amount * 100;
+        rocketAmmo += amount * 5;
     }
 
     public void setHoldingMoveDirection(boolean holdingMoveDirection) {

@@ -30,6 +30,7 @@ public class MovingEnemyComponent extends Component {
     private boolean movingRight;
 
     public void onAdded() {
+        entity.getTransformComponent().setScaleOrigin(new Point2D(entity.getWidth()/2, entity.getHeight()/2));
         enemyAttackInterval = FXGL.newLocalTimer();
         enemyAttackInterval.capture();
 
@@ -70,6 +71,7 @@ public class MovingEnemyComponent extends Component {
                     if (checkLineOfSight(true)) {
                         basicEnemyAttack(player);
                         enemyAttackInterval.capture();
+                        entity.setScaleX(-1);
                         if (!nearbyPitL)
                             moveLeft();
                     }
@@ -78,6 +80,7 @@ public class MovingEnemyComponent extends Component {
                     if (checkLineOfSight(false)) {
                         basicEnemyAttack(player);
                         enemyAttackInterval.capture();
+                        entity.setScaleX(1);
                         if (!nearbyPitR)
                             moveRight();
                     }
@@ -179,6 +182,7 @@ public class MovingEnemyComponent extends Component {
         hp.setValue(hp.getValue() - damage);
 
         if (hp.getValue() <= 0) {
+            FXGL.spawn("enemyDeathEffect", entity.getPosition());
             entity.removeFromWorld();
         }
     }

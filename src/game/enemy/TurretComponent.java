@@ -54,6 +54,7 @@ public class TurretComponent extends Component {
         hp.setValue(hp.getValue() - damage);
 
         if (hp.getValue() <= 0) {
+            FXGL.spawn("enemyDeathEffect", entity.getPosition());
             entity.removeFromWorld();
         }
     }

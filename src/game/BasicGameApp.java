@@ -51,6 +51,7 @@ public class BasicGameApp extends GameApplication {
 
     public static int ammoShotgun = 20;
     public static int ammoMachineGun = 200;
+    public static int ammoRocket = 10;
 
     public static int enemyDamageModifier = 0;
 
@@ -177,13 +178,27 @@ public class BasicGameApp extends GameApplication {
         input.addAction(new UserAction("Shoot") {
             @Override
             protected void onAction() {
-                Point2D vector = FXGL.getInput().getVectorToMouse(player.getPosition());
-                if (vector.getX() < 0 && player.getTransformComponent().getScaleX() != -1.0)
-                    return;
-                if (vector.getX() > 0 && player.getTransformComponent().getScaleX() != 1.0)
-                    return;
+//                Point2D vector = FXGL.getInput().getVectorToMouse(player.getPosition());
+//                if (vector.getX() < 0 && player.getTransformComponent().getScaleX() != -1.0)
+//                    return;
+//                if (vector.getX() > 0 && player.getTransformComponent().getScaleX() != 1.0)
+//                    return;
 
                 double mouseY = FXGL.getInput().getVectorToMouse(player.getPosition()).getY();
+
+                // Quick hack to fire rocket from proper position.
+                int rocketCheck = geti("weaponIndicatorPosition");
+                if (rocketCheck == 133) {
+                    if (player.getTransformComponent().getScaleX() == -1.0) {
+                        // Middle position, Up position, down position.
+                        FiringPosition(mouseY, gunLeftMiddle, gunLeftUp.add(-22, -20), gunLeftDown);
+                    }
+                    // Facing right.
+                    else {
+                        // Middle position, Up position, down position.
+                        FiringPosition(mouseY, gunRightMiddle, gunRightUp.add(-5,-20), gunRightDown);
+                    }
+                }
 
                 // Facing left.
                 if (player.getTransformComponent().getScaleX() == -1.0) {
@@ -253,6 +268,7 @@ public class BasicGameApp extends GameApplication {
 
         vars.put("ammoShotgun", ammoShotgun);
         vars.put("ammoMachineGun", ammoMachineGun);
+        vars.put("ammoRockets", ammoRocket);
         vars.put("weaponIndicatorPosition", 13);
 
         vars.put("hasKeycardBlue", false);
@@ -292,11 +308,15 @@ public class BasicGameApp extends GameApplication {
         s.setStroke(Color.BLACK);
         var m = getUIFactory().newText("M", Color.WHITE, 20);
         m.setStroke(Color.BLACK);
+        var r = getUIFactory().newText("R", Color.WHITE, 20);
+        r.setStroke(Color.BLACK);
 
         var ammoShotgun = getUIFactory().newText("", Color.WHITE, 15);
         ammoShotgun.textProperty().bind(getip("ammoShotgun").asString());
         var ammoMachineGun = getUIFactory().newText("", Color.WHITE, 15);
         ammoMachineGun.textProperty().bind(getip("ammoMachineGun").asString());
+        var ammoRockets = getUIFactory().newText("", Color.WHITE, 15);
+        ammoRockets.textProperty().bind(getip("ammoRockets").asString());
 
         var weaponIndicator = new Rectangle(13, 32, 20, 22);
         weaponIndicator.xProperty().bind(getip("weaponIndicatorPosition"));
@@ -311,6 +331,8 @@ public class BasicGameApp extends GameApplication {
         addUINode(ammoShotgun, 55, 65);
         addUINode(m, 95, 50);
         addUINode(ammoMachineGun, 95, 65);
+        addUINode(r, 135, 50);
+        addUINode(ammoRockets, 135, 65);
         addUINode(weaponIndicator);
 
     }
@@ -402,6 +424,14 @@ public class BasicGameApp extends GameApplication {
                 player.getComponent(FlickerComponent.class).flicker();
             }
         });
+
+        playerRocketCollision(WALL);
+        playerRocketCollision(SIDEDOOR);
+        playerRocketCollision(TURRET);
+        playerRocketCollision(ELITETURRET);
+        playerRocketCollision(MOVINGENEMY);
+        playerRocketCollision(ELITEMOVINGENEMY);
+        playerRocketCollision(BREAKABLEWALL);
 
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, EXIT) {
             @Override
@@ -569,6 +599,19 @@ public class BasicGameApp extends GameApplication {
             protected void onCollisionEnd(Entity actor, Entity sideDoorTrigger) {
                 Entity sideDoor = getGameWorld().getEntitiesAt(sideDoorTrigger.getPosition().add(90, 0)).get(0);
                 sideDoor.getComponent(SideDoorComponent.class).checkCondition();
+            }
+        });
+    }
+
+    private void playerRocketCollision(BasicGameTypes hit) {
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(ROCKET, hit) {
+            @Override
+            protected void onCollisionBegin(Entity rocket, Entity hit) {
+                if (hit.isType(SIDEDOOR))
+                    if (hit.getComponent(SideDoorComponent.class).isOpened())
+                        return;
+                FXGL.spawn("playerExplosion", rocket.getPosition().add(-50,- 80));
+                rocket.removeFromWorld();
             }
         });
     }
