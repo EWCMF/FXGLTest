@@ -147,6 +147,6 @@
   <object id="43" type="eliteMovingEnemy" x="2848" y="192" width="32" height="96"/>
   <object id="44" type="movingEnemy" x="1952" y="192" width="32" height="96"/>
   <object id="45" type="movingEnemy" x="352" y="992" width="32" height="96"/>
-  <object id="46" type="eliteMovingEnemy" x="512" y="992" width="32" height="96"/>
+  <object id="46" type="eliteMovingEnemy" x="480" y="704" width="32" height="96"/>
  </objectgroup>
 </map>

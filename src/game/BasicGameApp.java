@@ -15,7 +15,8 @@ import game.enemy.MovingEnemyComponent;
 import game.level.*;
 import game.characters.HPComponent;
 import game.player.PlayerComponent;
-import game.ui.BasicGameMenu;
+import game.ui.BasicGameGameMenu;
+import game.ui.BasicGameMainMenu;
 import game.ui.HPIndicator;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -24,6 +25,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 
 import static game.BasicGameTypes.*;
@@ -70,7 +73,13 @@ public class BasicGameApp extends GameApplication {
         settings.setSceneFactory(new SceneFactory() {
             @Override
             public FXGLMenu newMainMenu() {
-                return new BasicGameMenu();
+                return new BasicGameMainMenu();
+            }
+
+            @NotNull
+            @Override
+            public FXGLMenu newGameMenu() {
+                return new BasicGameGameMenu();
             }
         });
         settings.setDeveloperMenuEnabled(false);
@@ -591,6 +600,13 @@ public class BasicGameApp extends GameApplication {
                 double typeCast2 = passable.getHeight();
                 data.put("height", (int) typeCast2);
                 getGameWorld().spawn("passablePlatformTrigger", data);
+
+                SpawnData data2 = new SpawnData(passable.getPosition());
+                double typeCast3 = passable.getWidth();
+                data2.put("width", (int) typeCast3);
+                double typeCast4 = passable.getHeight();
+                data2.put("height", (int) typeCast4);
+                getGameWorld().spawn("passablePlatformEnemy", data2);
             }
         }
 

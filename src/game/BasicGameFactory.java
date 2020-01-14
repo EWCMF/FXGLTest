@@ -13,6 +13,7 @@ import com.almasb.fxgl.particle.ParticleComponent;
 import com.almasb.fxgl.particle.ParticleEmitters;
 import com.almasb.fxgl.physics.*;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
+import com.almasb.fxgl.physics.box2d.dynamics.Filter;
 import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
 import game.characters.FlickerComponent;
 import game.enemy.TurretComponent;
@@ -143,8 +144,13 @@ public class BasicGameFactory implements EntityFactory {
     public Entity newPlayer(SpawnData data) {
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
+        Filter filter = new Filter();
+        filter.groupIndex = -1;
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.setFriction(5);
+        fixtureDef.setFilter(filter);
+        physicsComponent.setFixtureDef(fixtureDef);
         physicsComponent.addGroundSensor(new HitBox(new Point2D(39, 84), BoundingShape.box(5, 10)));
-        physicsComponent.setFixtureDef(new FixtureDef().friction(5));
 
         Point2D hitboxOffset = new Point2D(7, 14);
 
@@ -233,6 +239,23 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new CollidableComponent(true))
                 .build();
     }
+
+    @Spawns("passablePlatformEnemy")
+    public Entity newPassablePlatformEnemy(SpawnData data) {
+        PhysicsComponent physicsComponent = new PhysicsComponent();
+        physicsComponent.setBodyType(BodyType.STATIC);
+        Filter filter = new Filter();
+        filter.groupIndex = -1;
+        physicsComponent.setFixtureDef(new FixtureDef().filter(filter));
+
+        return entityBuilder()
+                .from(data)
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .with(physicsComponent)
+                .collidable()
+                .build();
+    }
+
 
     @Spawns("movingPlatform")
     public Entity newMovingPlatform(SpawnData data) {

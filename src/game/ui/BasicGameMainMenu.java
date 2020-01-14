@@ -14,9 +14,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
-public class BasicGameMenu extends FXGLMenu {
+public class BasicGameMainMenu extends FXGLMenu {
 
-    public BasicGameMenu() {
+    public BasicGameMainMenu() {
         super(MenuType.MAIN_MENU);
 
         VBox vBox1 = new VBox();
