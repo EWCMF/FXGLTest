@@ -7,6 +7,7 @@ import com.almasb.fxgl.physics.PhysicsComponent;
 import game.BasicGameApp;
 import game.BasicGameTypes;
 import game.characters.FlickerComponent;
+import game.enemy.BaronOfHellComponent;
 import game.enemy.MovingEnemyComponent;
 import game.enemy.TurretComponent;
 import game.level.BreakableWallComponent;
@@ -39,7 +40,8 @@ public class PlayerExplosionComponent extends Component {
                 .filter(e -> e.hasComponent(PlayerComponent.class)
                         || e.hasComponent(MovingEnemyComponent.class)
                         || e.hasComponent(TurretComponent.class)
-                        || e.hasComponent(BreakableWallComponent.class))
+                        || e.hasComponent(BreakableWallComponent.class)
+                        || e.hasComponent(BaronOfHellComponent.class))
                 .collect(Collectors.toList());
 
         // Check to remove affected on the other side of walls. Don't look at it too much.
@@ -101,8 +103,12 @@ public class PlayerExplosionComponent extends Component {
                 value.getComponent(TurretComponent.class).onHit(damage);
                 value.getComponent(FlickerComponent.class).flicker();
             }
-            if (value.hasComponent(BreakableWallComponent.class))
+            if (value.hasComponent(BreakableWallComponent.class)) {
                 value.getComponent(BreakableWallComponent.class).onHit(damage);
+            }
+            if (value.hasComponent(BaronOfHellComponent.class)) {
+                value.getComponent(BaronOfHellComponent.class).onHit(25);
+            }
         }
     }
 }

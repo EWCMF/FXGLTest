@@ -18,6 +18,8 @@ import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
 import com.almasb.fxgl.physics.box2d.dynamics.Filter;
 import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
 import game.characters.FlickerComponent;
+import game.enemy.BaronOfHellComponent;
+import game.enemy.BaronOfHellFireball;
 import game.enemy.TurretComponent;
 import game.enemy.MovingEnemyComponent;
 import game.level.*;
@@ -523,6 +525,56 @@ public class BasicGameFactory implements EntityFactory {
                 .from(data)
                 .view(getUIFactory().newText(text, 20))
                 .with(new ExpireCleanComponent(Duration.seconds(3)))
+                .build();
+    }
+
+    @Spawns("bossEnemyBOH")
+    public Entity newBossEnemyBOH(SpawnData data) {
+        PhysicsComponent physicsComponent = new PhysicsComponent();
+        physicsComponent.setBodyType(BodyType.DYNAMIC);
+
+        Point2D hitboxOffsetBody = new Point2D(125, 100);
+        Point2D hitboxOffsetHead = new Point2D(145, 0);
+
+        return entityBuilder()
+                .type(BARONOFHELL)
+                .from(data)
+                .bbox(new HitBox("bodyBOH", hitboxOffsetBody, BoundingShape.box(140, 228)))
+                .bbox(new HitBox("headBOH", hitboxOffsetHead, BoundingShape.box(95, 90)))
+                .with(physicsComponent)
+                .collidable()
+                .with(new HPComponent(300))
+                .with(new BaronOfHellComponent())
+                .build();
+    }
+
+    @Spawns("normalBOH")
+    public Entity newNormalBOH(SpawnData data) {
+        return entityBuilder()
+                .type(NORMALBOH)
+                .from(data)
+                .view(texture("fireballBOH.png").toAnimatedTexture(6, Duration.seconds(0.2)).loop())
+                .bbox(new HitBox(new Point2D(150, -5), BoundingShape.circle(30)))
+                .collidable()
+                .with(new ProjectileComponent(data.get("direction"), 650))
+                .build();
+    }
+
+    @Spawns("normalBOHExplosion")
+    public Entity newNormalBOHExplosion(SpawnData data) {
+        FXGL.play("fireballHit.wav");
+        var emitter = ParticleEmitters.newExplosionEmitter(250);
+        emitter.setMaxEmissions(2);
+        emitter.setSize(2, 10);
+        emitter.setColor(Color.GREEN);
+        emitter.setSpawnPointFunction(i -> new Point2D(75, 75));
+        return entityBuilder()
+                .with(new ExpireCleanComponent(Duration.seconds(1)))
+                .from(data)
+                .with(new ParticleComponent(emitter))
+                .view(texture("fireballBOHExplosion.png").toAnimatedTexture(3, Duration.seconds(1)).play())
+                .with("damage", 2 * BasicGameApp.enemyDamageModifier)
+                .with(new BaronOfHellFireball())
                 .build();
     }
 }

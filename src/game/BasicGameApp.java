@@ -10,6 +10,7 @@ import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import game.characters.FlickerComponent;
+import game.enemy.BaronOfHellComponent;
 import game.enemy.TurretComponent;
 import game.enemy.MovingEnemyComponent;
 import game.level.*;
@@ -17,11 +18,14 @@ import game.characters.HPComponent;
 import game.player.PlayerComponent;
 import game.ui.BasicGameGameMenu;
 import game.ui.BasicGameMainMenu;
+import game.ui.BossHPIndicator;
 import game.ui.HPIndicator;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -55,7 +59,7 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "test1.tmx";
+    private String startLevel = "testBoss.tmx";
     private int startBoundX = 32 * 100;
     private int startBoundY = 32 * 70;
 
@@ -66,6 +70,7 @@ public class BasicGameApp extends GameApplication {
     private String cameraPosY = "";
 
     private VBox keysBox = new VBox();
+    private AnchorPane bossHP = new AnchorPane();
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -86,7 +91,7 @@ public class BasicGameApp extends GameApplication {
                 return new BasicGameGameMenu();
             }
         });
-        settings.setDeveloperMenuEnabled(false);
+        settings.setDeveloperMenuEnabled(true);
     }
 
     @Override
@@ -154,12 +159,31 @@ public class BasicGameApp extends GameApplication {
         input.addAction(new UserAction("Test something") {
             @Override
             protected void onActionBegin() {
-                System.out.println(getGameWorld().getEntitiesInRange(new Rectangle2D(player.getX()-1, player.getY(), player.getWidth()+2, player.getHeight())).stream()
-                .filter(entity -> entity.isType(WALL))
-                .findAny()
-                .get().getPosition());
+                getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).walkLeft();
             }
         }, KeyCode.C);
+
+        input.addAction(new UserAction("Test something2") {
+            @Override
+            protected void onActionBegin() {
+                getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).walkRight();
+            }
+        }, KeyCode.V);
+
+        input.addAction(new UserAction("Test something3") {
+            @Override
+            protected void onActionBegin() {
+                getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).attack();
+            }
+        }, KeyCode.B);
+
+        input.addAction(new UserAction("Test something4") {
+            @Override
+            protected void onActionBegin() {
+                System.out.println(getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(PhysicsComponent.class).getBody().getContactList().contact);
+                System.out.println(getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(PhysicsComponent.class).getBody().getFixtures().get(1).getHitBox());
+            }
+        }, KeyCode.N);
 
         input.addAction(new UserAction("Change weapon") {
             @Override
@@ -260,6 +284,8 @@ public class BasicGameApp extends GameApplication {
         vars.put("hasKeycardBlue", false);
         vars.put("hasKeycardRed", false);
         vars.put("hasKeycardYellow", false);
+
+        vars.put("isBossLevel", false);
     }
 
     public Entity player;
@@ -320,7 +346,7 @@ public class BasicGameApp extends GameApplication {
         addUINode(r, 135, 50);
         addUINode(ammoRockets, 135, 65);
         addUINode(weaponIndicator);
-
+        addUINode(bossHP, 15, 35);
     }
 
     @Override
@@ -359,6 +385,17 @@ public class BasicGameApp extends GameApplication {
                 bullet.removeFromWorld();
                 movingEnemy.getComponent(MovingEnemyComponent.class).onHit(bullet.getInt("damage"));
                 movingEnemy.getComponent(FlickerComponent.class).flicker();
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(BULLET, BARONOFHELL) {
+            @Override
+            protected void onCollisionBegin(Entity bullet, Entity baron) {
+                if (bullet.getY() < getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(PhysicsComponent.class).getBody().getFixtures().get(1).getHitBox().getMaxYWorld()) {
+                    baron.getComponent(BaronOfHellComponent.class).onHit(bullet.getInt("damage"));
+                }
+                bullet.removeFromWorld();
+
             }
         });
 
@@ -418,6 +455,7 @@ public class BasicGameApp extends GameApplication {
         playerRocketCollision(MOVINGENEMY);
         playerRocketCollision(ELITEMOVINGENEMY);
         playerRocketCollision(BREAKABLEWALL);
+        playerRocketCollision(BARONOFHELL);
 
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, EXIT) {
             @Override
@@ -571,6 +609,22 @@ public class BasicGameApp extends GameApplication {
                 onSwitch = false;
             }
         });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(NORMALBOH, WALL) {
+            @Override
+            protected void onCollisionBegin(Entity normalBOH, Entity wall) {
+                getGameWorld().spawn("normalBOHExplosion", new SpawnData(normalBOH.getPosition().add(-160, -30)));
+                normalBOH.removeFromWorld();
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(NORMALBOH, PLAYER) {
+            @Override
+            protected void onCollisionBegin(Entity normalBOH, Entity wall) {
+                getGameWorld().spawn("normalBOHExplosion", new SpawnData(normalBOH.getPosition().add(-160, -30)));
+                normalBOH.removeFromWorld();
+            }
+        });
     }
 
     private void sideDoorTrigger(BasicGameTypes enemy) {
@@ -674,6 +728,16 @@ public class BasicGameApp extends GameApplication {
                 data.put("height", typeCast.intValue());
                 getGameWorld().spawn("sideDoorTrigger", data);
             }
+        }
+
+        if (!getGameWorld().getEntitiesByType(BARONOFHELL).isEmpty()) {
+            Entity boss = getGameWorld().getEntitiesByType(BARONOFHELL).get(0);
+            set("isBossLevel", true);
+            var bossName = getUIFactory().newText("Boss", Color.WHITE, 22);
+            bossName.setX(920);
+            bossName.setY(25);
+            var bossHPBar = new BossHPIndicator(boss.getComponent(HPComponent.class));
+            bossHP.getChildren().addAll(bossName, bossHPBar);
         }
     }
 
