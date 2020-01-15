@@ -186,20 +186,6 @@ public class BasicGameApp extends GameApplication {
 
                 double mouseY = FXGL.getInput().getVectorToMouse(player.getPosition()).getY();
 
-                // Quick hack to fire rocket from proper position.
-                int rocketCheck = geti("weaponIndicatorPosition");
-                if (rocketCheck == 133) {
-                    if (player.getTransformComponent().getScaleX() == -1.0) {
-                        // Middle position, Up position, down position.
-                        FiringPosition(mouseY, gunLeftMiddle, gunLeftUp.add(-22, -20), gunLeftDown);
-                    }
-                    // Facing right.
-                    else {
-                        // Middle position, Up position, down position.
-                        FiringPosition(mouseY, gunRightMiddle, gunRightUp.add(-5,-20), gunRightDown);
-                    }
-                }
-
                 // Facing left.
                 if (player.getTransformComponent().getScaleX() == -1.0) {
                     // Middle position, Up position, down position.
@@ -610,7 +596,7 @@ public class BasicGameApp extends GameApplication {
                 if (hit.isType(SIDEDOOR))
                     if (hit.getComponent(SideDoorComponent.class).isOpened())
                         return;
-                FXGL.spawn("playerExplosion", rocket.getPosition().add(-50,- 80));
+                FXGL.spawn("playerExplosion", rocket.getPosition().add(-80,- 85));
                 rocket.removeFromWorld();
             }
         });
@@ -651,7 +637,7 @@ public class BasicGameApp extends GameApplication {
         set("hasKeycardRed", false);
         set("hasKeycardYellow", false);
         keysBox.getChildren().clear();
-        var keys = getUIFactory().newText("Keys:", Color.WHITE, 20);
+        var keys = getUIFactory().newText("Keycards:", Color.WHITE, 20);
         keysBox.getChildren().add(keys);
 
         if (player != null) {

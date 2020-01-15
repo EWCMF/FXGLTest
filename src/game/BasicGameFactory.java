@@ -73,13 +73,22 @@ public class BasicGameFactory implements EntityFactory {
                 .with("damage", 2)
                 .build();
     }
+    @Spawns("playerRocketDummy")
+    public Entity newPlayerRocketDummy(SpawnData data) {
+        return entityBuilder()
+                .type(ROCKETDUMMY)
+                .from(data)
+                .bbox(new HitBox(BoundingShape.box(data.get("width"), data.get("height"))))
+                .build();
+    }
 
     @Spawns("playerRocket")
     public Entity newPlayerRocket(SpawnData data) {
         return entityBuilder()
                 .type(ROCKET)
                 .at((Point2D) data.get("position"))
-                .viewWithBBox("rocket.png")
+                .view("rocket.png")
+                .bbox(new HitBox(BoundingShape.box(-24, 7)))
                 .collidable()
                 .with(new ProjectileComponent(data.get("direction"), 850))
                 .build();
@@ -362,6 +371,7 @@ public class BasicGameFactory implements EntityFactory {
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
         physicsComponent.setFixtureDef(new FixtureDef().density(1000));
+        physicsComponent.addGroundSensor(new HitBox(new Point2D(0, data.<Integer>get("height")), BoundingShape.box(data.<Integer>get("width"), 5)));
 
         return entityBuilder()
                 .type(MOVINGENEMY)
@@ -381,6 +391,7 @@ public class BasicGameFactory implements EntityFactory {
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
         physicsComponent.setFixtureDef(new FixtureDef().density(1000));
+        physicsComponent.addGroundSensor(new HitBox(new Point2D(0, data.<Integer>get("height")), BoundingShape.box(data.<Integer>get("width"), 5)));
 
         return entityBuilder()
                 .type(ELITEMOVINGENEMY)

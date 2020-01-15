@@ -10,6 +10,7 @@ import game.characters.FlickerComponent;
 import game.enemy.MovingEnemyComponent;
 import game.enemy.TurretComponent;
 import game.level.BreakableWallComponent;
+import game.level.SideDoorComponent;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 
@@ -22,20 +23,69 @@ public class PlayerExplosionComponent extends Component {
         double minX = entity.getPosition().getX();
         double minY = entity.getPosition().getY();
         int damage = entity.getProperties().getInt("damage");
+        Rectangle2D range = new Rectangle2D(minX, minY, 200, 200);
+        Entity posAtFiring = FXGL.getGameWorld().getSingleton(BasicGameTypes.ROCKETDUMMY);
+        Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
 
-        List<Entity> affected = FXGL.getGameWorld().getEntitiesInRange(new Rectangle2D(minX, minY, 200, 200)).stream()
+        List<Entity> findWalls = FXGL.getGameWorld().getEntitiesInRange(range).stream()
+                .filter(e -> e.hasComponent(SideDoorComponent.class)
+                        && !e.getComponent(SideDoorComponent.class).isOpened()
+                        || e.isType(BasicGameTypes.WALL) && e.getWidth() <= 64).collect(Collectors.toList());
+
+        List<Entity> findFloors = FXGL.getGameWorld().getEntitiesInRange(range).stream()
+                .filter(e -> e.isType(BasicGameTypes.WALL) && e.getWidth() > 64).collect(Collectors.toList());
+
+        List<Entity> affected = FXGL.getGameWorld().getEntitiesInRange(range).stream()
                 .filter(e -> e.hasComponent(PlayerComponent.class)
                         || e.hasComponent(MovingEnemyComponent.class)
                         || e.hasComponent(TurretComponent.class)
                         || e.hasComponent(BreakableWallComponent.class))
                 .collect(Collectors.toList());
+
+        // Check to remove affected on the other side of walls. Don't look at it too much.
+        if (!affected.isEmpty() || !findWalls.isEmpty()) {
+            for (int i = 0; i < affected.size(); i++) {
+                if (!affected.get(i).isType(player)) {
+                    for (Entity findWall : findWalls) {
+                        if (affected.get(i).getX() > findWall.getX() && findWall.getX() > posAtFiring.getX()) {
+                            for (Entity findFloor : findFloors) {
+                                if (affected.get(i).getY() > findFloor.getY()) {
+                                    affected.remove(i);
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        if (affected.get(i).getX() < findWall.getX() && findWall.getX() < posAtFiring.getX()) {
+                            for (Entity findFloor : findFloors) {
+                                if (affected.get(i).getY() > findFloor.getY()) {
+                                    affected.remove(i);
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    for (Entity findFloor : findFloors) {
+                        if (affected.get(i).getY() < findFloor.getY() && findFloor.getY() < posAtFiring.getY()) {
+                            affected.remove(i);
+                            break;
+                        }
+                        if (affected.get(i).getY() > findFloor.getY() && findFloor.getY() > posAtFiring.getY()) {
+                            affected.remove(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        FXGL.despawnWithScale(posAtFiring);
         for (Entity value : affected) {
             if (value.hasComponent(PlayerComponent.class)) {
                 value.getComponent(FlickerComponent.class).flicker();
                 if (value.getScaleX() == -1) {
                     value.getComponent(PlayerComponent.class).onHit(3 * BasicGameApp.enemyDamageModifier, new Point2D(1, 0));
-                }
-                else {
+                } else {
                     value.getComponent(PlayerComponent.class).onHit(3 * BasicGameApp.enemyDamageModifier, new Point2D(-1, 0));
                 }
             }

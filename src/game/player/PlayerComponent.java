@@ -1,6 +1,7 @@
 package game.player;
 
 import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.entity.component.Required;
@@ -8,6 +9,7 @@ import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
 import game.BasicGameApp;
+import game.BasicGameTypes;
 import game.characters.HPComponent;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
@@ -101,10 +103,10 @@ public class PlayerComponent extends Component {
 
         double mousePosition = FXGL.getInput().getMouseXWorld();
         if (!dead) {
-            if ((int) mousePosition - (int) entity.getBoundingBoxComponent().getCenterWorld().getX()<= 0) {
+            if ((int) mousePosition - (int) entity.getBoundingBoxComponent().getMinXWorld()<= 0) {
                 getEntity().setScaleX(-1);
             }
-            else if ((int) mousePosition - (int) entity.getBoundingBoxComponent().getCenterWorld().getX() > 0) {
+            else if ((int) mousePosition - (int) entity.getBoundingBoxComponent().getMaxXWorld() > 0) {
                 getEntity().setScaleX(1);
             }
         }
@@ -183,6 +185,9 @@ public class PlayerComponent extends Component {
     }
 
     public void fire(Point2D aim, Point2D position) {
+        if (dead)
+            return;
+
         if (canFire) {
             switch (weaponList[currentWeapon]) {
                 case "default":
@@ -237,6 +242,8 @@ public class PlayerComponent extends Component {
                         SpawnData spawnDataRocket = new SpawnData(aim).put("direction", aim);
                         spawnDataRocket.put("position", position);
                         FXGL.spawn("playerRocket", spawnDataRocket);
+                        Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+                        FXGL.spawn("playerRocketDummy", new SpawnData(player.getPosition().add(7, 14)).put("width", player.getBoundingBoxComponent().getWidth()).put("height", player.getBoundingBoxComponent().getHeight()));
                         FXGL.runOnce(() -> {
                             canFire = true;
                         }, Duration.seconds(rocketCooldown));

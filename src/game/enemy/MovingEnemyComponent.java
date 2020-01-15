@@ -30,7 +30,7 @@ public class MovingEnemyComponent extends Component {
     private boolean movingRight;
 
     public void onAdded() {
-        entity.getTransformComponent().setScaleOrigin(new Point2D(entity.getWidth()/2, entity.getHeight()/2));
+        entity.getTransformComponent().setScaleOrigin(new Point2D(entity.getWidth() / 2, entity.getHeight() / 2));
         enemyAttackInterval = FXGL.newLocalTimer();
         enemyAttackInterval.capture();
 
@@ -47,7 +47,7 @@ public class MovingEnemyComponent extends Component {
             }
         });
 
-        physics.addSensor(new HitBox(new Point2D(entity.getWidth()+100, entity.getHeight() + 5), BoundingShape.box(32, 20)), new SensorCollisionHandler() {
+        physics.addSensor(new HitBox(new Point2D(entity.getWidth() + 100, entity.getHeight() + 5), BoundingShape.box(32, 20)), new SensorCollisionHandler() {
             @Override
             protected void onCollisionBegin(Entity other) {
                 nearbyPitR = false;
@@ -56,6 +56,12 @@ public class MovingEnemyComponent extends Component {
             @Override
             protected void onCollisionEnd(Entity other) {
                 nearbyPitR = true;
+                stop();
+            }
+        });
+
+        physics.onGroundProperty().addListener((observableValue, old, isOnGround) -> {
+            if (isOnGround) {
                 stop();
             }
         });
@@ -75,8 +81,7 @@ public class MovingEnemyComponent extends Component {
                         if (!nearbyPitL)
                             moveLeft();
                     }
-                }
-                else {
+                } else {
                     if (checkLineOfSight(false)) {
                         basicEnemyAttack(player);
                         enemyAttackInterval.capture();
@@ -104,8 +109,7 @@ public class MovingEnemyComponent extends Component {
         if (fromLeftSide) {
             double minX = entity.getPosition().getX() - entity.getInt("alertRange");
             return checkForObstacles(minX, true);
-        }
-        else {
+        } else {
             double minX = entity.getPosition().getX() + entity.getWidth();
             return checkForObstacles(minX, false);
         }
@@ -174,8 +178,8 @@ public class MovingEnemyComponent extends Component {
         Point2D enemyTarget = player.getBoundingBoxComponent().getCenterWorld().add(0, -12).subtract(entity.getBoundingBoxComponent().getCenterWorld());
         if (entity.isType(BasicGameTypes.MOVINGENEMY)) {
             FXGL.getGameWorld().spawn("enemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));
-        }
-        else FXGL.getGameWorld().spawn("eliteEnemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));
+        } else
+            FXGL.getGameWorld().spawn("eliteEnemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));
     }
 
     public void onHit(int damage) {
