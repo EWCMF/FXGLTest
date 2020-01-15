@@ -371,7 +371,6 @@ public class BasicGameFactory implements EntityFactory {
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
         physicsComponent.setFixtureDef(new FixtureDef().density(1000));
-        physicsComponent.addGroundSensor(new HitBox(new Point2D(0, data.<Integer>get("height")), BoundingShape.box(data.<Integer>get("width"), 5)));
 
         return entityBuilder()
                 .type(MOVINGENEMY)
@@ -391,7 +390,6 @@ public class BasicGameFactory implements EntityFactory {
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
         physicsComponent.setFixtureDef(new FixtureDef().density(1000));
-        physicsComponent.addGroundSensor(new HitBox(new Point2D(0, data.<Integer>get("height")), BoundingShape.box(data.<Integer>get("width"), 5)));
 
         return entityBuilder()
                 .type(ELITEMOVINGENEMY)

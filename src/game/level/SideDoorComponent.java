@@ -51,7 +51,7 @@ public class SideDoorComponent extends Component {
         if (opened && !openType.equals("auto") && !locked)
             return;
 
-        trigger = FXGL.getGameWorld().getEntitiesByType(BasicGameTypes.SIDEDOOR)
+        trigger = FXGL.getGameWorld().getEntitiesByType(BasicGameTypes.SIDEDOORTRIGGER)
                 .stream()
                 .filter(e -> e.isColliding(entity))
                 .findAny()
@@ -68,6 +68,9 @@ public class SideDoorComponent extends Component {
             closeDoor();
 
         if (openType.equals("key")) {
+            if (actorsOnTrigger.stream().noneMatch(e -> e.isType(BasicGameTypes.PLAYER)))
+                return;
+
             switch (entity.getProperties().getString("neededKey")) {
                 case "blue":
                     if (FXGL.getb("hasKeycardBlue"))

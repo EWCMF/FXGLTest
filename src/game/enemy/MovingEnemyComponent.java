@@ -17,6 +17,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.util.Duration;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class MovingEnemyComponent extends Component {
@@ -24,8 +25,8 @@ public class MovingEnemyComponent extends Component {
     private HPComponent hp;
     private PhysicsComponent physics;
     private boolean alerted = false;
-    private boolean nearbyPitL;
-    private boolean nearbyPitR;
+    private boolean nearbyPitL = false;
+    private boolean nearbyPitR = false;
     private boolean movingLeft;
     private boolean movingRight;
 
@@ -33,38 +34,6 @@ public class MovingEnemyComponent extends Component {
         entity.getTransformComponent().setScaleOrigin(new Point2D(entity.getWidth() / 2, entity.getHeight() / 2));
         enemyAttackInterval = FXGL.newLocalTimer();
         enemyAttackInterval.capture();
-
-        physics.addSensor(new HitBox(new Point2D(-100, entity.getHeight() + 5), BoundingShape.box(50, 20)), new SensorCollisionHandler() {
-            @Override
-            protected void onCollisionBegin(Entity other) {
-                nearbyPitL = false;
-            }
-
-            @Override
-            protected void onCollisionEnd(Entity other) {
-                nearbyPitL = true;
-                stop();
-            }
-        });
-
-        physics.addSensor(new HitBox(new Point2D(entity.getWidth() + 100, entity.getHeight() + 5), BoundingShape.box(32, 20)), new SensorCollisionHandler() {
-            @Override
-            protected void onCollisionBegin(Entity other) {
-                nearbyPitR = false;
-            }
-
-            @Override
-            protected void onCollisionEnd(Entity other) {
-                nearbyPitR = true;
-                stop();
-            }
-        });
-
-        physics.onGroundProperty().addListener((observableValue, old, isOnGround) -> {
-            if (isOnGround) {
-                stop();
-            }
-        });
     }
 
     @Override
@@ -72,105 +41,134 @@ public class MovingEnemyComponent extends Component {
         Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
 
         if (enemyAttackInterval.elapsed(Duration.seconds((Math.random() * 2) + 2))) {
-            if (alerted) {
-                if (player.getBoundingBoxComponent().getCenterWorld().getX() - entity.getBoundingBoxComponent().getCenterWorld().getX() < 0) {
-                    if (checkLineOfSight(true)) {
-                        basicEnemyAttack(player);
-                        enemyAttackInterval.capture();
-                        entity.setScaleX(-1);
-                        if (!nearbyPitL)
-                            moveLeft();
-                    }
-                } else {
-                    if (checkLineOfSight(false)) {
-                        basicEnemyAttack(player);
-                        enemyAttackInterval.capture();
-                        entity.setScaleX(1);
-                        if (!nearbyPitR)
-                            moveRight();
-                    }
+            if (player.getBoundingBoxComponent().getMaxXWorld() - entity.getBoundingBoxComponent().getMaxXWorld() < 0) {
+                if (checkLineOfSight()) {
+                    if (!nearbyPitL)
+                        moveLeft();
+                    basicEnemyAttack(player);
+                    enemyAttackInterval.capture();
+                    entity.setScaleX(-1);
+                }
+            } else {
+                if (checkLineOfSight()) {
+                    if (!nearbyPitR)
+                        moveRight();
+                    basicEnemyAttack(player);
+                    enemyAttackInterval.capture();
+                    entity.setScaleX(1);
                 }
             }
         }
 
-        if (stopCheckLeft() && movingLeft)
+        Rectangle2D checkPitLSelection = new Rectangle2D(entity.getX() - 20, entity.getY() + entity.getHeight(), 10, 10);
+        List<Entity> checkPitL = FXGL.getGameWorld().getEntitiesInRange(checkPitLSelection);
+        nearbyPitL = checkPitL.isEmpty();
+        if (nearbyPitL && !movingRight)
             stop();
-        if (stopCheckRight() && movingRight)
+
+        Rectangle2D checkPitRSelection = new Rectangle2D(entity.getX() + entity.getWidth() + 10, entity.getY() + entity.getHeight(), 10, 10);
+        List<Entity> checkPitR = FXGL.getGameWorld().getEntitiesInRange(checkPitRSelection);
+        nearbyPitR = checkPitR.isEmpty();
+        if (nearbyPitR && !movingLeft)
             stop();
 
-        alerted = distanceToPlayer(player) < entity.getInt("alertRange");
+//        alerted = distanceToPlayer(player) < entity.getInt("alertRange");
     }
 
-    public double distanceToPlayer(Entity player) {
-        return player.getPosition().distance(getEntity().getPosition());
-    }
+//    public double distanceToPlayer(Entity player) {
+//        return player.getPosition().distance(getEntity().getPosition());
+//    }
 
-    public boolean checkLineOfSight(boolean fromLeftSide) {
-        if (fromLeftSide) {
-            double minX = entity.getPosition().getX() - entity.getInt("alertRange");
-            return checkForObstacles(minX, true);
-        } else {
-            double minX = entity.getPosition().getX() + entity.getWidth();
-            return checkForObstacles(minX, false);
-        }
-    }
-
-    private boolean checkForObstacles(double minX, boolean fromLeftSide) {
-        double minY = entity.getPosition().getY();
-        List<Entity> list = FXGL.getGameWorld().getEntitiesInRange(new Rectangle2D(minX, minY, entity.getInt("alertRange"), 80));
-        double playerPos = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER).getBoundingBoxComponent().getCenterWorld().getX();
-        if (fromLeftSide) {
-            return list
-                    .stream()
-                    .filter(e -> e.getBoundingBoxComponent().getCenterWorld().getX() - playerPos > 0)
-                    .noneMatch(e -> e.hasComponent(SideDoorComponent.class) && !e.getComponent(SideDoorComponent.class).isOpened() || e.isType(BasicGameTypes.WALL));
-        }
-        return list
-                .stream()
-                .filter(e -> playerPos - e.getBoundingBoxComponent().getCenterWorld().getX() > 0)
-                .noneMatch(e -> e.hasComponent(SideDoorComponent.class) && !e.getComponent(SideDoorComponent.class).isOpened() || e.isType(BasicGameTypes.WALL));
-    }
-
-    public boolean stopCheckLeft() {
-        double minX = entity.getX() - 10;
-        double minY = entity.getPosition().getY();
-        List<Entity> list = FXGL.getGameWorld().getEntitiesInRange(new Rectangle2D(minX, minY, 10, 80));
-        return list
-                .stream()
-                .anyMatch(e -> e.hasComponent(SideDoorComponent.class)
+    public boolean checkLineOfSight() {
+        Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        Integer alertRange = entity.getProperties().getInt("alertRange");
+        Rectangle2D selection = new Rectangle2D(entity.getX() - alertRange.doubleValue(), entity.getY() - alertRange.doubleValue(), alertRange.doubleValue() * 2 + entity.getWidth(), alertRange.doubleValue() * 2 + entity.getHeight());
+        List<Entity> findWalls = FXGL.getGameWorld().getEntitiesInRange(selection).stream()
+                .filter(e -> e.hasComponent(SideDoorComponent.class)
                         && !e.getComponent(SideDoorComponent.class).isOpened()
-                        || e.isType(BasicGameTypes.WALL)
-                        || e.isType(BasicGameTypes.MOVINGENEMY)
-                        || e.isType(BasicGameTypes.ELITEMOVINGENEMY));
+                        || e.isType(BasicGameTypes.WALL) && e.getWidth() < 64
+                        && e.getY() > entity.getY()).collect(Collectors.toList());
+
+        List<Entity> findFloors = FXGL.getGameWorld().getEntitiesInRange(selection).stream()
+                .filter(e -> e.isType(BasicGameTypes.WALL) && e.getWidth() > 64).collect(Collectors.toList());
+
+        if (!findWalls.isEmpty() || !findFloors.isEmpty()) {
+            for (Entity findWall : findWalls) {
+                if (entity.getX() > findWall.getX() && findWall.getX() > player.getX()) {
+                    return false;
+                }
+                if (entity.getX() < findWall.getX() && findWall.getX() < player.getX()) {
+                    return false;
+                }
+            }
+            for (Entity findFloor : findFloors) {
+                if (entity.getY() > findFloor.getY() && findFloor.getY() > player.getY()) {
+                    return false;
+                }
+                if (entity.getY() < findFloor.getY() && findFloor.getY() < player.getY()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
-    public boolean stopCheckRight() {
-        double minX = entity.getX() + entity.getWidth();
-        double minY = entity.getPosition().getY();
-        List<Entity> list = FXGL.getGameWorld().getEntitiesInRange(new Rectangle2D(minX, minY, 20, 80));
-        return list
-                .stream()
-                .anyMatch(e -> e.hasComponent(SideDoorComponent.class)
-                        && !e.getComponent(SideDoorComponent.class).isOpened()
-                        || e.isType(BasicGameTypes.WALL)
-                        || e.isType(BasicGameTypes.MOVINGENEMY)
-                        || e.isType(BasicGameTypes.ELITEMOVINGENEMY));
-    }
+//    private boolean checkForObstacles(double minX, boolean fromLeftSide) {
+//        double minY = entity.getPosition().getY();
+//        List<Entity> list = FXGL.getGameWorld().getEntitiesInRange(new Rectangle2D(minX, minY, entity.getInt("alertRange"), 80));
+//        double playerPos = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER).getBoundingBoxComponent().getCenterWorld().getX();
+//        if (fromLeftSide) {
+//            return list
+//                    .stream()
+//                    .filter(e -> e.getBoundingBoxComponent().getCenterWorld().getX() - playerPos > 0)
+//                    .noneMatch(e -> e.hasComponent(SideDoorComponent.class) && !e.getComponent(SideDoorComponent.class).isOpened() || e.isType(BasicGameTypes.WALL));
+//        }
+//        return list
+//                .stream()
+//                .filter(e -> playerPos - e.getBoundingBoxComponent().getCenterWorld().getX() > 0)
+//                .noneMatch(e -> e.hasComponent(SideDoorComponent.class) && !e.getComponent(SideDoorComponent.class).isOpened() || e.isType(BasicGameTypes.WALL));
+//    }
+
+//    public boolean stopCheckLeft() {
+//        double minX = entity.getX() - 10;
+//        double minY = entity.getPosition().getY();
+//        List<Entity> list = FXGL.getGameWorld().getEntitiesInRange(new Rectangle2D(minX, minY, 10, 80));
+//        return list
+//                .stream()
+//                .anyMatch(e -> e.hasComponent(SideDoorComponent.class)
+//                        && !e.getComponent(SideDoorComponent.class).isOpened()
+//                        || e.isType(BasicGameTypes.WALL)
+//                        || e.isType(BasicGameTypes.MOVINGENEMY)
+//                        || e.isType(BasicGameTypes.ELITEMOVINGENEMY));
+//    }
+//
+//    public boolean stopCheckRight() {
+//        double minX = entity.getX() + entity.getWidth();
+//        double minY = entity.getPosition().getY();
+//        List<Entity> list = FXGL.getGameWorld().getEntitiesInRange(new Rectangle2D(minX, minY, 20, 80));
+//        return list
+//                .stream()
+//                .anyMatch(e -> e.hasComponent(SideDoorComponent.class)
+//                        && !e.getComponent(SideDoorComponent.class).isOpened()
+//                        || e.isType(BasicGameTypes.WALL)
+//                        || e.isType(BasicGameTypes.MOVINGENEMY)
+//                        || e.isType(BasicGameTypes.ELITEMOVINGENEMY));
+//    }
 
     public void stop() {
         physics.setVelocityX(0);
-        movingLeft = false;
-        movingRight = false;
     }
 
     public void moveLeft() {
         physics.setVelocityX(-100);
         movingLeft = true;
+        movingRight = false;
     }
 
     public void moveRight() {
         physics.setVelocityX(100);
         movingRight = true;
+        movingLeft = false;
     }
 
     public void basicEnemyAttack(Entity player) {
