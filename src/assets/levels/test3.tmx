@@ -100,6 +100,7 @@
   <object id="17" type="platform" x="1824" y="288" width="192" height="832"/>
   <object id="18" type="exit" x="2944" y="992" width="64" height="96">
    <properties>
+    <property name="next" value="testBoss.tmx"/>
     <property name="startOpened" type="bool" value="false"/>
    </properties>
   </object>

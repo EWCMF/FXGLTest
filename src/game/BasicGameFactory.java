@@ -532,6 +532,7 @@ public class BasicGameFactory implements EntityFactory {
     public Entity newBossEnemyBOH(SpawnData data) {
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.setBodyType(BodyType.DYNAMIC);
+        physicsComponent.setFixtureDef(new FixtureDef().density(10000));
 
         Point2D hitboxOffsetBody = new Point2D(125, 100);
         Point2D hitboxOffsetHead = new Point2D(145, 0);
@@ -543,7 +544,8 @@ public class BasicGameFactory implements EntityFactory {
                 .bbox(new HitBox("headBOH", hitboxOffsetHead, BoundingShape.box(95, 90)))
                 .with(physicsComponent)
                 .collidable()
-                .with(new HPComponent(300))
+                .with(new HPComponent(400))
+                .with(new FlickerComponent())
                 .with(new BaronOfHellComponent())
                 .build();
     }
@@ -572,9 +574,51 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new ExpireCleanComponent(Duration.seconds(1)))
                 .from(data)
                 .with(new ParticleComponent(emitter))
+                .bbox(new HitBox(BoundingShape.circle(10)))
                 .view(texture("fireballBOHExplosion.png").toAnimatedTexture(3, Duration.seconds(1)).play())
                 .with("damage", 2 * BasicGameApp.enemyDamageModifier)
                 .with(new BaronOfHellFireball())
+                .build();
+    }
+
+    @Spawns("purpleBOH")
+    public Entity newpurpleBOH(SpawnData data) {
+        return entityBuilder()
+                .type(PURPLEBOH)
+                .from(data)
+                .view(texture("fireballBOHPurple.png").toAnimatedTexture(6, Duration.seconds(0.2)).loop())
+                .bbox(new HitBox(new Point2D(300, -5), BoundingShape.circle(55)))
+                .collidable()
+                .with(new ProjectileComponent(data.get("direction"), 850))
+                .build();
+    }
+
+    @Spawns("normalBOHExplosionPurple")
+    public Entity newNormalBOHExplosionPurple(SpawnData data) {
+        FXGL.play("fireballHit.wav");
+        var emitter = ParticleEmitters.newExplosionEmitter(250);
+        emitter.setMaxEmissions(2);
+        emitter.setSize(4, 20);
+        emitter.setColor(Color.PURPLE);
+        emitter.setSpawnPointFunction(i -> new Point2D(75, 75));
+        return entityBuilder()
+                .with(new ExpireCleanComponent(Duration.seconds(1)))
+                .type(PURPLEBOHEXPLOSION)
+                .from(data)
+                .with(new ParticleComponent(emitter))
+                .view(texture("fireballBOHExplosionPurple.png").toAnimatedTexture(3, Duration.seconds(1)).play())
+                .with("damage", 3 * BasicGameApp.enemyDamageModifier)
+                .with(new BaronOfHellFireball())
+                .build();
+    }
+
+    @Spawns("bossBOHTrigger")
+    public Entity newBossBOHTrigger(SpawnData data) {
+        return entityBuilder()
+                .type(BOHTRIGGER)
+                .from(data)
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .with(new CollidableComponent(true))
                 .build();
     }
 }

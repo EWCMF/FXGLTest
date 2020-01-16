@@ -1,6 +1,7 @@
 package game;
 
 import com.almasb.fxgl.app.*;
+import com.almasb.fxgl.audio.Music;
 import com.almasb.fxgl.core.collection.PropertyMap;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
@@ -21,8 +22,6 @@ import game.ui.BasicGameMainMenu;
 import game.ui.BossHPIndicator;
 import game.ui.HPIndicator;
 import javafx.geometry.Point2D;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
@@ -72,6 +71,8 @@ public class BasicGameApp extends GameApplication {
     private VBox keysBox = new VBox();
     private AnchorPane bossHP = new AnchorPane();
 
+    public static Music music;
+
     @Override
     protected void initSettings(GameSettings settings) {
         settings.setWidth(1280);
@@ -91,7 +92,7 @@ public class BasicGameApp extends GameApplication {
                 return new BasicGameGameMenu();
             }
         });
-        settings.setDeveloperMenuEnabled(true);
+        settings.setDeveloperMenuEnabled(false);
     }
 
     @Override
@@ -159,14 +160,19 @@ public class BasicGameApp extends GameApplication {
         input.addAction(new UserAction("Test something") {
             @Override
             protected void onActionBegin() {
-                getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).walkLeft();
+                if (getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).isActive()) {
+                    getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).setActive(false);
+                    getAudioPlayer().stopMusic(music);
+                }
+                else
+                    getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).setActive(true);
             }
         }, KeyCode.C);
 
         input.addAction(new UserAction("Test something2") {
             @Override
             protected void onActionBegin() {
-                getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).walkRight();
+                getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).attackPurple();
             }
         }, KeyCode.V);
 
@@ -257,13 +263,11 @@ public class BasicGameApp extends GameApplication {
             Point2D gunOffset = player.getPosition().add(gunMiddle);
             Point2D mouseVector = FXGL.getInput().getVectorToMouse(gunOffset).normalize();
             player.getComponent(PlayerComponent.class).fire(mouseVector, gunOffset);
-        }
-        else if (mouseY < aimUpVectorY) {
+        } else if (mouseY < aimUpVectorY) {
             Point2D gunOffset = player.getPosition().add(gunUp);
             Point2D mouseVector = FXGL.getInput().getVectorToMouse(gunOffset).normalize();
             player.getComponent(PlayerComponent.class).fire(mouseVector, gunOffset);
-        }
-        else if (mouseY > aimDownVectorY) {
+        } else if (mouseY > aimDownVectorY) {
             Point2D gunOffset = player.getPosition().add(gunDown);
             Point2D mouseVector = FXGL.getInput().getVectorToMouse(gunOffset).normalize();
             player.getComponent(PlayerComponent.class).fire(mouseVector, gunOffset);
@@ -286,6 +290,7 @@ public class BasicGameApp extends GameApplication {
         vars.put("hasKeycardYellow", false);
 
         vars.put("isBossLevel", false);
+        vars.put("isPlayingMusic", false);
     }
 
     public Entity player;
@@ -471,8 +476,7 @@ public class BasicGameApp extends GameApplication {
                         } else
                             setLevel(gets("level"));
                     });
-                }
-                else
+                } else
                     spawn("overheadText", new SpawnData(exit.getPosition().add(0, -50)).put("text", "Find a switch to open the door."));
             }
         });
@@ -625,14 +629,52 @@ public class BasicGameApp extends GameApplication {
                 normalBOH.removeFromWorld();
             }
         });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PURPLEBOH, WALL) {
+            @Override
+            protected void onCollisionBegin(Entity purpleBOH, Entity wall) {
+                getGameWorld().spawn("normalBOHExplosionPurple", new SpawnData(purpleBOH.getPosition().add(-360, -80)));
+                purpleBOH.removeFromWorld();
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PURPLEBOH, PLAYER) {
+            @Override
+            protected void onCollisionBegin(Entity purpleBOH, Entity wall) {
+                getGameWorld().spawn("normalBOHExplosionPurple", new SpawnData(purpleBOH.getPosition().add(-360, -80)));
+                purpleBOH.removeFromWorld();
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, BARONOFHELL) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity baron) {
+                baron.getComponent(BaronOfHellComponent.class).melee();
+            }
+        });
+
+        onCollisionOneTimeOnly(PLAYER, BOHTRIGGER, (player, bohTrigger) -> {
+            getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).walkLeftCutscene();
+            getGameWorld().getEntitiesByType(SIDEDOOR).get(0).getComponent(SideDoorComponent.class).lockDoor();
+            getGameWorld().getEntitiesByType(PLAYER).get(0).getComponent(PlayerComponent.class).setPlayerControl(false);
+            getGameWorld().getEntitiesByType(PLAYER).get(0).getComponent(PlayerComponent.class).completeStop();
+            FXGL.runOnce(() -> {
+                getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).setActive(true);
+                activateBossHP();
+                getGameWorld().getEntitiesByType(PLAYER).get(0).getComponent(PlayerComponent.class).setPlayerControl(true);
+                music = FXGL.getAssetLoader().loadMusic("bossBGM.mp3");
+                getAudioPlayer().loopMusic(music);
+                set("isPlayingMusic", true);
+            }, Duration.seconds(5));
+        });
     }
 
     private void sideDoorTrigger(BasicGameTypes enemy) {
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(enemy, SIDEDOORTRIGGER) {
             @Override
             protected void onCollisionBegin(Entity actor, Entity sideDoorTrigger) {
-                    Entity sideDoor = getGameWorld().getEntitiesAt(sideDoorTrigger.getPosition().add(90, 0)).get(0);
-                    sideDoor.getComponent(SideDoorComponent.class).checkCondition();
+                Entity sideDoor = getGameWorld().getEntitiesAt(sideDoorTrigger.getPosition().add(90, 0)).get(0);
+                sideDoor.getComponent(SideDoorComponent.class).checkCondition();
             }
 
             @Override
@@ -650,7 +692,7 @@ public class BasicGameApp extends GameApplication {
                 if (hit.isType(SIDEDOOR))
                     if (hit.getComponent(SideDoorComponent.class).isOpened())
                         return;
-                FXGL.spawn("playerExplosion", rocket.getPosition().add(-80,- 85));
+                FXGL.spawn("playerExplosion", rocket.getPosition().add(-80, -85));
                 rocket.removeFromWorld();
             }
         });
@@ -691,6 +733,8 @@ public class BasicGameApp extends GameApplication {
         set("hasKeycardRed", false);
         set("hasKeycardYellow", false);
         keysBox.getChildren().clear();
+        bossHP.getChildren().clear();
+        bossHP.setOpacity(1);
         var keys = getUIFactory().newText("Keycards:", Color.WHITE, 20);
         keysBox.getChildren().add(keys);
 
@@ -738,13 +782,20 @@ public class BasicGameApp extends GameApplication {
             bossName.setY(25);
             var bossHPBar = new BossHPIndicator(boss.getComponent(HPComponent.class));
             bossHP.getChildren().addAll(bossName, bossHPBar);
+            bossHP.setOpacity(0);
         }
     }
 
     public void playerDeath() {
         FXGL.runOnce(() -> {
             getDisplay().showMessageBox("You Died.", getGameController()::gotoMainMenu);
+            if (getb("isPlayingMusic"))
+                getAudioPlayer().stopMusic(music);
         }, Duration.seconds(0.45));
+    }
+
+    public void activateBossHP() {
+        bossHP.setOpacity(1);
     }
 
     protected void initHP() {

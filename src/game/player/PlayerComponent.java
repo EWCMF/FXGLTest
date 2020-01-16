@@ -32,7 +32,7 @@ public class PlayerComponent extends Component {
     private int currentWeapon = 0;
 
     private boolean canFire = true;
-    private double defaultCooldown = 0.6;
+    private double defaultCooldown = 0.4;
     private double shotgunCooldown = 1;
     private double machineGunCooldown = 0.10;
     private double rocketCooldown = 2;
@@ -45,6 +45,8 @@ public class PlayerComponent extends Component {
     private boolean dead = false;
 
     private boolean holdingMoveDirection = false;
+    private boolean knockedBack;
+    private boolean playerControl = true;
 
     public PlayerComponent() {
 
@@ -79,7 +81,7 @@ public class PlayerComponent extends Component {
 
     @Override
     public void onUpdate(double tpf) {
-        if (holdingMoveDirection) {
+        if (holdingMoveDirection && playerControl) {
             if (texture.getAnimationChannel() != animWalk && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() > aimUpVectorY && FXGL.getInput().getVectorToMouse(entity.getPosition()).getY() < aimDownVectorY) {
                 texture.loopAnimationChannel(animWalk);
             }
@@ -101,12 +103,12 @@ public class PlayerComponent extends Component {
             }
         }
 
-        double mousePosition = FXGL.getInput().getMouseXWorld();
+        double mousePosition = FXGL.getInput().getMouseXUI();
         if (!dead) {
-            if ((int) mousePosition - (int) entity.getBoundingBoxComponent().getMinXWorld()<= 0) {
+            if (mousePosition < FXGL.getAppWidth() / 4) {
                 getEntity().setScaleX(-1);
             }
-            else if ((int) mousePosition - (int) entity.getBoundingBoxComponent().getMaxXWorld() > 0) {
+            else if (mousePosition >= FXGL.getAppWidth() / 4) {
                 getEntity().setScaleX(1);
             }
         }
@@ -127,6 +129,7 @@ public class PlayerComponent extends Component {
         FXGL.set("ammoMachineGun", machineGunAmmo);
         FXGL.set("ammoShotgun", shotgunAmmo);
         FXGL.set("ammoRockets", rocketAmmo);
+
     }
 
     private boolean isMoving() {
@@ -134,20 +137,31 @@ public class PlayerComponent extends Component {
     }
 
     public void left() {
+        if (!playerControl)
+            return;
         if (dead)
+            return;
+        if (knockedBack)
             return;
 
         physics.setVelocityX(-300);
     }
 
     public void right() {
+        if (!playerControl)
+            return;
         if (dead)
+            return;
+        if (knockedBack)
             return;
 
         physics.setVelocityX(300);
     }
 
     public void jump() {
+        if (!playerControl)
+            return;
+
         if (jumps == 0 || dead)
             return;
 
@@ -156,13 +170,26 @@ public class PlayerComponent extends Component {
     }
 
     public void stop() {
+        if (!playerControl)
+            return;
+
         if (dead)
+            return;
+        if (knockedBack)
             return;
 
         physics.setVelocityX(0);
     }
 
+    public void completeStop() {
+        physics.setVelocityY(0);
+        physics.setVelocityX(0);
+    }
+
     public void changeWeapon() {
+        if (!playerControl)
+            return;
+
         if (currentWeapon < weaponList.length - 1) {
             currentWeapon++;
             FXGL.inc("weaponIndicatorPosition", 40);
@@ -174,6 +201,9 @@ public class PlayerComponent extends Component {
     }
 
     public void changeWeaponReverse() {
+        if (!playerControl)
+            return;
+
         if (currentWeapon != 0) {
             currentWeapon--;
             FXGL.inc("weaponIndicatorPosition", -40);
@@ -188,9 +218,13 @@ public class PlayerComponent extends Component {
         if (dead)
             return;
 
+        if (!playerControl)
+            return;
+
         if (canFire) {
             switch (weaponList[currentWeapon]) {
                 case "default":
+                    FXGL.play("plik.wav");
                     canFire = false;
                     SpawnData spawnData = new SpawnData(aim).put("direction", aim);
                     spawnData.put("position", position);
@@ -201,6 +235,7 @@ public class PlayerComponent extends Component {
                     return;
                 case "shotgun":
                     if (shotgunAmmo != 0) {
+                        FXGL.play("bangchikchik.wav");
                         canFire = false;
                         shotgunAmmo--;
                         SpawnData spawnDataShotgunInitial = new SpawnData(aim).put("direction", aim);
@@ -224,6 +259,7 @@ public class PlayerComponent extends Component {
                     return;
                 case "machineGun":
                     if (machineGunAmmo != 0) {
+                        //FXGL.play("takataka.wav");
                         machineGunAmmo--;
                         canFire = false;
                         SpawnData spawnDataMachineGun = new SpawnData(aim).put("direction", aim);
@@ -295,5 +331,17 @@ public class PlayerComponent extends Component {
 
     public void setHoldingMoveDirection(boolean holdingMoveDirection) {
         this.holdingMoveDirection = holdingMoveDirection;
+    }
+
+    public boolean isKnockedBack() {
+        return knockedBack;
+    }
+
+    public void setKnockedBack(boolean knockedBack) {
+        this.knockedBack = knockedBack;
+    }
+
+    public void setPlayerControl(boolean playerControl) {
+        this.playerControl = playerControl;
     }
 }

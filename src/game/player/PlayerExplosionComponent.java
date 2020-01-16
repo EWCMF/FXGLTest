@@ -107,7 +107,7 @@ public class PlayerExplosionComponent extends Component {
                 value.getComponent(BreakableWallComponent.class).onHit(damage);
             }
             if (value.hasComponent(BaronOfHellComponent.class)) {
-                value.getComponent(BaronOfHellComponent.class).onHit(25);
+                value.getComponent(BaronOfHellComponent.class).onHit(20);
             }
         }
     }

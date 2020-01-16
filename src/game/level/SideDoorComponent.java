@@ -51,6 +51,9 @@ public class SideDoorComponent extends Component {
         if (opened && !openType.equals("auto") && !locked)
             return;
 
+        if (!opened && openType.equals("auto") && locked)
+            return;
+
         trigger = FXGL.getGameWorld().getEntitiesByType(BasicGameTypes.SIDEDOORTRIGGER)
                 .stream()
                 .filter(e -> e.isColliding(entity))
