@@ -4,10 +4,7 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
-import com.almasb.fxgl.physics.BoundingShape;
-import com.almasb.fxgl.physics.HitBox;
 import com.almasb.fxgl.physics.PhysicsComponent;
-import com.almasb.fxgl.physics.SensorCollisionHandler;
 import com.almasb.fxgl.time.LocalTimer;
 import game.BasicGameTypes;
 import game.characters.HPComponent;
@@ -64,7 +61,7 @@ public class MovingEnemyComponent extends Component {
         }
 
         Rectangle2D checkPitLSelection = new Rectangle2D(entity.getX() - 20, entity.getY() + entity.getHeight(), 10, 10);
-        List<Entity> checkPitL = FXGL.getGameWorld().getEntitiesInRange(checkPitLSelection);
+        List<Entity> checkPitL = FXGL.getGameWorld().getEntitiesInRange(checkPitLSelection).stream().filter(e -> !e.isType(BasicGameTypes.MOVINGSTOP)).collect(Collectors.toList());
         nearbyPitL = checkPitL.isEmpty();
         if (nearbyPitL && !movingRight)
             stop();
