@@ -55,6 +55,7 @@
   <object id="10" type="platform" x="2784" y="160" width="64" height="416"/>
   <object id="11" type="exit" x="2944" y="608" width="64" height="96">
    <properties>
+    <property name="next" value="test1.tmx"/>
     <property name="startOpened" type="bool" value="true"/>
    </properties>
   </object>

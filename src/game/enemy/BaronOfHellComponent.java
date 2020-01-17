@@ -31,8 +31,10 @@ public class BaronOfHellComponent extends Component {
     private boolean movedLeftOnce = false;
     private boolean purpleOnce = false;
     private boolean tripleOnce = false;
+    private int triples = 0;
     private int frenzyCooldown = 2;
     private boolean dead = false;
+    private int walkLeftLimit = 0;
 
     public BaronOfHellComponent() {
         Image image = FXGL.image("testBoH.png");
@@ -72,19 +74,31 @@ public class BaronOfHellComponent extends Component {
 
         if (enemyAttackInterval.elapsed(Duration.seconds((Math.random() * frenzyCooldown) + 2))) {
             if (cycleAttacks == 2) {
-                double randomSpecial = Math.random();
-                if (randomSpecial <= 0.33 && !tripleOnce) {
+//                double randomSpecial = Math.random();
+//                if (randomSpecial <= 0.33 && !tripleOnce) {
+//                    triple();
+//                    tripleOnce = true;
+//                    cycleAttacks = 0;
+//                }
+//                else if (randomSpecial > 0.33) {
+//                    attackPurple();
+//                    cycleAttacks = 0;
+//                }
+//                else if (purpleOnce && tripleOnce) {
+//                    walkLeft();
+//                    cycleAttacks = 0;
+//                }
+                if (triples <= 2) {
                     triple();
-                    tripleOnce = true;
                     cycleAttacks = 0;
                 }
-                else if (randomSpecial > 0.33 && !purpleOnce) {
-                    attackPurple();
-                    cycleAttacks = 0;
-                }
-                else if (purpleOnce && tripleOnce) {
+                else if (walkLeftLimit <= 2) {
                     walkLeft();
+                    triples = 0;
                     cycleAttacks = 0;
+                }
+                else if (frenzyCooldown == -1) {
+                    triple();
                 }
 
             } else {
@@ -92,16 +106,27 @@ public class BaronOfHellComponent extends Component {
                 cycleAttacks++;
             }
         }
-        if (movedLeftOnce && tripleOnce && purpleOnce) {
+//        if (movedLeftOnce && tripleOnce && purpleOnce) {
+//            FXGL.runOnce(() -> {
+//                movedLeftOnce = false;
+//                tripleOnce = false;
+//                purpleOnce = false;
+//            }, Duration.seconds(4));
+//        }
+
+        if (movedLeftOnce &&tripleOnce) {
             FXGL.runOnce(() -> {
                 movedLeftOnce = false;
                 tripleOnce = false;
-                purpleOnce = false;
             }, Duration.seconds(4));
         }
     }
 
     public void walkLeft() {
+        if (walkLeftLimit == 2)
+            return;
+
+        walkLeftLimit++;
         movedLeftOnce = true;
         moving = true;
         physics.setVelocityX(-150);
@@ -110,7 +135,6 @@ public class BaronOfHellComponent extends Component {
         enemyAttackInterval.capture();
         FXGL.runOnce(() -> {
             physics.setVelocityX(0);
-            texture.loopAnimationChannel(animIdle);
             moving = false;
         }, Duration.seconds(1.5));
     }
@@ -185,6 +209,7 @@ public class BaronOfHellComponent extends Component {
         if (dead)
             return;
 
+        triples++;
         tripleOnce = true;
         enemyAttackInterval.capture();
         player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
