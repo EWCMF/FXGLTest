@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/FXGLTest.iml" filepath="$PROJECT_DIR$/FXGLTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BasicGameApp.iml" filepath="$PROJECT_DIR$/BasicGameApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ContraKnockoff.iml" filepath="$PROJECT_DIR$/ContraKnockoff.iml" />
     </modules>
   </component>
 </project>

@@ -1,4 +1,4 @@
-package game.characters;
+package game.components;
 
 import com.almasb.fxgl.entity.components.IntegerComponent;
 

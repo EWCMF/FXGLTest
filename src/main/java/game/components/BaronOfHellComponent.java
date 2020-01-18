@@ -1,4 +1,4 @@
-package game.enemy;
+package game.components;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
@@ -10,9 +10,6 @@ import com.almasb.fxgl.texture.AnimationChannel;
 import com.almasb.fxgl.time.LocalTimer;
 import game.BasicGameApp;
 import game.BasicGameTypes;
-import game.characters.FlickerComponent;
-import game.characters.HPComponent;
-import game.player.PlayerComponent;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.util.Duration;

@@ -1,14 +1,13 @@
-package game.enemy;
+package game.components;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
+import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.time.LocalTimer;
 import game.BasicGameTypes;
-import game.characters.HPComponent;
-import game.level.SideDoorComponent;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.util.Duration;
@@ -16,7 +15,7 @@ import javafx.util.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Required(HPComponent.class)
 public class MovingEnemyComponent extends Component {
     private LocalTimer enemyAttackInterval;
     private HPComponent hp;

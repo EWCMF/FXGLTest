@@ -1,10 +1,10 @@
-package game.level;
+package game.components;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.component.Component;
 import game.BasicGameTypes;
-import game.characters.HPComponent;
+import game.components.HPComponent;
 import javafx.geometry.Rectangle2D;
 
 import java.util.List;

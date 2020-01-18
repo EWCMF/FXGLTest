@@ -10,13 +10,7 @@ import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
 import com.almasb.fxgl.physics.PhysicsComponent;
-import game.characters.FlickerComponent;
-import game.enemy.BaronOfHellComponent;
-import game.enemy.TurretComponent;
-import game.enemy.MovingEnemyComponent;
-import game.level.*;
-import game.characters.HPComponent;
-import game.player.PlayerComponent;
+import game.components.*;
 import game.ui.BasicGameGameMenu;
 import game.ui.BasicGameMainMenu;
 import game.ui.BossHPIndicator;
@@ -33,8 +27,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-import static game.BasicGameTypes.*;
 import static com.almasb.fxgl.dsl.FXGL.*;
+import static game.BasicGameTypes.*;
 
 
 public class BasicGameApp extends GameApplication {
@@ -73,14 +67,15 @@ public class BasicGameApp extends GameApplication {
 
     public static Music music;
 
+
     @Override
-    protected void initSettings(GameSettings settings) {
-        settings.setWidth(1280);
-        settings.setHeight(720);
-        settings.setTitle("Contra Knockoff");
-        settings.setVersion("0.3");
-        settings.setMenuEnabled(true);
-        settings.setSceneFactory(new SceneFactory() {
+    protected void initSettings(GameSettings gameSettings) {
+        gameSettings.setWidth(1280);
+        gameSettings.setHeight(720);
+        gameSettings.setTitle("Contra Knockoff");
+        gameSettings.setVersion("0.3");
+        gameSettings.setMenuEnabled(true);
+        gameSettings.setSceneFactory(new SceneFactory() {
             @Override
             public FXGLMenu newMainMenu() {
                 return new BasicGameMainMenu();
@@ -92,7 +87,7 @@ public class BasicGameApp extends GameApplication {
                 return new BasicGameGameMenu();
             }
         });
-        settings.setDeveloperMenuEnabled(false);
+        gameSettings.setDeveloperMenuEnabled(false);
     }
 
     @Override

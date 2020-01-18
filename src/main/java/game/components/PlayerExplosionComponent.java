@@ -1,4 +1,4 @@
-package game.player;
+package game.components;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
@@ -6,12 +6,6 @@ import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import game.BasicGameApp;
 import game.BasicGameTypes;
-import game.characters.FlickerComponent;
-import game.enemy.BaronOfHellComponent;
-import game.enemy.MovingEnemyComponent;
-import game.enemy.TurretComponent;
-import game.level.BreakableWallComponent;
-import game.level.SideDoorComponent;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 
