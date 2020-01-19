@@ -10,5 +10,5 @@ mvn package
 ## Run
 
 ```
-java -jar target/BasicGameApp-0.1.jar
+java -jar target/ContraKnockoff-0.3.jar
 ```
