@@ -48,7 +48,7 @@ public class HPIndicator extends AnchorPane {
         var timeline = new Timeline();
         if (hp != 0) {
             timeline.getKeyFrames().addAll(
-                new KeyFrame(Duration.seconds(0.44), new KeyValue(inner.widthProperty(), hp * 1.0 / playerHP.getMaxHP() * length, Interpolators.LINEAR.EASE_IN()))
+                new KeyFrame(Duration.seconds(0.44), new KeyValue(inner.widthProperty(), hp * 1.0 / playerHP.getMaxHP() * (length - 6), Interpolators.LINEAR.EASE_IN()))
             );
         }
         else {

@@ -52,7 +52,7 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "test1.tmx";
+    private String startLevel = "level1.tmx";
     private int startBoundX = 32 * 100;
     private int startBoundY = 32 * 70;
 
@@ -514,6 +514,16 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, MEDKIT) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity medkit) {
+                if (player.getComponent(PlayerComponent.class).getHP() != player.getComponent(HPComponent.class).getMaxHP() && !player.getComponent(PlayerComponent.class).isDead()) {
+                    medkit.removeFromWorld();
+                    player.getComponent(PlayerComponent.class).restoreHP(medkit.getInt("amount"));
+                }
+            }
+        });
+
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, PASSABLETRIGGER) {
             @Override
             protected void onCollisionBegin(Entity player, Entity passableTrigger) {
@@ -736,7 +746,7 @@ public class BasicGameApp extends GameApplication {
         if (player != null) {
             player.getComponent(PhysicsComponent.class).overwritePosition(getGameWorld().getSingleton(START).getPosition());
             player.setZ(Integer.MAX_VALUE);
-            player.getComponent(PlayerComponent.class).restoreHP();
+            player.getComponent(PlayerComponent.class).restoreMaxHP();
         }
 
         if (!getGameWorld().getEntitiesByType(PASSABLE).isEmpty()) {
@@ -795,7 +805,7 @@ public class BasicGameApp extends GameApplication {
 
     protected void initHP() {
         if (player != null) {
-            player.getComponent(PlayerComponent.class).restoreHP();
+            player.getComponent(PlayerComponent.class).restoreMaxHP();
         }
     }
 

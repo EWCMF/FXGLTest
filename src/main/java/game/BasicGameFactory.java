@@ -57,7 +57,7 @@ public class BasicGameFactory implements EntityFactory {
     }
 
     @Spawns("machineGunBullet")
-    public Entity newMachineGun(SpawnData data) {
+    public Entity newMachineGunBullet(SpawnData data) {
         return entityBuilder()
                 .type(BULLET)
                 .at((Point2D) data.get("position"))
@@ -432,6 +432,51 @@ public class BasicGameFactory implements EntityFactory {
                 .bbox(new HitBox(new Point2D(0, 27), BoundingShape.box(64, 37)))
                 .with(new CollidableComponent(true))
                 .with("amount", data.get("amount"))
+                .build();
+    }
+
+    @Spawns("medkit")
+    public Entity newMedkit(SpawnData data) {
+        return entityBuilder()
+                .type(MEDKIT)
+                .from(data)
+                .view("medkit.png")
+                .bbox(new HitBox(new Point2D(8, 32), BoundingShape.box(48, 32)))
+                .with(new CollidableComponent(true))
+                .with("amount", data.get("amount"))
+                .build();
+    }
+
+    @Spawns("shotgun")
+    public Entity newShotgun(SpawnData data) {
+        return entityBuilder()
+                .type(SG)
+                .from(data)
+                .view("shotgun.png")
+                .bbox(new HitBox(new Point2D(8, 32), BoundingShape.box(48, 32)))
+                .with(new CollidableComponent(true))
+                .build();
+    }
+
+    @Spawns("machineGun")
+    public Entity newMachineGun(SpawnData data) {
+        return entityBuilder()
+                .type(MG)
+                .from(data)
+                .view("machineGun.png")
+                .bbox(new HitBox(new Point2D(8, 32), BoundingShape.box(48, 32)))
+                .with(new CollidableComponent(true))
+                .build();
+    }
+
+    @Spawns("rocketLauncher")
+    public Entity newRocketLauncher(SpawnData data) {
+        return entityBuilder()
+                .type(RL)
+                .from(data)
+                .view("rocketLauncher.png")
+                .bbox(new HitBox(new Point2D(8, 32), BoundingShape.box(48, 32)))
+                .with(new CollidableComponent(true))
                 .build();
     }
 

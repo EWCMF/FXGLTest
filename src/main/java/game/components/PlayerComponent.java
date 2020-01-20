@@ -318,7 +318,18 @@ public class PlayerComponent extends Component {
         this.hp.setValue(hp);
     }
 
-    public void restoreHP() {
+    public int getHP() {
+        return this.hp.getValue();
+    }
+
+    public void restoreHP(int amount) {
+        if (this.hp.getValue() + amount < this.hp.getMaxHP())
+            this.hp.setValue(this.hp.getValue() + amount);
+        else
+            restoreMaxHP();
+    }
+
+    public void restoreMaxHP() {
         hp.setValue(hp.getMaxHP());
     }
 
@@ -334,6 +345,10 @@ public class PlayerComponent extends Component {
 
     public boolean isKnockedBack() {
         return knockedBack;
+    }
+
+    public boolean isDead() {
+        return dead;
     }
 
     public void setKnockedBack(boolean knockedBack) {
