@@ -286,6 +286,10 @@ public class BasicGameApp extends GameApplication {
 
         vars.put("isBossLevel", false);
         vars.put("isPlayingMusic", false);
+
+        vars.put("hasShotgun", false);
+        vars.put("hasMachineGun", false);
+        vars.put("hasRocketLauncher", false);
     }
 
     public Entity player;
