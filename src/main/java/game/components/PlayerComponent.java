@@ -14,6 +14,8 @@ import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
 
+import java.util.ArrayList;
+
 @Required(HPComponent.class)
 public class PlayerComponent extends Component {
 
@@ -27,7 +29,7 @@ public class PlayerComponent extends Component {
     private HPComponent hp;
     private int jumps = 2;
 
-    private String[] weaponList = {"default", "shotgun", "machineGun", "rocketLauncher"};
+    private ArrayList<String> weaponList = new ArrayList<>();
     private int currentWeapon = 0;
 
     private boolean canFire = true;
@@ -69,6 +71,8 @@ public class PlayerComponent extends Component {
 
     @Override
     public void onAdded() {
+        weaponList.add("default");
+
         entity.getTransformComponent().setScaleOrigin(new Point2D(32, 47));
         entity.getViewComponent().addChild(texture);
 
@@ -189,7 +193,7 @@ public class PlayerComponent extends Component {
         if (!playerControl)
             return;
 
-        if (currentWeapon < weaponList.length - 1) {
+        if (currentWeapon < weaponList.size() - 1) {
             currentWeapon++;
             FXGL.inc("weaponIndicatorPosition", 40);
         }
@@ -208,8 +212,8 @@ public class PlayerComponent extends Component {
             FXGL.inc("weaponIndicatorPosition", -40);
         }
         else {
-            currentWeapon = weaponList.length - 1;
-            FXGL.set("weaponIndicatorPosition", 13 + 40 * (weaponList.length - 1));
+            currentWeapon = weaponList.size() - 1;
+            FXGL.set("weaponIndicatorPosition", 13 + 40 * (weaponList.size() - 1));
         }
     }
 
@@ -221,7 +225,7 @@ public class PlayerComponent extends Component {
             return;
 
         if (canFire) {
-            switch (weaponList[currentWeapon]) {
+            switch (weaponList.get(currentWeapon)) {
                 case "default":
                     FXGL.play("plik.wav");
                     canFire = false;
@@ -312,6 +316,33 @@ public class PlayerComponent extends Component {
                 physics.setLinearVelocity(500, -300);
             }
         }
+    }
+
+    public void addWeaponShotgun() {
+        if (!FXGL.getb("hasShotgun")) {
+            weaponList.add("shotgun");
+            FXGL.set("hasShotgun", true);
+        }
+        else
+            shotgunAmmo += 10;
+    }
+
+    public void addWeaponMachineGun() {
+        if (!FXGL.getb("hasMachineGun")) {
+            weaponList.add("machineGun");
+            FXGL.set("hasMachineGun", true);
+        }
+        else
+            machineGunAmmo += 100;
+    }
+
+    public void addWeaponRocketLauncher() {
+        if (!FXGL.getb("hasRocketLauncher")) {
+            weaponList.add("rocketLauncher");
+            FXGL.set("hasRocketLauncher", true);
+        }
+        else
+            rocketAmmo += 5;
     }
 
     public void setHP(int hp) {

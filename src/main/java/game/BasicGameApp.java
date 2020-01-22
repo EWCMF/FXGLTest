@@ -16,12 +16,14 @@ import game.ui.BasicGameMainMenu;
 import game.ui.BossHPIndicator;
 import game.ui.HPIndicator;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,6 +68,15 @@ public class BasicGameApp extends GameApplication {
     private AnchorPane bossHP = new AnchorPane();
 
     public static Music music;
+
+    private Text d;
+    private Text s;
+    private Text m;
+    private Text rl;
+
+    private Text ammoShotgunUI;
+    private Text ammoMachineGunUI;
+    private Text ammoRocketsUI;
 
 
     @Override
@@ -318,21 +329,23 @@ public class BasicGameApp extends GameApplication {
     protected void initUI() {
         var hp = new HPIndicator(player.getComponent(HPComponent.class));
 
-        var d = getUIFactory().newText("D", Color.WHITE, 20);
+        d = getUIFactory().newText("D", Color.WHITE, 20);
         d.setStroke(Color.BLACK);
-        var s = getUIFactory().newText("S", Color.WHITE, 20);
+        s = getUIFactory().newText("S", Color.WHITE, 20);
         s.setStroke(Color.BLACK);
-        var m = getUIFactory().newText("M", Color.WHITE, 20);
+        m = getUIFactory().newText("M", Color.WHITE, 20);
         m.setStroke(Color.BLACK);
-        var r = getUIFactory().newText("R", Color.WHITE, 20);
-        r.setStroke(Color.BLACK);
+        rl = getUIFactory().newText("R", Color.WHITE, 20);
+        rl.setStroke(Color.BLACK);
 
-        var ammoShotgun = getUIFactory().newText("", Color.WHITE, 15);
-        ammoShotgun.textProperty().bind(getip("ammoShotgun").asString());
-        var ammoMachineGun = getUIFactory().newText("", Color.WHITE, 15);
-        ammoMachineGun.textProperty().bind(getip("ammoMachineGun").asString());
-        var ammoRockets = getUIFactory().newText("", Color.WHITE, 15);
-        ammoRockets.textProperty().bind(getip("ammoRockets").asString());
+        ammoShotgunUI = getUIFactory().newText("", Color.WHITE, 15);
+        ammoShotgunUI.textProperty().bind(getip("ammoShotgun").asString());
+        ammoMachineGunUI = getUIFactory().newText("", Color.WHITE, 15);
+        ammoMachineGunUI.textProperty().bind(getip("ammoMachineGun").asString());
+        ammoRocketsUI = getUIFactory().newText("", Color.WHITE, 15);
+        ammoRocketsUI.textProperty().bind(getip("ammoRockets").asString());
+
+        updateWeaponUI();
 
         var weaponIndicator = new Rectangle(13, 32, 20, 22);
         weaponIndicator.xProperty().bind(getip("weaponIndicatorPosition"));
@@ -344,13 +357,40 @@ public class BasicGameApp extends GameApplication {
         addUINode(keysBox, 15, 120);
         addUINode(d, 15, 50);
         addUINode(s, 55, 50);
-        addUINode(ammoShotgun, 55, 65);
+        addUINode(ammoShotgunUI, 55, 65);
         addUINode(m, 95, 50);
-        addUINode(ammoMachineGun, 95, 65);
-        addUINode(r, 135, 50);
-        addUINode(ammoRockets, 135, 65);
+        addUINode(ammoMachineGunUI, 95, 65);
+        addUINode(rl, 135, 50);
+        addUINode(ammoRocketsUI, 135, 65);
         addUINode(weaponIndicator);
         addUINode(bossHP, 15, 35);
+    }
+
+    private void updateWeaponUI() {
+        if (getb("hasShotgun")) {
+            s.setOpacity(1);
+            ammoShotgunUI.setOpacity(1);
+        }
+        else {
+            s.setOpacity(0);
+            ammoShotgunUI.setOpacity(0);
+        }
+        if (getb("hasMachineGun")) {
+            m.setOpacity(1);
+            ammoMachineGunUI.setOpacity(1);
+        }
+        else {
+            m.setOpacity(0);
+            ammoMachineGunUI.setOpacity(0);
+        }
+        if (getb("hasRocketLauncher")) {
+            rl.setOpacity(1);
+            ammoRocketsUI.setOpacity(1);
+        }
+        else {
+            rl.setOpacity(0);
+            ammoRocketsUI.setOpacity(0);
+        }
     }
 
     @Override
@@ -525,6 +565,33 @@ public class BasicGameApp extends GameApplication {
                     medkit.removeFromWorld();
                     player.getComponent(PlayerComponent.class).restoreHP(medkit.getInt("amount"));
                 }
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, SG) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity shotgun) {
+                shotgun.removeFromWorld();
+                player.getComponent(PlayerComponent.class).addWeaponShotgun();
+                updateWeaponUI();
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, MG) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity machineGun) {
+                machineGun.removeFromWorld();
+                player.getComponent(PlayerComponent.class).addWeaponMachineGun();
+                updateWeaponUI();
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, RL) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity rocketLauncher) {
+                rocketLauncher.removeFromWorld();
+                player.getComponent(PlayerComponent.class).addWeaponRocketLauncher();
+                updateWeaponUI();
             }
         });
 
