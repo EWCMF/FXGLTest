@@ -543,6 +543,18 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, HIDDENROOM) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity room) {
+                room.getComponent(HiddenRoomComponent.class).fadeOut();
+            }
+
+            @Override
+            protected void onCollisionEnd(Entity player, Entity room) {
+                room.getComponent(HiddenRoomComponent.class).fadeIn();
+            }
+        });
+
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(MOVING, MOVINGSTOP) {
             @Override
             protected void onCollisionBegin(Entity moving, Entity movingStop) {

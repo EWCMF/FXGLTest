@@ -254,6 +254,20 @@ public class BasicGameFactory implements EntityFactory {
                 .build();
     }
 
+    @Spawns("hiddenRoom")
+    public Entity newHiddenRoom(SpawnData data) {
+
+        return entityBuilder()
+                .type(HIDDENROOM)
+                .view("hiddenGray1.png")
+                .from(data)
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .collidable()
+                .with("style", data.get("style"))
+                .with(new HiddenRoomComponent())
+                .build();
+    }
+
     @Spawns("passablePlatform")
     public Entity newPassablePlatform(SpawnData data) {
         PhysicsComponent physicsComponent = new PhysicsComponent();
