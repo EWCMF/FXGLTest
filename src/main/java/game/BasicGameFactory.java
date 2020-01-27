@@ -111,6 +111,8 @@ public class BasicGameFactory implements EntityFactory {
 
     @Spawns("enemyBullet")
     public Entity newEnemyBullet(SpawnData data) {
+        FXGL.play("enemyBullet.wav");
+
         return entityBuilder()
                 .type(ENEMYBULLET)
                 .from(data)
@@ -415,6 +417,8 @@ public class BasicGameFactory implements EntityFactory {
 
     @Spawns("eliteEnemyBullet")
     public Entity newEliteEnemyBullet(SpawnData data) {
+        FXGL.play("eliteBullet.wav");
+
         return entityBuilder()
                 .type(ENEMYBULLET)
                 .from(data)

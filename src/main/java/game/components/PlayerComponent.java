@@ -262,7 +262,7 @@ public class PlayerComponent extends Component {
                     return;
                 case "machineGun":
                     if (machineGunAmmo != 0) {
-                        //FXGL.play("takataka.wav");
+                        FXGL.play("takataka.wav");
                         machineGunAmmo--;
                         canFire = false;
                         SpawnData spawnDataMachineGun = new SpawnData(aim).put("direction", aim);

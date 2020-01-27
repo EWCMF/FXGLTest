@@ -7,7 +7,7 @@
   <image source="scifi.png" width="512" height="3520"/>
  </tileset>
  <tileset firstgid="1761" name="platform" tilewidth="32" tileheight="32" tilecount="3" columns="3">
-  <image source="../../../../../Downloads/Project assets/platform.png" width="96" height="32"/>
+  <image source="platform.png" width="96" height="32"/>
  </tileset>
  <layer id="3" name="BackgroundLayer" width="100" height="70">
   <data encoding="csv">
