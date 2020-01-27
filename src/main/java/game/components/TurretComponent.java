@@ -15,7 +15,8 @@ import javafx.util.Duration;
 public class TurretComponent extends Component {
     private LocalTimer enemyAttackInterval;
     private HPComponent hp;
-    boolean alerted = false;
+    boolean alertedRight = false;
+    boolean alertedLeft = false;
 
     public void onAdded() {
         enemyAttackInterval = FXGL.newLocalTimer();
@@ -25,19 +26,36 @@ public class TurretComponent extends Component {
     @Override
     public void onUpdate(double tpf) {
         Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        int alertRange = entity.getInt("alertRange");
 
         if (enemyAttackInterval.elapsed(Duration.seconds((Math.random() * 2) + 2))) {
-            if (alerted) {
+            if (alertedRight || alertedLeft) {
                 basicEnemyAttack(player);
                 enemyAttackInterval.capture();
             }
         }
 
-        alerted = distanceToPlayer(player) < entity.getInt("alertRange");
+        if (distanceToPlayerX(player) > -alertRange && distanceToPlayerX(player) < 0
+                && distanceToPlayerY(player) > 0 && distanceToPlayerY(player) < alertRange / 1.5
+                || distanceToPlayerY(player) < 0 && distanceToPlayerY(player) > -alertRange / 1.5) {
+            alertedLeft = true;
+        }
+        else alertedLeft = false;
+
+        if (distanceToPlayerX(player) < alertRange && distanceToPlayerX(player) > 0
+                && distanceToPlayerY(player) > 0 && distanceToPlayerY(player) < alertRange / 1.5
+                || distanceToPlayerY(player) < 0 && distanceToPlayerY(player) > -alertRange / 1.5) {
+            alertedRight = true;
+        }
+        else alertedRight = false;
     }
 
-    public double distanceToPlayer(Entity player) {
-        return player.getPosition().distance(getEntity().getPosition());
+    public double distanceToPlayerX(Entity player) {
+        return player.getPosition().getX() - entity.getPosition().getX();
+    }
+
+    public double distanceToPlayerY(Entity player) {
+        return player.getPosition().getY() - entity.getPosition().getY();
     }
 
     public void basicEnemyAttack(Entity player) {

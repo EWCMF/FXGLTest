@@ -54,7 +54,7 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "test1.tmx";
+    private String startLevel = "test2.tmx";
     private int startBoundX = 32 * 100;
     private int startBoundY = 32 * 70;
 

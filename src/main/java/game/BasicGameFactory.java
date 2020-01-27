@@ -119,7 +119,6 @@ public class BasicGameFactory implements EntityFactory {
                 .viewWithBBox(new Rectangle(12, 3, Color.RED))
                 .with(new CollidableComponent(true))
                 .with(new ProjectileComponent(data.get("direction"), 300))
-                .with(new OffscreenCleanComponent())
                 .with("damage", 1 * BasicGameApp.enemyDamageModifier)
                 .build();
     }
@@ -359,7 +358,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new HPComponent(6))
                 .with(new TurretComponent())
                 .with(new FlickerComponent())
-                .with("alertRange", 1000)
+                .with("alertRange", 700)
                 .build();
     }
 
@@ -373,7 +372,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new HPComponent(30))
                 .with(new TurretComponent())
                 .with(new FlickerComponent())
-                .with("alertRange", 1000)
+                .with("alertRange", 700)
                 .build();
     }
 
@@ -392,7 +391,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new HPComponent(12))
                 .with(new MovingEnemyComponent())
                 .with(new FlickerComponent())
-                .with("alertRange", 1000)
+                .with("alertRange", 900)
                 .build();
     }
 
@@ -411,7 +410,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new HPComponent(40))
                 .with(new MovingEnemyComponent())
                 .with(new FlickerComponent())
-                .with("alertRange", 1000)
+                .with("alertRange", 900)
                 .build();
     }
 
@@ -425,7 +424,6 @@ public class BasicGameFactory implements EntityFactory {
                 .viewWithBBox(new Rectangle(20, 3, Color.DARKVIOLET))
                 .with(new CollidableComponent(true))
                 .with(new ProjectileComponent(data.get("direction"), 700))
-                .with(new OffscreenCleanComponent())
                 .with("damage", 3 * BasicGameApp.enemyDamageModifier)
                 .build();
     }

@@ -34,9 +34,10 @@ public class MovingEnemyComponent extends Component {
     @Override
     public void onUpdate(double tpf) {
         Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        double distance = player.getPosition().getX() - entity.getPosition().getX();
 
         if (enemyAttackInterval.elapsed(Duration.seconds((Math.random() * 2) + 2))) {
-            if (player.getBoundingBoxComponent().getMaxXWorld() - entity.getBoundingBoxComponent().getMaxXWorld() < 0) {
+            if (distance > -entity.getProperties().getInt("alertRange") && distance < 0) {
                 if (checkLineOfSight()) {
                     if (!nearbyPitL)
                         moveLeft();
@@ -46,7 +47,7 @@ public class MovingEnemyComponent extends Component {
                 }
                 else
                     completeStop();
-            } else {
+            } else if (distance > 0 && distance < entity.getProperties().getInt("alertRange")) {
                 if (checkLineOfSight()) {
                     if (!nearbyPitR)
                         moveRight();
