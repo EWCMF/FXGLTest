@@ -54,7 +54,7 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "test2.tmx";
+    private String startLevel = "test1.tmx";
     private int startBoundX = 32 * 100;
     private int startBoundY = 32 * 70;
 
@@ -68,6 +68,7 @@ public class BasicGameApp extends GameApplication {
     private AnchorPane bossHP = new AnchorPane();
 
     public static Music music;
+    public static Music bgm;
 
     private Text d;
     private Text s;
@@ -307,6 +308,10 @@ public class BasicGameApp extends GameApplication {
 
     @Override
     protected void initGame() {
+        bgm = FXGL.getAssetLoader().loadMusic("normalBGM.mp3");
+        getAudioPlayer().playMusic(bgm);
+        set("isPlayingMusic", true);
+
         getGameWorld().addEntityFactory(new BasicGameFactory());
 
         player = null;
@@ -865,6 +870,8 @@ public class BasicGameApp extends GameApplication {
         if (!getGameWorld().getEntitiesByType(BARONOFHELL).isEmpty()) {
             Entity boss = getGameWorld().getEntitiesByType(BARONOFHELL).get(0);
             set("isBossLevel", true);
+            set("isPlayingMusic", false);
+            getAudioPlayer().stopMusic(bgm);
             var bossName = getUIFactory().newText("Boss", Color.WHITE, 22);
             bossName.setX(920);
             bossName.setY(25);
@@ -877,8 +884,12 @@ public class BasicGameApp extends GameApplication {
     public void playerDeath() {
         FXGL.runOnce(() -> {
             getDisplay().showMessageBox("You Died.", getGameController()::gotoMainMenu);
-            if (getb("isPlayingMusic"))
-                getAudioPlayer().stopMusic(music);
+            if (getb("isPlayingMusic")) {
+                if (getb("isBossLevel"))
+                    getAudioPlayer().stopMusic(music);
+                else
+                    getAudioPlayer().stopMusic(bgm);
+            }
         }, Duration.seconds(0.45));
     }
 
