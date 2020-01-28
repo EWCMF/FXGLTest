@@ -88,8 +88,7 @@ public class MovingEnemyComponent extends Component {
         List<Entity> findWalls = FXGL.getGameWorld().getEntitiesInRange(selection).stream()
                 .filter(e -> e.hasComponent(SideDoorComponent.class)
                         && !e.getComponent(SideDoorComponent.class).isOpened()
-                        || e.isType(BasicGameTypes.WALL) && e.getWidth() < 64
-                        && e.getY() > entity.getY()).collect(Collectors.toList());
+                        || e.isType(BasicGameTypes.WALL) && e.getWidth() < 64).collect(Collectors.toList());
 
         List<Entity> findFloors = FXGL.getGameWorld().getEntitiesInRange(selection).stream()
                 .filter(e -> e.isType(BasicGameTypes.WALL) && e.getWidth() > 64).collect(Collectors.toList());
@@ -97,7 +96,8 @@ public class MovingEnemyComponent extends Component {
         if (!findWalls.isEmpty() || !findFloors.isEmpty()) {
             for (Entity findWall : findWalls) {
                 if (entity.getX() > findWall.getX() && findWall.getX() > player.getX()) {
-                    return false;
+                    if (entity.getY() >= findWall.getBottomY() && player.getY() - entity.getY() < 0)
+                        return false;
                 }
                 if (entity.getX() < findWall.getX() && findWall.getX() < player.getX()) {
                     return false;

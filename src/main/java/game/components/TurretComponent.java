@@ -82,35 +82,42 @@ public class TurretComponent extends Component {
 
         if (player.getPosition().getX() - entity.getPosition().getX() < 0) {
             List<Entity> leftWalls = findWalls.stream().filter(e -> e.getPosition().getX() < entity.getPosition().getX()).collect(Collectors.toList());
+            List<Entity> leftFloors = findFloors.stream().filter(e -> e.getX() < entity.getX() && e.getX() > player.getX()).collect(Collectors.toList());
             if (player.getPosition().getY() - entity.getPosition().getY() < 0) {
-                List<Entity> upFloors = findFloors.stream().filter(e -> e.getPosition().getY() > entity.getPosition().getY()).collect(Collectors.toList());
+                List<Entity> upFloors = leftFloors.stream().filter(e -> e.getPosition().getY() < entity.getPosition().getY()).collect(Collectors.toList());
 
                 if (!leftWalls.isEmpty() || !upFloors.isEmpty()) {
                     List<Entity> remainingWalls = leftWalls.stream().filter(e -> e.getY() < entity.getY()).collect(Collectors.toList());
                     for (Entity remainingWall : remainingWalls) {
                         if (entity.getX() > remainingWall.getX() && remainingWall.getX() > player.getX() && player.getY() > remainingWall.getY()) {
+//                            System.out.println("LU P W T");
                             return false;
                         }
                     }
                     for (Entity upFloor : upFloors) {
                         if (entity.getY() > upFloor.getY() && upFloor.getY() > player.getY()) {
+//                            System.out.println("LU P F T");
                             return false;
                         }
                     }
                 }
             }
             else {
-                List<Entity> downFloors = findFloors.stream().filter(e -> e.getPosition().getY() < entity.getPosition().getY()).collect(Collectors.toList());
+                List<Entity> downFloors = leftFloors.stream().filter(e -> e.getPosition().getY() > entity.getPosition().getY()).collect(Collectors.toList());
 
                 if (!leftWalls.isEmpty() || !downFloors.isEmpty()) {
                     List<Entity> remainingWalls = leftWalls.stream().filter(e -> e.getBottomY() > entity.getY()).collect(Collectors.toList());
                     for (Entity remainingWall : remainingWalls) {
                         if (entity.getX() > remainingWall.getX() && remainingWall.getX() > player.getX() && player.getY() > remainingWall.getY()) {
+//                            System.out.println("LD P W T");
+//                            System.out.println(remainingWall.toString());
                             return false;
                         }
                     }
                     for (Entity downFloor : downFloors) {
                         if (entity.getY() < downFloor.getY() && downFloor.getY() < player.getY()) {
+//                            System.out.println("LD P F T");
+//                            System.out.println(downFloor.toString());
                             return false;
                         }
                     }
@@ -119,35 +126,40 @@ public class TurretComponent extends Component {
         }
         else {
             List<Entity> rightWalls = findWalls.stream().filter(e -> e.getPosition().getX() > entity.getPosition().getX()).collect(Collectors.toList());
+            List<Entity> rightFloors = findFloors.stream().filter(e -> e.getX() > entity.getX() && e.getX() < player.getX()).collect(Collectors.toList());
             if (player.getPosition().getY() - entity.getPosition().getY() < 0) {
-                List<Entity> upFloors = findFloors.stream().filter(e -> e.getPosition().getY() > entity.getPosition().getY()).collect(Collectors.toList());
+                List<Entity> upFloors = rightFloors.stream().filter(e -> e.getPosition().getY() < entity.getPosition().getY()).collect(Collectors.toList());
 
                 if (!rightWalls.isEmpty() || !upFloors.isEmpty()) {
                     List<Entity> remainingWalls = rightWalls.stream().filter(e -> e.getY() < entity.getY()).collect(Collectors.toList());
                     for (Entity remainingWall : remainingWalls) {
                         if (entity.getX() > remainingWall.getX() && remainingWall.getX() > player.getX() && player.getY() > remainingWall.getY()) {
+//                            System.out.println("RU P W T");
                             return false;
                         }
                     }
                     for (Entity upFloor : upFloors) {
                         if (entity.getY() > upFloor.getY() && upFloor.getY() > player.getY()) {
+//                            System.out.println("RU P F T");
                             return false;
                         }
                     }
                 }
             }
             else {
-                List<Entity> downFloors = findFloors.stream().filter(e -> e.getPosition().getY() < entity.getPosition().getY()).collect(Collectors.toList());
+                List<Entity> downFloors = rightFloors.stream().filter(e -> e.getPosition().getY() > entity.getPosition().getY()).collect(Collectors.toList());
 
                 if (!rightWalls.isEmpty() || !downFloors.isEmpty()) {
                     List<Entity> remainingWalls = rightWalls.stream().filter(e -> e.getBottomY() > entity.getY()).collect(Collectors.toList());
                     for (Entity remainingWall : remainingWalls) {
                         if (entity.getX() > remainingWall.getX() && remainingWall.getX() > player.getX() && player.getY() > remainingWall.getY()) {
+                            System.out.println("RD P W T");
                             return false;
                         }
                     }
                     for (Entity downFloor : downFloors) {
                         if (entity.getY() < downFloor.getY() && downFloor.getY() < player.getY()) {
+                            System.out.println("RD P F T");
                             return false;
                         }
                     }

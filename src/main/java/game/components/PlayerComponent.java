@@ -44,6 +44,8 @@ public class PlayerComponent extends Component {
 
     private boolean isBeingDamaged = false;
     private boolean dead = false;
+    private boolean testMode = true;
+    private boolean invincible = true;
 
     private boolean holdingMoveDirection = false;
     private boolean knockedBack;
@@ -80,6 +82,12 @@ public class PlayerComponent extends Component {
             if (isOnGround)
                 jumps = 2;
         });
+
+        if (testMode) {
+            addWeaponShotgun();
+            addWeaponMachineGun();
+            addWeaponRocketLauncher();
+        }
     }
 
     @Override
@@ -292,6 +300,9 @@ public class PlayerComponent extends Component {
     }
 
     public void onHit(int damage, Point2D direction) {
+        if (invincible)
+            return;
+
         if (isBeingDamaged)
             return;
 
@@ -322,6 +333,7 @@ public class PlayerComponent extends Component {
         if (!FXGL.getb("hasShotgun")) {
             weaponList.add("shotgun");
             FXGL.set("hasShotgun", true);
+            shotgunAmmo = BasicGameApp.ammoShotgun;
         }
         else
             shotgunAmmo += 10;
@@ -331,6 +343,7 @@ public class PlayerComponent extends Component {
         if (!FXGL.getb("hasMachineGun")) {
             weaponList.add("machineGun");
             FXGL.set("hasMachineGun", true);
+            machineGunAmmo = BasicGameApp.ammoMachineGun;
         }
         else
             machineGunAmmo += 100;
@@ -340,6 +353,7 @@ public class PlayerComponent extends Component {
         if (!FXGL.getb("hasRocketLauncher")) {
             weaponList.add("rocketLauncher");
             FXGL.set("hasRocketLauncher", true);
+            rocketAmmo = BasicGameApp.ammoRocket;
         }
         else
             rocketAmmo += 5;
