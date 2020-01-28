@@ -58,7 +58,7 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "level1.tmx";
+    private String startLevel = "level3.tmx";
     private int startBoundX = 32 * 150;
     private int startBoundY = 32 * 70;
 
@@ -334,7 +334,7 @@ public class BasicGameApp extends GameApplication {
         Viewport viewport = FXGL.getGameScene().getViewport();
 
         viewport.setBounds(32, 0, startBoundX, startBoundY);
-        viewport.bindToEntity(player, FXGL.getAppWidth() / 4, FXGL.getAppHeight() / 1.5);
+        viewport.bindToEntity(player, FXGL.getAppWidth() / 3, FXGL.getAppHeight() / 2);
     }
 
     @Override

@@ -3,6 +3,7 @@ package game;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.dsl.components.ExpireCleanComponent;
 import com.almasb.fxgl.dsl.components.OffscreenCleanComponent;
+import com.almasb.fxgl.dsl.components.OffscreenPauseComponent;
 import com.almasb.fxgl.dsl.components.ProjectileComponent;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.EntityFactory;
@@ -358,6 +359,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new HPComponent(6))
                 .with(new TurretComponent())
                 .with(new FlickerComponent())
+                .with(new OffscreenPauseComponent())
                 .with("alertRange", 700)
                 .build();
     }
@@ -372,6 +374,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new HPComponent(30))
                 .with(new TurretComponent())
                 .with(new FlickerComponent())
+                .with(new OffscreenPauseComponent())
                 .with("alertRange", 700)
                 .build();
     }
@@ -391,6 +394,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new HPComponent(12))
                 .with(new MovingEnemyComponent())
                 .with(new FlickerComponent())
+                .with(new OffscreenPauseComponent())
                 .with("alertRange", 900)
                 .build();
     }
@@ -410,6 +414,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new HPComponent(40))
                 .with(new MovingEnemyComponent())
                 .with(new FlickerComponent())
+                .with(new OffscreenPauseComponent())
                 .with("alertRange", 900)
                 .build();
     }

@@ -96,7 +96,7 @@
   <object id="5" type="movingPlatform" x="448" y="992" width="96" height="32">
    <properties>
     <property name="startDirX" type="int" value="0"/>
-    <property name="startDirY" type="int" value="-100"/>
+    <property name="startDirY" type="int" value="-15"/>
     <property name="stopTime" type="int" value="2"/>
    </properties>
   </object>

@@ -356,6 +356,7 @@
   <object id="125" type="platform" x="1888" y="0" width="480" height="32"/>
   <object id="126" type="exit" x="4672" y="288" width="64" height="96">
    <properties>
+    <property name="next" value="level2.tmx"/>
     <property name="startOpened" type="bool" value="true"/>
    </properties>
   </object>
