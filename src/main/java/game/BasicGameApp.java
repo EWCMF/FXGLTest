@@ -16,7 +16,6 @@ import game.ui.BasicGameMainMenu;
 import game.ui.BossHPIndicator;
 import game.ui.HPIndicator;
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
@@ -47,6 +46,11 @@ public class BasicGameApp extends GameApplication {
     private Point2D gunLeftUp = new Point2D(6, 13);
     private Point2D gunLeftMiddle = new Point2D(0, 35);
     private Point2D gunLeftDown = new Point2D(7, 70);
+
+    private int playerLives = 3;
+    private int playerLivesCurrent;
+    private boolean allowDeath;
+    public static boolean allowRespawn;
 
     public static int ammoShotgun = 20;
     public static int ammoMachineGun = 200;
@@ -308,6 +312,7 @@ public class BasicGameApp extends GameApplication {
 
     @Override
     protected void initGame() {
+        playerLivesCurrent = playerLives;
         bgm = FXGL.getAssetLoader().loadMusic("normalBGM.mp3");
         getAudioPlayer().playMusic(bgm);
         set("isPlayingMusic", true);
@@ -323,6 +328,8 @@ public class BasicGameApp extends GameApplication {
         player = getGameWorld().spawn("player", start);
 
         initHP();
+        allowDeath = true;
+
 
         Viewport viewport = FXGL.getGameScene().getViewport();
 
@@ -882,14 +889,43 @@ public class BasicGameApp extends GameApplication {
     }
 
     public void playerDeath() {
+        if (!allowDeath)
+            return;
+
+        allowDeath = false;
         FXGL.runOnce(() -> {
-            getDisplay().showMessageBox("You Died.", getGameController()::gotoMainMenu);
             if (getb("isPlayingMusic")) {
                 if (getb("isBossLevel"))
                     getAudioPlayer().stopMusic(music);
                 else
                     getAudioPlayer().stopMusic(bgm);
             }
+
+            playerLivesCurrent--;
+            if (playerLivesCurrent != 0 && allowRespawn) {
+                if (playerLivesCurrent != 1) {
+                    getDisplay().showMessageBox("You Died. " + playerLivesCurrent + " lives remaining.", () -> {
+                        player.getComponent(PlayerComponent.class).respawn();
+                        setLevel(gets("level"));
+                        getAudioPlayer().playMusic(bgm);
+                        runOnce(() -> {
+                            allowDeath = true;
+                        }, Duration.seconds(2));
+                    });
+                }
+                else {
+                    getDisplay().showMessageBox("You Died. " + playerLivesCurrent + " life remaining.", () -> {
+                        player.getComponent(PlayerComponent.class).respawn();
+                        setLevel(gets("level"));
+                        getAudioPlayer().playMusic(bgm);
+                        runOnce(() -> {
+                            allowDeath = true;
+                        }, Duration.seconds(2));
+                    });
+                }
+            }
+            else
+                getDisplay().showMessageBox("Game Over", getGameController()::gotoMainMenu);
         }, Duration.seconds(0.45));
     }
 

@@ -364,6 +364,14 @@ public class PlayerComponent extends Component {
         hp.setValue(hp.getMaxHP());
     }
 
+    public void respawn() {
+        hp.setValue(hp.getMaxHP());
+        dead = false;
+        shotgunAmmo = BasicGameApp.ammoShotgun;
+        machineGunAmmo = BasicGameApp.ammoMachineGun;
+        rocketAmmo = BasicGameApp.ammoRocket;
+    }
+
     public void restoreAmmo(int amount) {
         shotgunAmmo += amount * 10;
         machineGunAmmo += amount * 100;

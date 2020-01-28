@@ -44,6 +44,7 @@ public class BasicGameMainMenu extends FXGLMenu {
         var easy = new GameMenuButton("Easy", () -> {
             this.fireNewGame();
             BasicGameApp.enemyDamageModifier = 1;
+            BasicGameApp.allowRespawn = true;
             getMenuRoot().getChildren().set(0, vBox1);
         });
 
@@ -53,6 +54,7 @@ public class BasicGameMainMenu extends FXGLMenu {
         var normal = new GameMenuButton("Normal", () -> {
             this.fireNewGame();
             BasicGameApp.enemyDamageModifier = 2;
+            BasicGameApp.allowRespawn = true;
             getMenuRoot().getChildren().set(0, vBox1);
         });
 
@@ -62,6 +64,7 @@ public class BasicGameMainMenu extends FXGLMenu {
         var hard = new GameMenuButton("Hard", () -> {
             this.fireNewGame();
             BasicGameApp.enemyDamageModifier = 3;
+            BasicGameApp.allowRespawn = true;
             getMenuRoot().getChildren().set(0, vBox1);
         });
 
@@ -71,6 +74,7 @@ public class BasicGameMainMenu extends FXGLMenu {
         var lunatic = new GameMenuButton("Lunatic", () -> {
             this.fireNewGame();
             BasicGameApp.enemyDamageModifier = 4;
+            BasicGameApp.allowRespawn = false;
             getMenuRoot().getChildren().set(0, vBox1);
         });
 
