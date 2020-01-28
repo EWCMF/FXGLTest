@@ -30,7 +30,7 @@ public class BaronOfHellFireball extends Component {
             double minX = entity.getX();
             double minY = entity.getY();
             int damage = entity.getProperties().getInt("damage");
-            Rectangle2D selection = new Rectangle2D(minX, minY, 200, 200);
+            Rectangle2D selection = new Rectangle2D(minX, minY, 250, 250);
             List<Entity> list = FXGL.getGameWorld().getEntitiesInRange(selection).stream()
                     .filter(e -> e.isType(BasicGameTypes.PLAYER)).collect(Collectors.toList());
 

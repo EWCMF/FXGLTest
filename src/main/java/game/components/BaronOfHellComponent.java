@@ -14,6 +14,12 @@ import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
 
+import java.util.ArrayList;
+
+import static com.almasb.fxgl.dsl.FXGL.getGameWorld;
+import static game.BasicGameTypes.*;
+import static game.BasicGameTypes.NORMALBOHEXPLOSION;
+
 public class BaronOfHellComponent extends Component {
     private LocalTimer enemyAttackInterval;
     private Entity player;
@@ -32,6 +38,8 @@ public class BaronOfHellComponent extends Component {
     private int frenzyCooldown = 2;
     private boolean dead = false;
     private int walkLeftLimit = 0;
+
+    ArrayList<String> availableAttacks = new ArrayList<>();
 
     public BaronOfHellComponent() {
         Image image = FXGL.image("testBoH.png");
@@ -55,19 +63,50 @@ public class BaronOfHellComponent extends Component {
 
         enemyAttackInterval = FXGL.newLocalTimer();
         enemyAttackInterval.capture();
+
+        availableAttacks.add("triple");
+        availableAttacks.add("walkLeft");
+        availableAttacks.add("purple");
     }
 
     @Override
     public void onUpdate(double tpf) {
+        if (FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER).getComponent(PlayerComponent.class).isDead()) {
+            FXGL.runOnce(() -> {
+                if (!getGameWorld().getEntitiesByType(PURPLEBOH).isEmpty()) {
+                    for (int i = 0; i < getGameWorld().getEntitiesByType(PURPLEBOH).size(); i++) {
+                        getGameWorld().getEntitiesByType(PURPLEBOH).get(i).removeFromWorld();
+                    }
+                }
+                if (!getGameWorld().getEntitiesByType(PURPLEBOHEXPLOSION).isEmpty()) {
+                    for (int i = 0; i < getGameWorld().getEntitiesByType(PURPLEBOHEXPLOSION).size(); i++) {
+                        getGameWorld().getEntitiesByType(PURPLEBOHEXPLOSION).get(i).removeFromWorld();
+                    }
+                }
+                if (!getGameWorld().getEntitiesByType(NORMALBOH).isEmpty()) {
+                    for (int i = 0; i < getGameWorld().getEntitiesByType(NORMALBOH).size(); i++) {
+                        getGameWorld().getEntitiesByType(NORMALBOH).get(i).removeFromWorld();
+                    }
+                }
+                if (!getGameWorld().getEntitiesByType(NORMALBOHEXPLOSION).isEmpty()) {
+                    for (int i = 0; i < getGameWorld().getEntitiesByType(NORMALBOHEXPLOSION).size(); i++) {
+                        getGameWorld().getEntitiesByType(NORMALBOHEXPLOSION).get(i).removeFromWorld();
+                    }
+                }
+                active = false;
+            }, Duration.seconds(1));
+        }
+
         if (!active)
             return;
 
         if (dead)
             return;
 
-        if (hp.getValue() <= hp.getMaxHP() * 0.5) {
+        if (hp.getValue() <= hp.getMaxHP() * 0.6) {
             frenzyCooldown = -1;
         }
+
 
         if (enemyAttackInterval.elapsed(Duration.seconds((Math.random() * frenzyCooldown) + 2))) {
             if (cycleAttacks == 2) {
@@ -85,19 +124,34 @@ public class BaronOfHellComponent extends Component {
 //                    walkLeft();
 //                    cycleAttacks = 0;
 //                }
-                if (triples <= 2) {
-                    triple();
+                if (availableAttacks.size() != 0) {
+                    switch (availableAttacks.get((int) (Math.random() * availableAttacks.size()))) {
+                        case "triple":
+                            triple();
+                            availableAttacks.remove("triple");
+                            cycleAttacks = 0;
+                            break;
+                        case "walkLeft":
+                            if (walkLeftLimit != 2) {
+                                walkLeft();
+                                availableAttacks.remove("walkLeft");
+                                cycleAttacks = 0;
+                            }
+                            else {
+                                attack();
+                                cycleAttacks = 0;
+                            }
+                            break;
+                        case "purple":
+                            attackPurple();
+                            availableAttacks.remove("purple");
+                            cycleAttacks = 0;
+                            break;
+                    }
+                }
+                else
+                    attack();
                     cycleAttacks = 0;
-                }
-                else if (walkLeftLimit <= 2) {
-                    walkLeft();
-                    triples = 0;
-                    cycleAttacks = 0;
-                }
-                else if (frenzyCooldown == -1) {
-                    triple();
-                }
-
             } else {
                 attack();
                 cycleAttacks++;
@@ -111,18 +165,19 @@ public class BaronOfHellComponent extends Component {
 //            }, Duration.seconds(4));
 //        }
 
-        if (movedLeftOnce &&tripleOnce) {
+        if (movedLeftOnce && tripleOnce && purpleOnce) {
             FXGL.runOnce(() -> {
                 movedLeftOnce = false;
                 tripleOnce = false;
+                purpleOnce = false;
+                availableAttacks.add("triple");
+                availableAttacks.add("walkLeft");
+                availableAttacks.add("purple");
             }, Duration.seconds(4));
         }
     }
 
     public void walkLeft() {
-        if (walkLeftLimit == 2)
-            return;
-
         walkLeftLimit++;
         movedLeftOnce = true;
         moving = true;
@@ -133,7 +188,9 @@ public class BaronOfHellComponent extends Component {
         FXGL.runOnce(() -> {
             physics.setVelocityX(0);
             moving = false;
-        }, Duration.seconds(1.5));
+            if (!texture.getAnimationChannel().equals(animAtk))
+                texture.loopAnimationChannel(animIdle);
+        }, Duration.seconds(1.2));
     }
 
     public void walkLeftCutscene() {
@@ -144,7 +201,7 @@ public class BaronOfHellComponent extends Component {
             physics.setVelocityX(0);
             texture.loopAnimationChannel(animIdle);
             FXGL.play("enemyAlert.wav");
-        }, Duration.seconds(3));
+        }, Duration.seconds(3.2));
     }
 
     public void attack() {

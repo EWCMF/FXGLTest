@@ -145,6 +145,18 @@ public class BasicGameFactory implements EntityFactory {
                 .build();
     }
 
+    @Spawns("finalExit")
+    public Entity newFinalExit(SpawnData data) {
+        return entityBuilder()
+                .type(FINALEXIT)
+                .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
+                .with(new CollidableComponent(true))
+                .from(data)
+                .with(new ExitDoorComponent())
+                .with("startOpened", data.get("startOpened"))
+                .build();
+    }
+
     @Spawns("exitSwitch")
     public Entity newExitSwitch(SpawnData data) {
         return entityBuilder()
@@ -603,7 +615,7 @@ public class BasicGameFactory implements EntityFactory {
                 .bbox(new HitBox("headBOH", hitboxOffsetHead, BoundingShape.box(95, 90)))
                 .with(physicsComponent)
                 .collidable()
-                .with(new HPComponent(400))
+                .with(new HPComponent(500))
                 .with(new FlickerComponent())
                 .with(new BaronOfHellComponent())
                 .build();
@@ -630,6 +642,7 @@ public class BasicGameFactory implements EntityFactory {
         emitter.setColor(Color.GREEN);
         emitter.setSpawnPointFunction(i -> new Point2D(75, 75));
         return entityBuilder()
+                .type(NORMALBOHEXPLOSION)
                 .with(new ExpireCleanComponent(Duration.seconds(1)))
                 .from(data)
                 .with(new ParticleComponent(emitter))
@@ -645,10 +658,10 @@ public class BasicGameFactory implements EntityFactory {
         return entityBuilder()
                 .type(PURPLEBOH)
                 .from(data)
-                .view(texture("fireballBOHPurple.png").toAnimatedTexture(6, Duration.seconds(0.2)).loop())
+                .view(texture("fireballBOHPurple2.png").toAnimatedTexture(6, Duration.seconds(0.2)).loop())
                 .bbox(new HitBox(new Point2D(300, -5), BoundingShape.circle(55)))
                 .collidable()
-                .with(new ProjectileComponent(data.get("direction"), 850))
+                .with(new ProjectileComponent(data.get("direction"), 720))
                 .build();
     }
 
@@ -665,7 +678,7 @@ public class BasicGameFactory implements EntityFactory {
                 .type(PURPLEBOHEXPLOSION)
                 .from(data)
                 .with(new ParticleComponent(emitter))
-                .view(texture("fireballBOHExplosionPurple.png").toAnimatedTexture(3, Duration.seconds(1)).play())
+                .view(texture("fireballBOHExplosionPurple2.png").toAnimatedTexture(3, Duration.seconds(1)).play())
                 .with("damage", 3 * BasicGameApp.enemyDamageModifier)
                 .with(new BaronOfHellFireball())
                 .build();

@@ -108,10 +108,10 @@ public class PlayerComponent extends Component {
 
         double mousePosition = FXGL.getInput().getMouseXUI();
         if (!dead) {
-            if (mousePosition < FXGL.getAppWidth() / 4) {
+            if (mousePosition < FXGL.getAppWidth() / 3) {
                 getEntity().setScaleX(-1);
             }
-            else if (mousePosition >= FXGL.getAppWidth() / 4) {
+            else if (mousePosition >= FXGL.getAppWidth() / 3) {
                 getEntity().setScaleX(1);
             }
         }

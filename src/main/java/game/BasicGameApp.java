@@ -58,7 +58,7 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
-    private String startLevel = "level3.tmx";
+    private String startLevel = "level1.tmx";
     private int startBoundX = 32 * 150;
     private int startBoundY = 32 * 70;
 
@@ -167,40 +167,6 @@ public class BasicGameApp extends GameApplication {
                 }
             }
         }, KeyCode.F);
-
-        input.addAction(new UserAction("Test something") {
-            @Override
-            protected void onActionBegin() {
-                if (getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).isActive()) {
-                    getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).setActive(false);
-                    getAudioPlayer().stopMusic(music);
-                }
-                else
-                    getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).setActive(true);
-            }
-        }, KeyCode.C);
-
-        input.addAction(new UserAction("Test something2") {
-            @Override
-            protected void onActionBegin() {
-                getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).attackPurple();
-            }
-        }, KeyCode.V);
-
-        input.addAction(new UserAction("Test something3") {
-            @Override
-            protected void onActionBegin() {
-                getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).attack();
-            }
-        }, KeyCode.B);
-
-        input.addAction(new UserAction("Test something4") {
-            @Override
-            protected void onActionBegin() {
-                System.out.println(getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(PhysicsComponent.class).getBody().getContactList().contact);
-                System.out.println(getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(PhysicsComponent.class).getBody().getFixtures().get(1).getHitBox());
-            }
-        }, KeyCode.N);
 
         input.addAction(new UserAction("Change weapon") {
             @Override
@@ -532,6 +498,13 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, FINALEXIT) {
+            @Override
+            protected void onCollisionBegin(Entity player, Entity exit) {
+                getDisplay().showMessageBox("Congratulations, you completed the game!", getGameController()::exit);
+            }
+        });
+
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(PLAYER, KEYCARD) {
             @Override
             protected void onCollisionBegin(Entity player, Entity keycard) {
@@ -722,6 +695,14 @@ public class BasicGameApp extends GameApplication {
             }
         });
 
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(NORMALBOH, SIDEDOOR) {
+            @Override
+            protected void onCollisionBegin(Entity normalBOH, Entity wall) {
+                getGameWorld().spawn("normalBOHExplosion", new SpawnData(normalBOH.getPosition().add(-160, -30)));
+                normalBOH.removeFromWorld();
+            }
+        });
+
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(NORMALBOH, PLAYER) {
             @Override
             protected void onCollisionBegin(Entity normalBOH, Entity wall) {
@@ -731,6 +712,14 @@ public class BasicGameApp extends GameApplication {
         });
 
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(PURPLEBOH, WALL) {
+            @Override
+            protected void onCollisionBegin(Entity purpleBOH, Entity wall) {
+                getGameWorld().spawn("normalBOHExplosionPurple", new SpawnData(purpleBOH.getPosition().add(-360, -80)));
+                purpleBOH.removeFromWorld();
+            }
+        });
+
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PURPLEBOH, SIDEDOOR) {
             @Override
             protected void onCollisionBegin(Entity purpleBOH, Entity wall) {
                 getGameWorld().spawn("normalBOHExplosionPurple", new SpawnData(purpleBOH.getPosition().add(-360, -80)));
@@ -905,9 +894,11 @@ public class BasicGameApp extends GameApplication {
             if (playerLivesCurrent != 0 && allowRespawn) {
                 if (playerLivesCurrent != 1) {
                     getDisplay().showMessageBox("You Died. " + playerLivesCurrent + " lives remaining.", () -> {
-                        player.getComponent(PlayerComponent.class).respawn();
                         setLevel(gets("level"));
-                        getAudioPlayer().playMusic(bgm);
+                        player.getComponent(PlayerComponent.class).respawn();
+                        if (!getb("isBossLevel")) {
+                            getAudioPlayer().playMusic(bgm);
+                        }
                         runOnce(() -> {
                             allowDeath = true;
                         }, Duration.seconds(2));
@@ -917,7 +908,8 @@ public class BasicGameApp extends GameApplication {
                     getDisplay().showMessageBox("You Died. " + playerLivesCurrent + " life remaining.", () -> {
                         player.getComponent(PlayerComponent.class).respawn();
                         setLevel(gets("level"));
-                        getAudioPlayer().playMusic(bgm);
+                        if (!getb("isBossLevel"))
+                            getAudioPlayer().playMusic(bgm);
                         runOnce(() -> {
                             allowDeath = true;
                         }, Duration.seconds(2));

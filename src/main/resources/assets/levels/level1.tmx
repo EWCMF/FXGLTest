@@ -157,15 +157,7 @@
  <objectgroup id="2" name="Back">
   <object id="1" type="start" x="480" y="1728" width="64" height="96"/>
   <object id="3" type="platform" x="32" y="1984" width="512" height="32"/>
-  <object id="4" type="medkit" x="320" y="1760" width="64" height="64">
-   <properties>
-    <property name="amount" type="int" value="6"/>
-   </properties>
-  </object>
   <object id="5" type="shotgun" x="448" y="1920" width="64" height="64"/>
-  <object id="6" type="machineGun" x="832" y="1760" width="64" height="64"/>
-  <object id="7" type="rocketLauncher" x="928" y="1760" width="64" height="64"/>
-  <object id="8" type="shotgun" x="736" y="1760" width="64" height="64"/>
   <object id="9" type="platform" x="96" y="1824" width="928" height="32"/>
   <object id="10" type="platform" x="0" y="1440" width="32" height="544"/>
   <object id="11" type="platform" x="992" y="1856" width="32" height="384"/>
