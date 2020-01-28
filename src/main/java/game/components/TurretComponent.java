@@ -8,7 +8,11 @@ import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.time.LocalTimer;
 import game.BasicGameTypes;
 import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import javafx.util.Duration;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Required(HPComponent.class)
@@ -30,22 +34,28 @@ public class TurretComponent extends Component {
 
         if (enemyAttackInterval.elapsed(Duration.seconds((Math.random() * 2) + 2))) {
             if (alertedRight || alertedLeft) {
-                basicEnemyAttack(player);
-                enemyAttackInterval.capture();
+                if (checkLineOfSight()) {
+                    basicEnemyAttack(player);
+                    enemyAttackInterval.capture();
+                }
             }
         }
 
-        if (distanceToPlayerX(player) > -alertRange && distanceToPlayerX(player) < 0
-                && distanceToPlayerY(player) > 0 && distanceToPlayerY(player) < alertRange / 1.5
+        if (distanceToPlayerX(player) > -alertRange && distanceToPlayerX(player) < 0) {
+            if (distanceToPlayerY(player) > 0 && distanceToPlayerY(player) < alertRange / 1.5
                 || distanceToPlayerY(player) < 0 && distanceToPlayerY(player) > -alertRange / 1.5) {
-            alertedLeft = true;
+                alertedLeft = true;
+            }
+            else alertedLeft = false;
         }
         else alertedLeft = false;
 
-        if (distanceToPlayerX(player) < alertRange && distanceToPlayerX(player) > 0
-                && distanceToPlayerY(player) > 0 && distanceToPlayerY(player) < alertRange / 1.5
-                || distanceToPlayerY(player) < 0 && distanceToPlayerY(player) > -alertRange / 1.5) {
-            alertedRight = true;
+        if (distanceToPlayerX(player) < alertRange && distanceToPlayerX(player) > 0) {
+            if (distanceToPlayerY(player) > 0 && distanceToPlayerY(player) < alertRange / 1.5
+                || distanceToPlayerY(player) < 0 && distanceToPlayerY(player) > -alertRange / 1.5){
+                alertedRight = true;
+            }
+            else alertedRight = false;
         }
         else alertedRight = false;
     }
@@ -56,6 +66,95 @@ public class TurretComponent extends Component {
 
     public double distanceToPlayerY(Entity player) {
         return player.getPosition().getY() - entity.getPosition().getY();
+    }
+
+    public boolean checkLineOfSight() {
+        Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        Integer alertRange = entity.getProperties().getInt("alertRange");
+        Rectangle2D selection = new Rectangle2D(entity.getX() - alertRange.doubleValue(), entity.getY() - alertRange.doubleValue(), alertRange.doubleValue() * 2 + entity.getWidth(), alertRange.doubleValue() * 2 + entity.getHeight());
+        List<Entity> findWalls = FXGL.getGameWorld().getEntitiesInRange(selection).stream()
+                .filter(e -> e.hasComponent(SideDoorComponent.class)
+                        && !e.getComponent(SideDoorComponent.class).isOpened()
+                        || e.isType(BasicGameTypes.WALL) && e.getWidth() < 64).collect(Collectors.toList());
+
+        List<Entity> findFloors = FXGL.getGameWorld().getEntitiesInRange(selection).stream()
+                .filter(e -> e.isType(BasicGameTypes.WALL) && e.getWidth() >= 64).collect(Collectors.toList());
+
+        if (player.getPosition().getX() - entity.getPosition().getX() < 0) {
+            List<Entity> leftWalls = findWalls.stream().filter(e -> e.getPosition().getX() < entity.getPosition().getX()).collect(Collectors.toList());
+            if (player.getPosition().getY() - entity.getPosition().getY() < 0) {
+                List<Entity> upFloors = findFloors.stream().filter(e -> e.getPosition().getY() > entity.getPosition().getY()).collect(Collectors.toList());
+
+                if (!leftWalls.isEmpty() || !upFloors.isEmpty()) {
+                    List<Entity> remainingWalls = leftWalls.stream().filter(e -> e.getY() < entity.getY()).collect(Collectors.toList());
+                    for (Entity remainingWall : remainingWalls) {
+                        if (entity.getX() > remainingWall.getX() && remainingWall.getX() > player.getX() && player.getY() > remainingWall.getY()) {
+                            return false;
+                        }
+                    }
+                    for (Entity upFloor : upFloors) {
+                        if (entity.getY() > upFloor.getY() && upFloor.getY() > player.getY()) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            else {
+                List<Entity> downFloors = findFloors.stream().filter(e -> e.getPosition().getY() < entity.getPosition().getY()).collect(Collectors.toList());
+
+                if (!leftWalls.isEmpty() || !downFloors.isEmpty()) {
+                    List<Entity> remainingWalls = leftWalls.stream().filter(e -> e.getBottomY() > entity.getY()).collect(Collectors.toList());
+                    for (Entity remainingWall : remainingWalls) {
+                        if (entity.getX() > remainingWall.getX() && remainingWall.getX() > player.getX() && player.getY() > remainingWall.getY()) {
+                            return false;
+                        }
+                    }
+                    for (Entity downFloor : downFloors) {
+                        if (entity.getY() < downFloor.getY() && downFloor.getY() < player.getY()) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            List<Entity> rightWalls = findWalls.stream().filter(e -> e.getPosition().getX() > entity.getPosition().getX()).collect(Collectors.toList());
+            if (player.getPosition().getY() - entity.getPosition().getY() < 0) {
+                List<Entity> upFloors = findFloors.stream().filter(e -> e.getPosition().getY() > entity.getPosition().getY()).collect(Collectors.toList());
+
+                if (!rightWalls.isEmpty() || !upFloors.isEmpty()) {
+                    List<Entity> remainingWalls = rightWalls.stream().filter(e -> e.getY() < entity.getY()).collect(Collectors.toList());
+                    for (Entity remainingWall : remainingWalls) {
+                        if (entity.getX() > remainingWall.getX() && remainingWall.getX() > player.getX() && player.getY() > remainingWall.getY()) {
+                            return false;
+                        }
+                    }
+                    for (Entity upFloor : upFloors) {
+                        if (entity.getY() > upFloor.getY() && upFloor.getY() > player.getY()) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            else {
+                List<Entity> downFloors = findFloors.stream().filter(e -> e.getPosition().getY() < entity.getPosition().getY()).collect(Collectors.toList());
+
+                if (!rightWalls.isEmpty() || !downFloors.isEmpty()) {
+                    List<Entity> remainingWalls = rightWalls.stream().filter(e -> e.getBottomY() > entity.getY()).collect(Collectors.toList());
+                    for (Entity remainingWall : remainingWalls) {
+                        if (entity.getX() > remainingWall.getX() && remainingWall.getX() > player.getX() && player.getY() > remainingWall.getY()) {
+                            return false;
+                        }
+                    }
+                    for (Entity downFloor : downFloors) {
+                        if (entity.getY() < downFloor.getY() && downFloor.getY() < player.getY()) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     public void basicEnemyAttack(Entity player) {
