@@ -6,6 +6,8 @@ import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.physics.PhysicsComponent;
+import com.almasb.fxgl.texture.AnimatedTexture;
+import com.almasb.fxgl.texture.AnimationChannel;
 import com.almasb.fxgl.time.LocalTimer;
 import game.BasicGameTypes;
 import javafx.geometry.Point2D;
@@ -17,6 +19,10 @@ import java.util.stream.Collectors;
 
 @Required(HPComponent.class)
 public class MovingEnemyComponent extends Component {
+
+    private AnimatedTexture texture;
+    private AnimationChannel animIdle, animWalk;
+
     private LocalTimer enemyAttackInterval;
     private HPComponent hp;
     private PhysicsComponent physics;

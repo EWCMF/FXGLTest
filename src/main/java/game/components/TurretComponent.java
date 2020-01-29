@@ -153,13 +153,13 @@ public class TurretComponent extends Component {
                     List<Entity> remainingWalls = rightWalls.stream().filter(e -> e.getBottomY() > entity.getY()).collect(Collectors.toList());
                     for (Entity remainingWall : remainingWalls) {
                         if (entity.getX() > remainingWall.getX() && remainingWall.getX() > player.getX() && player.getY() > remainingWall.getY()) {
-                            System.out.println("RD P W T");
+//                            System.out.println("RD P W T");
                             return false;
                         }
                     }
                     for (Entity downFloor : downFloors) {
                         if (entity.getY() < downFloor.getY() && downFloor.getY() < player.getY()) {
-                            System.out.println("RD P F T");
+//                            System.out.println("RD P F T");
                             return false;
                         }
                     }
