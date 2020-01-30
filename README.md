@@ -23,4 +23,4 @@ I recommend downloading the latest SE JDK from here:
 
 https://www.oracle.com/technetwork/java/javase/downloads/index.html
 
-After installing the jar should run normally.
+After installing, the jar should run normally.
