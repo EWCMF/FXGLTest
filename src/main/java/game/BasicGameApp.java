@@ -58,6 +58,9 @@ public class BasicGameApp extends GameApplication {
 
     public static int enemyDamageModifier = 0;
 
+    public static boolean allWeaponsFromStart = false;
+    public static boolean playerInvincibility = false;
+
     private String startLevel = "level1.tmx";
     private int startBoundX = 32 * 150;
     private int startBoundY = 32 * 70;
@@ -89,7 +92,7 @@ public class BasicGameApp extends GameApplication {
         gameSettings.setWidth(1280);
         gameSettings.setHeight(720);
         gameSettings.setTitle("Contra Knockoff");
-        gameSettings.setVersion("0.3");
+        gameSettings.setVersion("0.7");
         gameSettings.setMenuEnabled(true);
         gameSettings.setSceneFactory(new SceneFactory() {
             @Override

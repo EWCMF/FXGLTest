@@ -44,8 +44,9 @@ public class PlayerComponent extends Component {
 
     private boolean isBeingDamaged = false;
     private boolean dead = false;
-    private boolean testMode = true;
-    private boolean invincible = true;
+
+    private boolean allWeaponsFromStart = BasicGameApp.allWeaponsFromStart;
+    private boolean invincible = BasicGameApp.playerInvincibility;
 
     private boolean holdingMoveDirection = false;
     private boolean knockedBack;
@@ -83,7 +84,7 @@ public class PlayerComponent extends Component {
                 jumps = 2;
         });
 
-        if (testMode) {
+        if (allWeaponsFromStart) {
             addWeaponShotgun();
             addWeaponMachineGun();
             addWeaponRocketLauncher();
@@ -203,11 +204,11 @@ public class PlayerComponent extends Component {
 
         if (currentWeapon < weaponList.size() - 1) {
             currentWeapon++;
-            FXGL.inc("weaponIndicatorPosition", 40);
+            changeIndicatorPosition();
         }
         else {
             currentWeapon = 0;
-            FXGL.set("weaponIndicatorPosition", 13);
+            changeIndicatorPosition();
         }
     }
 
@@ -217,11 +218,28 @@ public class PlayerComponent extends Component {
 
         if (currentWeapon != 0) {
             currentWeapon--;
-            FXGL.inc("weaponIndicatorPosition", -40);
+            changeIndicatorPosition();
         }
         else {
             currentWeapon = weaponList.size() - 1;
-            FXGL.set("weaponIndicatorPosition", 13 + 40 * (weaponList.size() - 1));
+            changeIndicatorPosition();
+        }
+    }
+
+    private void changeIndicatorPosition() {
+        switch (weaponList.get(currentWeapon)) {
+            case "default":
+                FXGL.set("weaponIndicatorPosition", 13);
+                break;
+            case "shotgun":
+                FXGL.set("weaponIndicatorPosition", 53);
+                break;
+            case "machineGun":
+                FXGL.set("weaponIndicatorPosition", 93);
+                break;
+            case "rocketLauncher":
+                FXGL.set("weaponIndicatorPosition", 133);
+                break;
         }
     }
 
