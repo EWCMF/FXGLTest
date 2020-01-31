@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="-1" width="150" height="70" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="185">
+<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="150" height="70" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="185">
  <tileset firstgid="1" name="scifi" tilewidth="32" tileheight="32" tilecount="1760" columns="16">
   <image source="../../../../../../../Downloads/Project assets/scifi.png" width="512" height="3520"/>
  </tileset>
@@ -229,8 +229,6 @@
     <property name="connected" value="1"/>
    </properties>
   </object>
-  <object id="36" type="shotgun" x="352" y="1760" width="64" height="64"/>
-  <object id="37" type="machineGun" x="256" y="1760" width="64" height="64"/>
   <object id="38" type="sideDoor" x="4480" y="64" width="32" height="160">
    <properties>
     <property name="openType" value="auto"/>
