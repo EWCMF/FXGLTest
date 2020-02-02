@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Required(HPComponent.class)
-public class MovingEnemyComponent extends Component {
+public class MovingEnemyComponentElite extends Component {
 
     private AnimatedTexture texture;
     private AnimationChannel animIdle, animWalk;
@@ -32,8 +32,8 @@ public class MovingEnemyComponent extends Component {
     private boolean movingLeft;
     private boolean movingRight;
 
-    public MovingEnemyComponent() {
-        Image image = FXGL.image("testMoveEnemy2.png");
+    public MovingEnemyComponentElite() {
+        Image image = FXGL.image("testMoveEnemy.png");
 
         animIdle = new AnimationChannel(image, 4, 85, 96, Duration.seconds(1), 0, 0);
         animWalk = new AnimationChannel(image, 4, 85, 96, Duration.seconds(1), 1,3);
@@ -188,7 +188,7 @@ public class MovingEnemyComponent extends Component {
     public void basicEnemyAttack(Entity player) {
         Point2D enemyPosition = entity.getBoundingBoxComponent().getCenterWorld().add(0, -12);
         Point2D enemyTarget = player.getBoundingBoxComponent().getCenterWorld().add(0, -12).subtract(entity.getBoundingBoxComponent().getCenterWorld());
-        FXGL.getGameWorld().spawn("enemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));
+        FXGL.getGameWorld().spawn("eliteEnemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));
     }
 
     public void onHit(int damage) {

@@ -283,7 +283,7 @@ public class BasicGameApp extends GameApplication {
     protected void initGame() {
         playerLivesCurrent = playerLives;
         bgm = FXGL.getAssetLoader().loadMusic("normalBGM.mp3");
-        getAudioPlayer().playMusic(bgm);
+        getAudioPlayer().loopMusic(bgm);
         set("isPlayingMusic", true);
 
         getGameWorld().addEntityFactory(new BasicGameFactory());
@@ -408,7 +408,7 @@ public class BasicGameApp extends GameApplication {
             @Override
             protected void onCollisionBegin(Entity bullet, Entity movingEnemy) {
                 bullet.removeFromWorld();
-                movingEnemy.getComponent(MovingEnemyComponent.class).onHit(bullet.getInt("damage"));
+                movingEnemy.getComponent(MovingEnemyComponentElite.class).onHit(bullet.getInt("damage"));
                 movingEnemy.getComponent(FlickerComponent.class).flicker();
             }
         });
@@ -900,7 +900,7 @@ public class BasicGameApp extends GameApplication {
                         setLevel(gets("level"));
                         player.getComponent(PlayerComponent.class).respawn();
                         if (!getb("isBossLevel")) {
-                            getAudioPlayer().playMusic(bgm);
+                            getAudioPlayer().loopMusic(bgm);
                         }
                         runOnce(() -> {
                             allowDeath = true;
