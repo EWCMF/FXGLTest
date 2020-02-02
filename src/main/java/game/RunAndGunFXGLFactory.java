@@ -22,14 +22,13 @@ import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
 import game.components.*;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
-import static game.BasicGameTypes.*;
+import static game.RunAndGunFXGLTypes.*;
 
-public class BasicGameFactory implements EntityFactory {
+public class RunAndGunFXGLFactory implements EntityFactory {
 
     @Spawns("defaultBullet")
     public Entity newDefault(SpawnData data) {
@@ -120,7 +119,7 @@ public class BasicGameFactory implements EntityFactory {
                 .viewWithBBox(new Rectangle(12, 3, Color.RED))
                 .with(new CollidableComponent(true))
                 .with(new ProjectileComponent(data.get("direction"), 300))
-                .with("damage", 1 * BasicGameApp.enemyDamageModifier)
+                .with("damage", 1 * RunAndGunFXGL.enemyDamageModifier)
                 .build();
     }
 
@@ -441,7 +440,7 @@ public class BasicGameFactory implements EntityFactory {
                 .viewWithBBox(new Rectangle(20, 3, Color.DARKVIOLET))
                 .with(new CollidableComponent(true))
                 .with(new ProjectileComponent(data.get("direction"), 700))
-                .with("damage", 3 * BasicGameApp.enemyDamageModifier)
+                .with("damage", 3 * RunAndGunFXGL.enemyDamageModifier)
                 .build();
     }
 
@@ -648,7 +647,7 @@ public class BasicGameFactory implements EntityFactory {
                 .with(new ParticleComponent(emitter))
                 .bbox(new HitBox(BoundingShape.circle(10)))
                 .view(texture("fireballBOHExplosion.png").toAnimatedTexture(3, Duration.seconds(1)).play())
-                .with("damage", 2 * BasicGameApp.enemyDamageModifier)
+                .with("damage", 2 * RunAndGunFXGL.enemyDamageModifier)
                 .with(new BaronOfHellFireball())
                 .build();
     }
@@ -679,7 +678,7 @@ public class BasicGameFactory implements EntityFactory {
                 .from(data)
                 .with(new ParticleComponent(emitter))
                 .view(texture("fireballBOHExplosionPurple2.png").toAnimatedTexture(3, Duration.seconds(1)).play())
-                .with("damage", 3 * BasicGameApp.enemyDamageModifier)
+                .with("damage", 3 * RunAndGunFXGL.enemyDamageModifier)
                 .with(new BaronOfHellFireball())
                 .build();
     }

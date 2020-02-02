@@ -8,8 +8,8 @@ import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
-import game.BasicGameApp;
-import game.BasicGameTypes;
+import game.RunAndGunFXGL;
+import game.RunAndGunFXGLTypes;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
@@ -22,8 +22,8 @@ public class PlayerComponent extends Component {
     private AnimatedTexture texture;
     private AnimationChannel animIdle, animIdleUp, animIdleDown, animWalk, animWalkUp, animWalkDown, animDeath, animDead;
 
-    private double aimUpVectorY = BasicGameApp.aimUpVectorY;
-    private double aimDownVectorY = BasicGameApp.aimDownVectorY;
+    private double aimUpVectorY = RunAndGunFXGL.aimUpVectorY;
+    private double aimDownVectorY = RunAndGunFXGL.aimDownVectorY;
 
     private PhysicsComponent physics;
     private HPComponent hp;
@@ -38,15 +38,15 @@ public class PlayerComponent extends Component {
     private double machineGunCooldown = 0.10;
     private double rocketCooldown = 2;
 
-    private int shotgunAmmo = BasicGameApp.ammoShotgun;
-    private int machineGunAmmo = BasicGameApp.ammoMachineGun;
-    private int rocketAmmo = BasicGameApp.ammoRocket;
+    private int shotgunAmmo = RunAndGunFXGL.ammoShotgun;
+    private int machineGunAmmo = RunAndGunFXGL.ammoMachineGun;
+    private int rocketAmmo = RunAndGunFXGL.ammoRocket;
 
     private boolean isBeingDamaged = false;
     private boolean dead = false;
 
-    private boolean allWeaponsFromStart = BasicGameApp.allWeaponsFromStart;
-    private boolean invincible = BasicGameApp.playerInvincibility;
+    private boolean allWeaponsFromStart = RunAndGunFXGL.allWeaponsFromStart;
+    private boolean invincible = RunAndGunFXGL.playerInvincibility;
 
     private boolean holdingMoveDirection = false;
     private boolean knockedBack;
@@ -134,7 +134,7 @@ public class PlayerComponent extends Component {
             texture.loopAnimationChannel(animDead);
             physics.setVelocityX(0);
             FXGL.runOnce(() -> {
-                FXGL.<BasicGameApp>getAppCast().playerDeath();
+                FXGL.<RunAndGunFXGL>getAppCast().playerDeath();
             }, Duration.seconds(2));
         }
 
@@ -307,7 +307,7 @@ public class PlayerComponent extends Component {
                         SpawnData spawnDataRocket = new SpawnData(aim).put("direction", aim);
                         spawnDataRocket.put("position", position);
                         FXGL.spawn("playerRocket", spawnDataRocket);
-                        Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+                        Entity player = FXGL.getGameWorld().getSingleton(RunAndGunFXGLTypes.PLAYER);
                         FXGL.spawn("playerRocketDummy", new SpawnData(player.getPosition().add(7, 14)).put("width", player.getBoundingBoxComponent().getWidth()).put("height", player.getBoundingBoxComponent().getHeight()));
                         FXGL.runOnce(() -> {
                             canFire = true;
@@ -351,7 +351,7 @@ public class PlayerComponent extends Component {
         if (!FXGL.getb("hasShotgun")) {
             weaponList.add("shotgun");
             FXGL.set("hasShotgun", true);
-            shotgunAmmo = BasicGameApp.ammoShotgun;
+            shotgunAmmo = RunAndGunFXGL.ammoShotgun;
         }
         else
             shotgunAmmo += 10;
@@ -361,7 +361,7 @@ public class PlayerComponent extends Component {
         if (!FXGL.getb("hasMachineGun")) {
             weaponList.add("machineGun");
             FXGL.set("hasMachineGun", true);
-            machineGunAmmo = BasicGameApp.ammoMachineGun;
+            machineGunAmmo = RunAndGunFXGL.ammoMachineGun;
         }
         else
             machineGunAmmo += 100;
@@ -371,7 +371,7 @@ public class PlayerComponent extends Component {
         if (!FXGL.getb("hasRocketLauncher")) {
             weaponList.add("rocketLauncher");
             FXGL.set("hasRocketLauncher", true);
-            rocketAmmo = BasicGameApp.ammoRocket;
+            rocketAmmo = RunAndGunFXGL.ammoRocket;
         }
         else
             rocketAmmo += 5;
@@ -399,9 +399,9 @@ public class PlayerComponent extends Component {
     public void respawn() {
         hp.setValue(hp.getMaxHP());
         dead = false;
-        shotgunAmmo = BasicGameApp.ammoShotgun;
-        machineGunAmmo = BasicGameApp.ammoMachineGun;
-        rocketAmmo = BasicGameApp.ammoRocket;
+        shotgunAmmo = RunAndGunFXGL.ammoShotgun;
+        machineGunAmmo = RunAndGunFXGL.ammoMachineGun;
+        rocketAmmo = RunAndGunFXGL.ammoRocket;
     }
 
     public void restoreAmmo(int amount) {

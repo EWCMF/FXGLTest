@@ -4,7 +4,7 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
-import game.BasicGameTypes;
+import game.RunAndGunFXGLTypes;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
 
@@ -32,7 +32,7 @@ public class ExitSwitchComponent extends Component {
         if (alreadyPressed)
             return;
         texture.playAnimationChannel(animOn);
-        FXGL.getGameWorld().getEntitiesByType(BasicGameTypes.EXIT).get(0).getComponent(ExitDoorComponent.class).openDoor();
+        FXGL.getGameWorld().getEntitiesByType(RunAndGunFXGLTypes.EXIT).get(0).getComponent(ExitDoorComponent.class).openDoor();
         alreadyPressed = true;
     }
 }

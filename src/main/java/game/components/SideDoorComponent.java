@@ -7,7 +7,7 @@ import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
-import game.BasicGameTypes;
+import game.RunAndGunFXGLTypes;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
 
@@ -52,7 +52,7 @@ public class SideDoorComponent extends Component {
         if (!opened && openType.equals("auto") && locked)
             return;
 
-        trigger = FXGL.getGameWorld().getEntitiesByType(BasicGameTypes.SIDEDOORTRIGGER)
+        trigger = FXGL.getGameWorld().getEntitiesByType(RunAndGunFXGLTypes.SIDEDOORTRIGGER)
                 .stream()
                 .filter(e -> e.isColliding(entity))
                 .findAny()
@@ -60,7 +60,7 @@ public class SideDoorComponent extends Component {
 
         List<Entity> actorsOnTrigger = FXGL.getGameWorld().getCollidingEntities(trigger)
                 .stream()
-                .filter(e -> e.isType(BasicGameTypes.PLAYER) || e.isType(BasicGameTypes.MOVINGENEMY) || e.isType(BasicGameTypes.ELITEMOVINGENEMY))
+                .filter(e -> e.isType(RunAndGunFXGLTypes.PLAYER) || e.isType(RunAndGunFXGLTypes.MOVINGENEMY) || e.isType(RunAndGunFXGLTypes.ELITEMOVINGENEMY))
                 .collect(Collectors.toList());
 
         if (openType.equals("auto") && !opened)
@@ -69,7 +69,7 @@ public class SideDoorComponent extends Component {
             closeDoor();
 
         if (openType.equals("key")) {
-            if (actorsOnTrigger.stream().noneMatch(e -> e.isType(BasicGameTypes.PLAYER)))
+            if (actorsOnTrigger.stream().noneMatch(e -> e.isType(RunAndGunFXGLTypes.PLAYER)))
                 return;
 
             switch (entity.getProperties().getString("neededKey")) {

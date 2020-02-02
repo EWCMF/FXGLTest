@@ -11,8 +11,8 @@ import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import game.components.*;
-import game.ui.BasicGameGameMenu;
-import game.ui.BasicGameMainMenu;
+import game.ui.RunAndGunFXGLGameMenu;
+import game.ui.RunAndGunFXGLMainMenu;
 import game.ui.BossHPIndicator;
 import game.ui.HPIndicator;
 import javafx.geometry.Point2D;
@@ -29,10 +29,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
-import static game.BasicGameTypes.*;
+import static game.RunAndGunFXGLTypes.*;
 
 
-public class BasicGameApp extends GameApplication {
+public class RunAndGunFXGL extends GameApplication {
     public static double aimUpVectorY = -150;
     public static double aimDownVectorY = 150;
 
@@ -74,7 +74,7 @@ public class BasicGameApp extends GameApplication {
     private VBox keysBox = new VBox();
     private AnchorPane bossHP = new AnchorPane();
 
-    public static Music music;
+    public static Music BossBGM;
     public static Music bgm;
 
     private Text d;
@@ -97,13 +97,13 @@ public class BasicGameApp extends GameApplication {
         gameSettings.setSceneFactory(new SceneFactory() {
             @Override
             public FXGLMenu newMainMenu() {
-                return new BasicGameMainMenu();
+                return new RunAndGunFXGLMainMenu();
             }
 
             @NotNull
             @Override
             public FXGLMenu newGameMenu() {
-                return new BasicGameGameMenu();
+                return new RunAndGunFXGLGameMenu();
             }
         });
         gameSettings.setDeveloperMenuEnabled(false);
@@ -286,7 +286,7 @@ public class BasicGameApp extends GameApplication {
         getAudioPlayer().loopMusic(bgm);
         set("isPlayingMusic", true);
 
-        getGameWorld().addEntityFactory(new BasicGameFactory());
+        getGameWorld().addEntityFactory(new RunAndGunFXGLFactory());
 
         player = null;
 
@@ -754,14 +754,14 @@ public class BasicGameApp extends GameApplication {
                 getGameWorld().getEntitiesByType(BARONOFHELL).get(0).getComponent(BaronOfHellComponent.class).setActive(true);
                 activateBossHP();
                 getGameWorld().getEntitiesByType(PLAYER).get(0).getComponent(PlayerComponent.class).setPlayerControl(true);
-                music = FXGL.getAssetLoader().loadMusic("bossBGM.mp3");
-                getAudioPlayer().loopMusic(music);
+                BossBGM = FXGL.getAssetLoader().loadMusic("bossBGM.mp3");
+                getAudioPlayer().loopMusic(BossBGM);
                 set("isPlayingMusic", true);
             }, Duration.seconds(5));
         });
     }
 
-    private void sideDoorTrigger(BasicGameTypes enemy) {
+    private void sideDoorTrigger(RunAndGunFXGLTypes enemy) {
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(enemy, SIDEDOORTRIGGER) {
             @Override
             protected void onCollisionBegin(Entity actor, Entity sideDoorTrigger) {
@@ -777,7 +777,7 @@ public class BasicGameApp extends GameApplication {
         });
     }
 
-    private void playerRocketCollision(BasicGameTypes hit) {
+    private void playerRocketCollision(RunAndGunFXGLTypes hit) {
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(ROCKET, hit) {
             @Override
             protected void onCollisionBegin(Entity rocket, Entity hit) {
@@ -880,6 +880,17 @@ public class BasicGameApp extends GameApplication {
         }
     }
 
+    public void stopMusic() {
+        if (getb("isPlayingMusic")) {
+            if (getb("isBossLevel")) {
+                getAudioPlayer().stopMusic(BossBGM);
+            }
+            else {
+                getAudioPlayer().stopMusic(bgm);
+            }
+        }
+    }
+
     public void playerDeath() {
         if (!allowDeath)
             return;
@@ -888,7 +899,7 @@ public class BasicGameApp extends GameApplication {
         FXGL.runOnce(() -> {
             if (getb("isPlayingMusic")) {
                 if (getb("isBossLevel"))
-                    getAudioPlayer().stopMusic(music);
+                    getAudioPlayer().stopMusic(BossBGM);
                 else
                     getAudioPlayer().stopMusic(bgm);
             }

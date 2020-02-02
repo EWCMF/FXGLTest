@@ -2,14 +2,14 @@ package game.components;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.component.Component;
-import game.BasicGameTypes;
+import game.RunAndGunFXGLTypes;
 import javafx.util.Duration;
 
 public class FlickerComponent extends Component {
     private boolean alreadyFlickering;
 
     public void flicker() {
-        if (entity != null && !entity.getType().equals(BasicGameTypes.BARONOFHELL)) {
+        if (entity != null && !entity.getType().equals(RunAndGunFXGLTypes.BARONOFHELL)) {
             if (entity != null && !alreadyFlickering) {
                 alreadyFlickering = true;
                 entity.getViewComponent().setOpacity(0.1);
@@ -36,7 +36,7 @@ public class FlickerComponent extends Component {
                 }, Duration.seconds(1));
             }
         }
-        else if (entity != null && entity.getType().equals(BasicGameTypes.BARONOFHELL)) {
+        else if (entity != null && entity.getType().equals(RunAndGunFXGLTypes.BARONOFHELL)) {
             if (entity != null && !alreadyFlickering) {
                 alreadyFlickering = true;
                 entity.getViewComponent().setOpacity(0.1);

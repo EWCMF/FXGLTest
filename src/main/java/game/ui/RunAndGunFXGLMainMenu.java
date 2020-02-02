@@ -3,7 +3,7 @@ package game.ui;
 import com.almasb.fxgl.app.FXGLMenu;
 import com.almasb.fxgl.app.MenuType;
 import com.almasb.fxgl.dsl.FXGL;
-import game.BasicGameApp;
+import game.RunAndGunFXGL;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.scene.Node;
@@ -14,9 +14,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
-public class BasicGameMainMenu extends FXGLMenu {
+public class RunAndGunFXGLMainMenu extends FXGLMenu {
 
-    public BasicGameMainMenu() {
+    public RunAndGunFXGLMainMenu() {
         super(MenuType.MAIN_MENU);
 
         VBox vBox1 = new VBox();
@@ -43,8 +43,8 @@ public class BasicGameMainMenu extends FXGLMenu {
         // Difficulty menu.
         var easy = new GameMenuButton("Easy", () -> {
             this.fireNewGame();
-            BasicGameApp.enemyDamageModifier = 1;
-            BasicGameApp.allowRespawn = true;
+            RunAndGunFXGL.enemyDamageModifier = 1;
+            RunAndGunFXGL.allowRespawn = true;
             getMenuRoot().getChildren().set(0, vBox1);
         });
 
@@ -53,8 +53,8 @@ public class BasicGameMainMenu extends FXGLMenu {
 
         var normal = new GameMenuButton("Normal", () -> {
             this.fireNewGame();
-            BasicGameApp.enemyDamageModifier = 2;
-            BasicGameApp.allowRespawn = true;
+            RunAndGunFXGL.enemyDamageModifier = 2;
+            RunAndGunFXGL.allowRespawn = true;
             getMenuRoot().getChildren().set(0, vBox1);
         });
 
@@ -63,8 +63,8 @@ public class BasicGameMainMenu extends FXGLMenu {
 
         var hard = new GameMenuButton("Hard", () -> {
             this.fireNewGame();
-            BasicGameApp.enemyDamageModifier = 3;
-            BasicGameApp.allowRespawn = true;
+            RunAndGunFXGL.enemyDamageModifier = 3;
+            RunAndGunFXGL.allowRespawn = true;
             getMenuRoot().getChildren().set(0, vBox1);
         });
 
@@ -73,8 +73,8 @@ public class BasicGameMainMenu extends FXGLMenu {
 
         var lunatic = new GameMenuButton("Lunatic", () -> {
             this.fireNewGame();
-            BasicGameApp.enemyDamageModifier = 4;
-            BasicGameApp.allowRespawn = false;
+            RunAndGunFXGL.enemyDamageModifier = 4;
+            RunAndGunFXGL.allowRespawn = false;
             getMenuRoot().getChildren().set(0, vBox1);
         });
 

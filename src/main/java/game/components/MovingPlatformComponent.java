@@ -4,7 +4,7 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.physics.PhysicsComponent;
-import game.BasicGameTypes;
+import game.RunAndGunFXGLTypes;
 import javafx.util.Duration;
 
 
@@ -29,7 +29,7 @@ public class MovingPlatformComponent extends Component {
     @Override
     public void onUpdate(double tpf) {
         // Needed for rebound
-        player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        player = FXGL.getGameWorld().getSingleton(RunAndGunFXGLTypes.PLAYER);
         playerPlatformDiffLeftSideX = entity.getBoundingBoxComponent().getMinXWorld() - player.getBoundingBoxComponent().getMaxXWorld();
         playerPlatformDiffRightSideX = player.getBoundingBoxComponent().getMinXWorld() - entity.getBoundingBoxComponent().getMaxXWorld();
         playerPlatformDiffY = entity.getBoundingBoxComponent().getMinYWorld() - player.getBoundingBoxComponent().getMaxYWorld();

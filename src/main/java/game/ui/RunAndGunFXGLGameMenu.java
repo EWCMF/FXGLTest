@@ -3,6 +3,7 @@ package game.ui;
 import com.almasb.fxgl.app.FXGLMenu;
 import com.almasb.fxgl.app.MenuType;
 import com.almasb.fxgl.dsl.FXGL;
+import game.RunAndGunFXGL;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.scene.Node;
@@ -12,19 +13,29 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
-public class BasicGameGameMenu extends FXGLMenu {
+public class RunAndGunFXGLGameMenu extends FXGLMenu {
 
-    public BasicGameGameMenu() {
+    public RunAndGunFXGLGameMenu() {
         super(MenuType.GAME_MENU);
 
-        var mainMenu = new GameMenuButton("Return to main menu", this::fireExitToMainMenu);
-        mainMenu.setTranslateX(FXGL.getAppWidth()/2 - 100);
-        mainMenu.setTranslateY(FXGL.getAppHeight()/2 - 20);
+        var mainMenu = new GameMenuButton("Return to main menu", () ->
+        {
+            FXGL.getDisplay().showConfirmationBox("Are you sure?", yes -> {
+                if (yes) {
+                    FXGL.getGameController().gotoMainMenu();
+                    FXGL.<RunAndGunFXGL>getAppCast().stopMusic();
+                }
+            });
+
+        });
+
+        mainMenu.setTranslateX(FXGL.getAppWidth() / 2 - 100);
+        mainMenu.setTranslateY(FXGL.getAppHeight() / 2 - 20);
 
         var stackP = new StackPane();
 
-        stackP.setTranslateX(FXGL.getAppWidth()/2 - 100);
-        stackP.setTranslateY(FXGL.getAppHeight()/2 - 100);
+        stackP.setTranslateX(FXGL.getAppWidth() / 2 - 100);
+        stackP.setTranslateY(FXGL.getAppHeight() / 2 - 100);
 
         var textRect = new Rectangle(200, 40);
         var text = FXGL.getUIFactory().newText("Game Paused", Color.WHITE, 24);

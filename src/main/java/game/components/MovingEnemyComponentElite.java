@@ -9,7 +9,7 @@ import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
 import com.almasb.fxgl.time.LocalTimer;
-import game.BasicGameTypes;
+import game.RunAndGunFXGLTypes;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
@@ -51,7 +51,7 @@ public class MovingEnemyComponentElite extends Component {
 
     @Override
     public void onUpdate(double tpf) {
-        Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        Entity player = FXGL.getGameWorld().getSingleton(RunAndGunFXGLTypes.PLAYER);
         double distance = player.getPosition().getX() - entity.getPosition().getX();
 
         if (enemyAttackInterval.elapsed(Duration.seconds((Math.random() * 2) + 2))) {
@@ -78,14 +78,14 @@ public class MovingEnemyComponentElite extends Component {
             }
         }
 
-        Rectangle2D checkPitLSelection = new Rectangle2D(entity.getX() - 20, entity.getY() + entity.getHeight(), 10, 10);
-        List<Entity> checkPitL = FXGL.getGameWorld().getEntitiesInRange(checkPitLSelection).stream().filter(e -> !e.isType(BasicGameTypes.MOVINGSTOP)).collect(Collectors.toList());
+        Rectangle2D checkPitLSelection = new Rectangle2D(entity.getX() - 32, entity.getY() + entity.getHeight(), 16, 32);
+        List<Entity> checkPitL = FXGL.getGameWorld().getEntitiesInRange(checkPitLSelection).stream().filter(e -> !e.isType(RunAndGunFXGLTypes.MOVINGSTOP) && !e.isType(RunAndGunFXGLTypes.TURRET)).collect(Collectors.toList());
         nearbyPitL = checkPitL.isEmpty();
         if (nearbyPitL && !movingRight)
             stop();
 
-        Rectangle2D checkPitRSelection = new Rectangle2D(entity.getX() + entity.getWidth() + 10, entity.getY() + entity.getHeight(), 10, 10);
-        List<Entity> checkPitR = FXGL.getGameWorld().getEntitiesInRange(checkPitRSelection);
+        Rectangle2D checkPitRSelection = new Rectangle2D(entity.getX() + entity.getWidth() + 16, entity.getY() + entity.getHeight(), 16, 32);
+        List<Entity> checkPitR = FXGL.getGameWorld().getEntitiesInRange(checkPitRSelection).stream().filter(e -> !e.isType(RunAndGunFXGLTypes.MOVINGSTOP) && !e.isType(RunAndGunFXGLTypes.TURRET)).collect(Collectors.toList());
         nearbyPitR = checkPitR.isEmpty();
         if (nearbyPitR && !movingLeft)
             stop();
@@ -100,16 +100,16 @@ public class MovingEnemyComponentElite extends Component {
     }
 
     public boolean checkLineOfSight() {
-        Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        Entity player = FXGL.getGameWorld().getSingleton(RunAndGunFXGLTypes.PLAYER);
         Integer alertRange = entity.getProperties().getInt("alertRange");
         Rectangle2D selection = new Rectangle2D(entity.getX() - alertRange.doubleValue(), entity.getY() - alertRange.doubleValue(), alertRange.doubleValue() * 2 + entity.getWidth(), alertRange.doubleValue() * 2 + entity.getHeight());
         List<Entity> findWalls = FXGL.getGameWorld().getEntitiesInRange(selection).stream()
                 .filter(e -> e.hasComponent(SideDoorComponent.class)
                         && !e.getComponent(SideDoorComponent.class).isOpened()
-                        || e.isType(BasicGameTypes.WALL) && e.getWidth() < 64).collect(Collectors.toList());
+                        || e.isType(RunAndGunFXGLTypes.WALL) && e.getWidth() < 64).collect(Collectors.toList());
 
         List<Entity> findFloors = FXGL.getGameWorld().getEntitiesInRange(selection).stream()
-                .filter(e -> e.isType(BasicGameTypes.WALL) && e.getWidth() > 64).collect(Collectors.toList());
+                .filter(e -> e.isType(RunAndGunFXGLTypes.WALL) && e.getWidth() > 64).collect(Collectors.toList());
 
         if (!findWalls.isEmpty() || !findFloors.isEmpty()) {
             for (Entity findWall : findWalls) {
@@ -141,9 +141,9 @@ public class MovingEnemyComponentElite extends Component {
                 .stream()
                 .anyMatch(e -> e.hasComponent(SideDoorComponent.class)
                         && !e.getComponent(SideDoorComponent.class).isOpened()
-                        || e.isType(BasicGameTypes.WALL)
-                        || e.isType(BasicGameTypes.MOVINGENEMY)
-                        || e.isType(BasicGameTypes.ELITEMOVINGENEMY));
+                        || e.isType(RunAndGunFXGLTypes.WALL)
+                        || e.isType(RunAndGunFXGLTypes.MOVINGENEMY)
+                        || e.isType(RunAndGunFXGLTypes.ELITEMOVINGENEMY));
     }
 
     public boolean stopCheckRight() {
@@ -154,9 +154,9 @@ public class MovingEnemyComponentElite extends Component {
                 .stream()
                 .anyMatch(e -> e.hasComponent(SideDoorComponent.class)
                         && !e.getComponent(SideDoorComponent.class).isOpened()
-                        || e.isType(BasicGameTypes.WALL)
-                        || e.isType(BasicGameTypes.MOVINGENEMY)
-                        || e.isType(BasicGameTypes.ELITEMOVINGENEMY));
+                        || e.isType(RunAndGunFXGLTypes.WALL)
+                        || e.isType(RunAndGunFXGLTypes.MOVINGENEMY)
+                        || e.isType(RunAndGunFXGLTypes.ELITEMOVINGENEMY));
     }
 
     public void stop() {

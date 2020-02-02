@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>game</groupId>
-    <artifactId>ContraKnockoff</artifactId>
-    <version>0.7</version>
+    <artifactId>RunAndGunFXGL</artifactId>
+    <version>1.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -58,7 +58,7 @@
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>game.BasicGameApp</mainClass>
+                                    <mainClass>game.RunAndGunFXGL</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

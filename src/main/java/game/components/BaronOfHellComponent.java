@@ -8,8 +8,8 @@ import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
 import com.almasb.fxgl.time.LocalTimer;
-import game.BasicGameApp;
-import game.BasicGameTypes;
+import game.RunAndGunFXGL;
+import game.RunAndGunFXGLTypes;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
@@ -17,8 +17,8 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 
 import static com.almasb.fxgl.dsl.FXGL.getGameWorld;
-import static game.BasicGameTypes.*;
-import static game.BasicGameTypes.NORMALBOHEXPLOSION;
+import static game.RunAndGunFXGLTypes.*;
+import static game.RunAndGunFXGLTypes.NORMALBOHEXPLOSION;
 
 public class BaronOfHellComponent extends Component {
     private LocalTimer enemyAttackInterval;
@@ -71,7 +71,7 @@ public class BaronOfHellComponent extends Component {
 
     @Override
     public void onUpdate(double tpf) {
-        if (FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER).getComponent(PlayerComponent.class).isDead()) {
+        if (FXGL.getGameWorld().getSingleton(RunAndGunFXGLTypes.PLAYER).getComponent(PlayerComponent.class).isDead()) {
             FXGL.runOnce(() -> {
                 if (!getGameWorld().getEntitiesByType(PURPLEBOH).isEmpty()) {
                     for (int i = 0; i < getGameWorld().getEntitiesByType(PURPLEBOH).size(); i++) {
@@ -214,7 +214,7 @@ public class BaronOfHellComponent extends Component {
             FXGL.play("enemyAction.wav");
 
         enemyAttackInterval.capture();
-        player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        player = FXGL.getGameWorld().getSingleton(RunAndGunFXGLTypes.PLAYER);
         texture.playAnimationChannel(animAtk);
         FXGL.runOnce(() -> {
             FXGL.play("fireballFire.wav");
@@ -234,7 +234,7 @@ public class BaronOfHellComponent extends Component {
 
         purpleOnce = true;
         enemyAttackInterval.capture();
-        player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        player = FXGL.getGameWorld().getSingleton(RunAndGunFXGLTypes.PLAYER);
         texture.playAnimationChannel(animAtk);
         Point2D enemyPosition = entity.getBoundingBoxComponent().getCenterWorld();
         Point2D enemyTarget = player.getBoundingBoxComponent().getCenterWorld().add(-50, -110).subtract(entity.getBoundingBoxComponent().getCenterWorld());
@@ -250,10 +250,10 @@ public class BaronOfHellComponent extends Component {
 
         FXGL.play("enemyPunch.wav");
         texture.playAnimationChannel(animAtk);
-        player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        player = FXGL.getGameWorld().getSingleton(RunAndGunFXGLTypes.PLAYER);
         player.getComponent(PhysicsComponent.class).setLinearVelocity(-1000, -200);
         player.getComponent(PlayerComponent.class).setKnockedBack(true);
-        player.getComponent(PlayerComponent.class).onHit(3 * BasicGameApp.enemyDamageModifier, new Point2D(-1, 0));
+        player.getComponent(PlayerComponent.class).onHit(3 * RunAndGunFXGL.enemyDamageModifier, new Point2D(-1, 0));
         FXGL.runOnce(() -> {
             player.getComponent(PlayerComponent.class).setKnockedBack(false);
         }, Duration.seconds(1.5));
@@ -266,7 +266,7 @@ public class BaronOfHellComponent extends Component {
         triples++;
         tripleOnce = true;
         enemyAttackInterval.capture();
-        player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        player = FXGL.getGameWorld().getSingleton(RunAndGunFXGLTypes.PLAYER);
         texture.playAnimationChannel(animAtk);
         Point2D enemyPosition = entity.getBoundingBoxComponent().getCenterWorld();
         Point2D enemyTarget = player.getBoundingBoxComponent().getCenterWorld().add(-50, -30).subtract(entity.getBoundingBoxComponent().getCenterWorld());
@@ -291,7 +291,7 @@ public class BaronOfHellComponent extends Component {
         hp.setValue(hp.getValue() - damage);
 
         if (hp.getValue() <= 0 && !dead) {
-            FXGL.getAudioPlayer().stopMusic(BasicGameApp.music);
+            FXGL.getAudioPlayer().stopMusic(RunAndGunFXGL.BossBGM);
             FXGL.play("enemyPain.wav");
             dead = true;
             physics.setVelocityX(0);

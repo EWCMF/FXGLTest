@@ -6,7 +6,7 @@ import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.time.LocalTimer;
-import game.BasicGameTypes;
+import game.RunAndGunFXGLTypes;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.util.Duration;
@@ -29,7 +29,7 @@ public class TurretComponent extends Component {
 
     @Override
     public void onUpdate(double tpf) {
-        Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        Entity player = FXGL.getGameWorld().getSingleton(RunAndGunFXGLTypes.PLAYER);
         int alertRange = entity.getInt("alertRange");
 
         if (enemyAttackInterval.elapsed(Duration.seconds((Math.random() * 2) + 2))) {
@@ -69,16 +69,16 @@ public class TurretComponent extends Component {
     }
 
     public boolean checkLineOfSight() {
-        Entity player = FXGL.getGameWorld().getSingleton(BasicGameTypes.PLAYER);
+        Entity player = FXGL.getGameWorld().getSingleton(RunAndGunFXGLTypes.PLAYER);
         Integer alertRange = entity.getProperties().getInt("alertRange");
         Rectangle2D selection = new Rectangle2D(entity.getX() - alertRange.doubleValue(), entity.getY() - alertRange.doubleValue(), alertRange.doubleValue() * 2 + entity.getWidth(), alertRange.doubleValue() * 2 + entity.getHeight());
         List<Entity> findWalls = FXGL.getGameWorld().getEntitiesInRange(selection).stream()
                 .filter(e -> e.hasComponent(SideDoorComponent.class)
                         && !e.getComponent(SideDoorComponent.class).isOpened()
-                        || e.isType(BasicGameTypes.WALL) && e.getWidth() < 64).collect(Collectors.toList());
+                        || e.isType(RunAndGunFXGLTypes.WALL) && e.getWidth() < 64).collect(Collectors.toList());
 
         List<Entity> findFloors = FXGL.getGameWorld().getEntitiesInRange(selection).stream()
-                .filter(e -> e.isType(BasicGameTypes.WALL) && e.getWidth() >= 64).collect(Collectors.toList());
+                .filter(e -> e.isType(RunAndGunFXGLTypes.WALL) && e.getWidth() >= 64).collect(Collectors.toList());
 
         if (player.getPosition().getX() - entity.getPosition().getX() < 0) {
             List<Entity> leftWalls = findWalls.stream().filter(e -> e.getPosition().getX() < entity.getPosition().getX()).collect(Collectors.toList());
@@ -172,7 +172,7 @@ public class TurretComponent extends Component {
     public void basicEnemyAttack(Entity player) {
         Point2D enemyPosition = entity.getBoundingBoxComponent().getCenterWorld();
         Point2D enemyTarget =  player.getBoundingBoxComponent().getCenterWorld().add(0, -12).subtract(entity.getBoundingBoxComponent().getCenterWorld());
-        if (entity.isType(BasicGameTypes.TURRET))
+        if (entity.isType(RunAndGunFXGLTypes.TURRET))
             FXGL.getGameWorld().spawn("enemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));
         else
             FXGL.getGameWorld().spawn("eliteEnemyBullet", new SpawnData(enemyPosition).put("direction", enemyTarget));

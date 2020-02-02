@@ -1,7 +1,7 @@
 package game.ui;
 
 import com.almasb.fxgl.animation.Interpolators;
-import game.BasicGameApp;
+import game.RunAndGunFXGL;
 import game.components.HPComponent;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -15,8 +15,8 @@ import javafx.util.Duration;
 
 public class HPIndicator extends AnchorPane {
     private final int length = 300;
-    private final int nodeX = BasicGameApp.hpInX;
-    private final int nodeY = BasicGameApp.hpInY;
+    private final int nodeX = RunAndGunFXGL.hpInX;
+    private final int nodeY = RunAndGunFXGL.hpInY;
 
     private HPComponent playerHP;
 
