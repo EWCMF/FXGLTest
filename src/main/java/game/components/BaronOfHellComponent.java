@@ -15,6 +15,7 @@ import javafx.scene.image.Image;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.almasb.fxgl.dsl.FXGL.getGameWorld;
 import static game.RunAndGunFXGLTypes.*;
@@ -35,7 +36,7 @@ public class BaronOfHellComponent extends Component {
     private boolean purpleOnce = false;
     private boolean tripleOnce = false;
     private int triples = 0;
-    private int frenzyCooldown = 2;
+    private double frenzyCooldown = 2;
     private boolean dead = false;
     private int walkLeftLimit = 0;
 
@@ -100,11 +101,24 @@ public class BaronOfHellComponent extends Component {
         if (!active)
             return;
 
-        if (dead)
+        if (dead) {
+            List<Entity> fireballs = FXGL.getGameWorld().getEntitiesFiltered(
+                    e -> e.isType(NORMALBOH) ||
+                            e.isType(NORMALBOHEXPLOSION) ||
+                            e.isType(PURPLEBOH) ||
+                            e.isType(PURPLEBOHEXPLOSION));
+            if (!fireballs.isEmpty()) {
+                fireballs.forEach(Entity::removeFromWorld);
+            }
             return;
+        }
 
         if (hp.getValue() <= hp.getMaxHP() * 0.6) {
             frenzyCooldown = -1;
+        }
+
+        if (hp.getValue() <= hp.getMaxHP() * 0.3) {
+            frenzyCooldown = -1.15;
         }
 
 
@@ -208,9 +222,7 @@ public class BaronOfHellComponent extends Component {
         if (dead)
             return;
 
-
-
-        if (Math.random() < 0.1)
+        if (Math.random() < 0.2)
             FXGL.play("enemyAction.wav");
 
         enemyAttackInterval.capture();

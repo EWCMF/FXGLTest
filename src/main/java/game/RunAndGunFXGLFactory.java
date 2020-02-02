@@ -169,6 +169,10 @@ public class RunAndGunFXGLFactory implements EntityFactory {
 
     @Spawns("sideDoor")
     public Entity newSideDoor(SpawnData data) {
+        PhysicsComponent physicsComponent = new PhysicsComponent();
+        physicsComponent.setBodyType(BodyType.STATIC);
+        physicsComponent.setFixtureDef(new FixtureDef().friction(0));
+
         String neededKey = "";
         if (data.hasKey("neededKey"))
             neededKey = data.get("neededKey");
@@ -177,7 +181,7 @@ public class RunAndGunFXGLFactory implements EntityFactory {
                 .bbox(new HitBox(BoundingShape.box(data.<Integer>get("width"), data.<Integer>get("height"))))
                 .with(new CollidableComponent(true))
                 .from(data)
-                .with(new PhysicsComponent())
+                .with(physicsComponent)
                 .with(new SideDoorComponent())
                 .with("startOpened", data.get("startOpened"))
                 .with("openType", data.get("openType"))
@@ -614,7 +618,7 @@ public class RunAndGunFXGLFactory implements EntityFactory {
                 .bbox(new HitBox("headBOH", hitboxOffsetHead, BoundingShape.box(95, 90)))
                 .with(physicsComponent)
                 .collidable()
-                .with(new HPComponent(500))
+                .with(new HPComponent(600))
                 .with(new FlickerComponent())
                 .with(new BaronOfHellComponent())
                 .build();
@@ -658,7 +662,7 @@ public class RunAndGunFXGLFactory implements EntityFactory {
                 .type(PURPLEBOH)
                 .from(data)
                 .view(texture("fireballBOHPurple2.png").toAnimatedTexture(6, Duration.seconds(0.2)).loop())
-                .bbox(new HitBox(new Point2D(300, -5), BoundingShape.circle(55)))
+                .bbox(new HitBox(new Point2D(220, -5), BoundingShape.circle(35)))
                 .collidable()
                 .with(new ProjectileComponent(data.get("direction"), 720))
                 .build();

@@ -33,6 +33,7 @@ public class PlayerExplosionComponent extends Component {
         List<Entity> affected = FXGL.getGameWorld().getEntitiesInRange(range).stream()
                 .filter(e -> e.hasComponent(PlayerComponent.class)
                         || e.hasComponent(MovingEnemyComponent.class)
+                        || e.hasComponent(MovingEnemyComponentElite.class)
                         || e.hasComponent(TurretComponent.class)
                         || e.hasComponent(BreakableWallComponent.class)
                         || e.hasComponent(BaronOfHellComponent.class))
@@ -93,6 +94,14 @@ public class PlayerExplosionComponent extends Component {
                 else
                     value.getComponent(PhysicsComponent.class).setLinearVelocity(-200, -200);
             }
+            if (value.hasComponent(MovingEnemyComponentElite.class)) {
+                value.getComponent(MovingEnemyComponentElite.class).onHit(damage);
+                value.getComponent(FlickerComponent.class).flicker();
+                if (value.getScaleX() == -1)
+                    value.getComponent(PhysicsComponent.class).setLinearVelocity(200, -200);
+                else
+                    value.getComponent(PhysicsComponent.class).setLinearVelocity(-200, -200);
+            }
             if (value.hasComponent(TurretComponent.class)) {
                 value.getComponent(TurretComponent.class).onHit(damage);
                 value.getComponent(FlickerComponent.class).flicker();
@@ -101,7 +110,7 @@ public class PlayerExplosionComponent extends Component {
                 value.getComponent(BreakableWallComponent.class).onHit(damage);
             }
             if (value.hasComponent(BaronOfHellComponent.class)) {
-                value.getComponent(BaronOfHellComponent.class).onHit(20);
+                value.getComponent(BaronOfHellComponent.class).onHit(30);
             }
         }
     }

@@ -111,11 +111,25 @@ public class MovingEnemyComponentElite extends Component {
         List<Entity> findFloors = FXGL.getGameWorld().getEntitiesInRange(selection).stream()
                 .filter(e -> e.isType(RunAndGunFXGLTypes.WALL) && e.getWidth() > 64).collect(Collectors.toList());
 
-        if (!findWalls.isEmpty() || !findFloors.isEmpty()) {
-            for (Entity findWall : findWalls) {
+        List<Entity> findWallsFilterLeftRight;
+        if (entity.getX() < player.getX())
+            findWallsFilterLeftRight = findWalls.stream().filter(e -> e.getX() < player.getX() && e.getX() > entity.getX()).collect(Collectors.toList());
+        else
+            findWallsFilterLeftRight = findWalls.stream().filter(e -> e.getX() > player.getX() && e.getX() < entity.getX()).collect(Collectors.toList());
+
+        List<Entity> findWallsFilterUpDown;
+        List<Entity> findFloorsFilterUpDown;
+        if (entity.getBottomY() >= player.getBottomY()) {
+            findWallsFilterUpDown = findWallsFilterLeftRight.stream().filter(e -> e.getY() <= entity.getY() && e.getBottomY() > player.getY()).collect(Collectors.toList());
+        }
+        else {
+            findWallsFilterUpDown = findWallsFilterLeftRight.stream().filter(e -> e.getBottomY() >= entity.getY() && e.getY() < player.getY()).collect(Collectors.toList());
+        }
+
+        if (!findWallsFilterUpDown.isEmpty() || !findFloors.isEmpty()) {
+            for (Entity findWall : findWallsFilterUpDown) {
                 if (entity.getX() > findWall.getX() && findWall.getX() > player.getX()) {
-                    if (entity.getY() >= findWall.getBottomY() && player.getY() - entity.getY() < 0)
-                        return false;
+                    return false;
                 }
                 if (entity.getX() < findWall.getX() && findWall.getX() < player.getX()) {
                     return false;

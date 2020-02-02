@@ -91,8 +91,8 @@ public class RunAndGunFXGL extends GameApplication {
     protected void initSettings(GameSettings gameSettings) {
         gameSettings.setWidth(1280);
         gameSettings.setHeight(720);
-        gameSettings.setTitle("Contra Knockoff");
-        gameSettings.setVersion("0.7");
+        gameSettings.setTitle("Run And Gun FXGL");
+        gameSettings.setVersion("1.0");
         gameSettings.setMenuEnabled(true);
         gameSettings.setSceneFactory(new SceneFactory() {
             @Override
@@ -717,7 +717,7 @@ public class RunAndGunFXGL extends GameApplication {
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(PURPLEBOH, WALL) {
             @Override
             protected void onCollisionBegin(Entity purpleBOH, Entity wall) {
-                getGameWorld().spawn("normalBOHExplosionPurple", new SpawnData(purpleBOH.getPosition().add(-360, -80)));
+                getGameWorld().spawn("normalBOHExplosionPurple", new SpawnData(purpleBOH.getPosition().add(-230, -80)));
                 purpleBOH.removeFromWorld();
             }
         });
@@ -725,7 +725,7 @@ public class RunAndGunFXGL extends GameApplication {
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(PURPLEBOH, SIDEDOOR) {
             @Override
             protected void onCollisionBegin(Entity purpleBOH, Entity wall) {
-                getGameWorld().spawn("normalBOHExplosionPurple", new SpawnData(purpleBOH.getPosition().add(-360, -80)));
+                getGameWorld().spawn("normalBOHExplosionPurple", new SpawnData(purpleBOH.getPosition().add(-230, -80)));
                 purpleBOH.removeFromWorld();
             }
         });
@@ -733,7 +733,7 @@ public class RunAndGunFXGL extends GameApplication {
         getPhysicsWorld().addCollisionHandler(new CollisionHandler(PURPLEBOH, PLAYER) {
             @Override
             protected void onCollisionBegin(Entity purpleBOH, Entity wall) {
-                getGameWorld().spawn("normalBOHExplosionPurple", new SpawnData(purpleBOH.getPosition().add(-360, -80)));
+                getGameWorld().spawn("normalBOHExplosionPurple", new SpawnData(purpleBOH.getPosition().add(-230, -80)));
                 purpleBOH.removeFromWorld();
             }
         });

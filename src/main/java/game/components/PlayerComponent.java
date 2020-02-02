@@ -8,11 +8,13 @@ import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
+import com.almasb.fxgl.time.LocalTimer;
 import game.RunAndGunFXGL;
 import game.RunAndGunFXGLTypes;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -44,6 +46,7 @@ public class PlayerComponent extends Component {
 
     private boolean isBeingDamaged = false;
     private boolean dead = false;
+    private LocalTimer deathFailSafe;
 
     private boolean allWeaponsFromStart = RunAndGunFXGL.allWeaponsFromStart;
     private boolean invincible = RunAndGunFXGL.playerInvincibility;
@@ -128,6 +131,9 @@ public class PlayerComponent extends Component {
 
         if (jumps == -1) {
             texture.loopAnimationChannel(animDeath);
+            if (deathFailSafe.elapsed(Duration.seconds(8))) {
+                FXGL.<RunAndGunFXGL>getAppCast().playerDeath();
+            }
         }
 
         if (jumps == 2 && dead) {
@@ -334,6 +340,8 @@ public class PlayerComponent extends Component {
 
         if (hp.getValue() <= 0 && !dead) {
             FXGL.play("aah.wav");
+            deathFailSafe = FXGL.newLocalTimer();
+            deathFailSafe.capture();
             dead = true;
             jumps = -1;
             if (direction.getX() <= 0) {
