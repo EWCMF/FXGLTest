@@ -1,4 +1,4 @@
-# FXGLTest
+# RunAndGunFXGL
 
 A Run and gun game like Contra made in FXGL but with gameplay concepts inspired by Doom.
 
