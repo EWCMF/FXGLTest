@@ -61,7 +61,7 @@ public class RunAndGunFXGL extends GameApplication {
     public static boolean allWeaponsFromStart = false;
     public static boolean playerInvincibility = false;
 
-    private String startLevel = "level4boss.tmx";
+    private String startLevel = "level1.tmx";
     private int startBoundX = 32 * 150;
     private int startBoundY = 32 * 70;
 
