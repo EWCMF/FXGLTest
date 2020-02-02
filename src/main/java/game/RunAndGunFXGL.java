@@ -68,9 +68,6 @@ public class RunAndGunFXGL extends GameApplication {
     private boolean allowPass = false;
     private boolean onSwitch = false;
 
-    private String cameraPosX = "";
-    private String cameraPosY = "";
-
     private VBox keysBox = new VBox();
     private AnchorPane bossHP = new AnchorPane();
 
@@ -208,34 +205,6 @@ public class RunAndGunFXGL extends GameApplication {
                 }
             }
         }, MouseButton.PRIMARY);
-
-        input.addAction(new UserAction("Camera left") {
-            @Override
-            protected void onActionBegin() {
-                cameraPosX = "left";
-            }
-        }, KeyCode.J);
-
-        input.addAction(new UserAction("Camera down") {
-            @Override
-            protected void onActionBegin() {
-                cameraPosY = "down";
-            }
-        }, KeyCode.K);
-
-        input.addAction(new UserAction("Camera right") {
-            @Override
-            protected void onActionBegin() {
-                cameraPosX = "right";
-            }
-        }, KeyCode.L);
-
-        input.addAction(new UserAction("Camera up") {
-            @Override
-            protected void onActionBegin() {
-                cameraPosY = "up";
-            }
-        }, KeyCode.I);
     }
 
     private void FiringPosition(double mouseY, Point2D gunMiddle, Point2D gunUp, Point2D gunDown) {
@@ -795,11 +764,6 @@ public class RunAndGunFXGL extends GameApplication {
             player.getComponent(PlayerComponent.class).setHP(0);
             playerDeath();
         }
-
-        if (cameraPosX.equals("left"))
-            getGameScene().getViewport().setX(player.getPosition().getX() - 900);
-        if (cameraPosY.equals("down"))
-            getGameScene().getViewport().setY(player.getPosition().getY() - 200);
     }
 
     protected void setLevel(String level) {
