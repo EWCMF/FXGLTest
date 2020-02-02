@@ -29,3 +29,12 @@ I recommend downloading the latest SE JDK from here:
 https://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 After installing, the jar should run normally.
+
+
+## Assets
+
+Sci-fi tileset and teleporter from: OpenGameArt.org
+Sprites from: Contra 3: The Alien Wars, Doom, Duke Nukem 3D
+Sounds from: Doom, Half-Life 1, Half-Life 2, Space Harrier
+Stage music from: Deus Ex
+Boss music by Nile
